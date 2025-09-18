@@ -1,0 +1,11 @@
+FRB_H15 Dictionary
+
+ Federal funds effective rate
+                                                                                                    
+RIFSPFF_N.M: Federal funds effective
+RIFLGFCM03_N.M: Market yield on U.S. Treasury securities at 3-month constant maturity, quoted on investment basis
+RIFLGFCY02_N.M: Market yield on U.S. Treasury securities at 2-year constant maturity, quoted on investment basis
+RIFLGFCY10_N.M: Market yield on U.S. Treasury securities at 10-year constant maturity, quoted on investment basis
+RIFLGFCY10_XII_N.M: Market yield on U.S. Treasury securities at 10-year constant maturity, quoted on investment basis, inflation-indexed
+RIFLGFCY30_XII_N.M: Market yield on U.S. Treasury securities at 30-year constant maturity, quoted on investment basis, inflation-indexed
+RIFLGFL_XII_N.M: Treasury long-term average (over 10 years)

@@ -1,0 +1,769 @@
+---
+editor: source
+execute: 
+  echo: false
+
+format:
+  pdf:
+    link-citations: true
+    toc: true
+    toc-depth: 2
+    toc-title: "Table of Contents"
+    number-sections: true
+    mainfont: FreeSerif
+    linestretch: 2
+    indent: true
+    geometry: 
+      - margin = 1in
+
+
+title: "Mapping the United States through TDA"
+subtitle: Instructor - Rubana Syed, ECON 111-800
+author: 
+  -  Ryan Johnson
+date: 2024-12-11 (Revised Jun - Spet 2025)
+
+bibliography: references.bib
+---
+
+\newpage
+# Introduction[^supplements]
+
+Since the late 19th Century, statistical techniques have been applied to the field of Economics. Common methodologies include generalized linear models or time series analysis. Although technology has advanced we still use these traditional methods but increasingly, new methods are being tested and developed.
+
+The goal of this paper is examine the macroeconomic landscape of the United States of America (US) through a lens of Topological Data Analysis (TDA). Specifically, we are going to apply a TDA algorithm called BallMapper (TDABM) developed by Pawel Dlotko. This new algorithm simplifies traditional TDA methods by reducing the need for the user to pass data through multiple functions. Dlotoko demonstrates that, mathematically, TDABM produces a near similar to that of traditional TDA methods for certain dimensions via a fuctor map [@dlotko2019ballmapper]. Thus, one benefit of TDABM compared to the traditional methods is, for those who have the tools and introductory understanding in Topology or TDA, TDABM could be a good entry point to the field of TDA.
+
+What follows below is primarily a proof-of-concept for TDA BallMapper and closely follows other papers that have applied TDABM. We will begin with a general overview of TDABM, current published literature, and useful concepts to know about TDABM. We then will describe out data and the reasoning behind their selection for analysis. Our [Methodology](#sec-methodology) and [Results](#sec-results) will touch on more mathematical concepts of TDABM and a couple of findings, respectively.
+
+Our hope here is for the reader to walk away understanding the general motivation behind TDA BallMapper, how it differs from other common statistical methods, and how methods such as TDA are additive to our current body of mathematical tools.
+
+[^supplements]: Supplementary materials referenced are available upon request via email: johnson.ryan1019@gmail.com.
+
+# Literature
+TDA is a relatively new field and is increasingly being applied to various areas of research such as genetics, financial fraud, biology, and image detection. From the small body of literature we have reviewed, TDABM has removed many of the parameters that are required for more traditional methods of TDA. Generally speaking, traditional TDA contains four broad steps, each with multiple user-defined parameters. Conversely, TDABM has reduced this process to an algorithm (FIXTHIS) and requires the user to select an epsilon value -- details on this follow below. What should be noted is that, although TDABM reduces the number of steps needed to produce similar outcomes of traditional TDA methods, we lose control of fine tuning of parameters. We also find that interpreting results becomes more difficult; however, TDABM is still in its infancy, so there is not a large body of research on interpretation [@dlotko2019ballmapper]. As mentioned earlier, this paper adds to the literature by providing another proof-of-concept case for TDABM. One major motivation for this paper is a paper written by @dlotko2019macroeconomy that applied TDABM to a global macroeconomic dataset to compare how countries have evolved over time, their transformation from the Great Depression Era, and various views on wealth and inequality. We, however, have not found any literature found specifically focused on the macroeconomic economy of singular countries; hence, our topic of choice.
+
+
+# Data {#sec-data}
+
+```{r}
+#| include: false
+
+library(tidyverse)
+library(corrr)
+library(data.table)
+library(viridis)
+library(knitr)
+library(kableExtra)
+library(BallMapper)
+library(svglite)
+```
+
+```{r}
+#| warning: false
+
+rawData <- list.files(paste(getwd(), "data/raw", sep = "/"), recursive = TRUE)
+for (f in rawData) {
+    dT <- fread(paste(getwd(), "data/raw", f, sep = "/"))
+    assign(sub("/", "_", f) |> str_remove(".csv"), dT)
+}
+```
+
+```{r}
+
+NEIA <- BEA_export_imports_A[c(1, 3, 27, 52:58), !1] %>%
+  .[1,1:="catagory"] %>%
+  setnames(paste(.[1])) %>%
+  .[!1] %>%
+  mutate(catagory = str_trim(catagory)) %>%
+  mutate_if(is.numeric, as.character) %>%
+  pivot_longer(!catagory, names_to = "year", values_to = "pctDelta") %>%
+  pivot_wider(names_from = catagory, values_from = pctDelta) %>%
+  mutate_if(is.character, as.numeric) %>%
+  setnames(paste("neia", gsub(" ", "_", names(.)), sep = "")) %>%
+  rename("year" = names(.)[1]) %>%
+  mutate(source = "BEA_exportsImportsA")
+
+NEIQ <- BEA_export_imports_Q[c(1:3, 27, 52:58), !1] %>%
+  .[1,1:="catagory"] %>%
+  .[2,1:="Quarter"] %>%
+  setnames(paste(.[1], .[2], sep = "_")) %>%
+  .[!1:2] %>%
+  rename(catagory = catagory_Quarter) %>%
+  mutate(catagory = str_trim(catagory)) %>%
+  pivot_longer(!catagory, 
+               names_to = c("year", "quarter"), names_sep = "_",
+               values_to = "pctDelta") %>%
+  pivot_wider(names_from = catagory, values_from = pctDelta) %>%
+  mutate_at(c(1, 3:ncol(.)), as.numeric) %>%
+  setnames(paste("neiq", gsub(" ", "_", names(.)), sep = "")) %>%
+  rename("year" = names(.)[1]) %>%
+  rename("quarter" = names(.)[2]) %>%
+  mutate(source = "BEA_exports_imports_Q")
+
+```
+
+```{r}
+#| warning: false
+
+FE <- BEA_foreign_direct_invesment[, 2:11] %>%
+  setnames(paste(.[3])) %>%
+  .[!1:3] %>%
+  pivot_longer(1:ncol(.), names_to = "year", values_to = "FE") %>%
+  mutate_if(is.character, as.numeric)
+  
+PE <- BEA_foreign_direct_invesment[, 12:21] %>%
+  setnames(paste(.[3])) %>%
+  .[!1:3] %>%
+  pivot_longer(1:ncol(.), names_to = "year", values_to = "PE") %>%
+  mutate_if(is.character, as.numeric)
+
+FDI <- merge(PE, FE, by = "year") %>%
+  mutate(DE = PE-FE) %>%
+  setnames(paste("fdi_", gsub(" ", "_", names(.)), sep = "")) %>%
+  rename("year" = names(.)[1]) %>%
+  mutate(source = "BEA_FDI")
+
+```
+
+```{r}
+#| warning: false
+
+GDPA <- BEA_gdp_A[!c(2, 16:17, 29:30), !1] %>%
+  .[1, 1:="catagory"] %>%
+  .[4, 1:= "Personal Goods"] %>%
+  .[7, 1:= "Personal Services"] %>%
+  .[16, 1:= "Export Goods"] %>%
+  .[17, 1:= "Export Services"] %>%
+  .[19, 2:= "Import Goods"] %>%
+  .[20, 2:= "Import Services"] %>%
+  setnames(paste(.[1])) %>%
+  .[!1] %>%
+  mutate(catagory = str_trim(catagory)) %>%
+  pivot_longer(!catagory, names_to = "year", values_to = "pct_delta") %>%
+  pivot_wider(names_from = catagory, values_from = pct_delta) %>%
+  mutate_if(is.character, as.numeric) %>%
+  setnames(paste("gdpa", gsub(" ", "_", names(.)), sep = "")) %>%
+  rename("year" = names(.)[1]) %>%
+  mutate(source = "BEA_gdp_A")
+
+
+GDPQ <- BEA_gdp_Q[!c(16:17, 29:30), !1] %>%
+  .[1, 1:="catagory"] %>%
+  .[2, 1:="Q"] %>%
+  .[5, 1:= "Personal Goods"] %>%
+  .[8, 1:= "Personal Services"] %>%
+  .[17, 1:= "Export Goods"] %>%
+  .[18, 1:= "Export Services"] %>%
+  .[20, 2:= "Import Goods"] %>%
+  .[21, 2:= "Import Services"] %>%
+  setnames(paste(.[1], .[2], sep = "_")) %>%
+  .[!1:2] %>%
+  rename(catagory = catagory_Q) %>%
+  mutate(catagory = str_trim(catagory)) %>%
+  pivot_longer(!catagory, 
+               names_to = c("year", "Q"), names_sep = "_", 
+               values_to = "pct_delta") %>%
+  pivot_wider(names_from = catagory, values_from = pct_delta) %>%
+  mutate_at(c(1,3:ncol(.)), as.numeric) %>%
+  setnames(paste("gdpq", gsub(" ", "_", names(.)), sep = "")) %>%
+  rename("year" = names(.)[1]) %>%
+  rename("quarter" = names(.)[2]) %>%
+  mutate(source = "BEA_gdp_Q")
+```
+
+```{r}
+#| warning: false
+
+value_cols <- c(2:10, 12:14)
+pctChg <- function(x){((x-lag(x))/lag(x))*100}
+
+PIDA <- BEA_personal_income_and_disposition_A[
+  c(1, 3:4, 11, 14:15, 18, 28, 29, 36:37, 41, 44:45, 49), !1] %>%
+  .[1, 1:="catagory"] %>%
+  .[13, 1:=str_c(.[13, 1], ".per_capita")] %>%
+  .[15, 1:=str_c(.[15, 1], ".pct_delta")] %>%
+  setnames(paste(.[1])) %>%
+  .[!1] %>%
+  mutate(catagory = str_trim(catagory)) %>%
+  mutate_if(is.numeric, as.character) %>%
+  pivot_longer(!catagory, names_to = "year", values_to = "total_M") %>%
+  pivot_wider(names_from = catagory, values_from = total_M) %>%
+  mutate_if(is.character, as.numeric) %>%
+  setnames(paste("pida", gsub(" ", "_", names(.)), sep = "")) %>%
+  mutate(across(value_cols, pctChg)) %>%
+  rename("year" = names(.)[1]) %>%
+  mutate(source = "BEA_PID_A")
+
+PIDQ <- BEA_personal_income_and_disposition_Q[
+  c(1:4, 11, 14:15, 18, 28, 29, 36:37, 41, 44:45, 49), !1] %>%
+  .[1, 1:="catagory"]%>%
+  .[2, 1:="Q"] %>%
+  .[14, 1:=str_c(.[14, 1], ".per_capita")] %>%
+  .[16, 1:=str_c(.[16, 1], ".pct_delta")] %>%
+  setnames(paste(.[1], .[2], sep = "_")) %>%
+  .[!1:2] %>%
+  rename(catagory = catagory_Q) %>%
+  mutate(catagory = str_trim(catagory)) %>%
+  pivot_longer(!catagory, 
+               names_to = c("year", "Q"), names_sep = "_", 
+               values_to = "total_M") %>%
+  pivot_wider(names_from = catagory, values_from = total_M) %>%
+  mutate_at(c(1, 3:ncol(.)), as.numeric) %>%
+  setnames(paste("pidq", gsub(" ", "_", names(.)), sep = "")) %>%
+  mutate(across(value_cols + 1  , pctChg)) %>%
+  rename("year" = names(.)[1]) %>%
+  rename("quarter" = names(.)[2]) %>%
+  mutate(source = "BEA_PID_Q")
+```
+
+```{r}
+#| warning: false
+
+FFRM <- FRB_FFER_M[!1:5] %>%
+  rename(date = "Series Description") %>%
+  rename(rate = "Federal funds effective rate") %>%
+  separate_wider_delim(date, delim = "-", names = c("year", "month")) %>%
+  mutate_if(is.character, as.numeric) %>%
+  setnames(paste("ffrm_", gsub(" ", "_", names(.)), sep = "")) %>%
+  rename("year" = names(.)[1]) %>%
+  mutate(source = "FRB_FFER_M")
+
+FFRA <- FRB_FFER_A[!1:5] %>%
+  rename(year = "Series Description") %>%
+  rename(rate = "Federal funds effective rate") %>%
+  mutate_if(is.character, as.numeric) %>%
+  setnames(paste("ffra", gsub(" ", "_", names(.)), sep = "")) %>%
+  rename("year" = names(.)[1]) %>%
+  mutate(source = "FRB_FFER_A")
+```
+
+```{r}
+#| warning: false
+
+FFRQ <- FFRM %>%
+  mutate(quarter = case_when(ffrm_month %in% c(1:3) ~ "Q1",
+                             ffrm_month %in% c(4:6) ~ "Q2",
+                             ffrm_month %in% c(7:9) ~ "Q3",
+                             ffrm_month %in% c(10:12) ~ "Q4")) %>%
+  group_by(year, quarter) %>%
+  mutate(ffrQ = mean(ffrm_rate)) %>%
+  select(year, quarter, ffrQ) %>%
+  distinct() %>%
+  ungroup() %>%
+  mutate(ffrQ_delta = (ffrQ - lag(ffrQ))/lag(ffrQ)) %>%
+  mutate(source = "FFRM")
+```
+
+```{r}
+#| waring: false
+
+coreInflation <- FRED_CPILFESL %>%
+  separate_wider_delim(DATE, delim = "-", 
+                       names = c("year", "month", "day")) %>%
+  select(year, month, CPILFESL) %>%
+  rename(cpi = CPILFESL) %>%
+  mutate(cpiDelta = (cpi - lag(cpi))/lag(cpi)) %>%
+  mutate(cpiYear = ((cpi-lag(cpi, 12))/lag(cpi, 12))*100) %>%
+  mutate_if(is.character, as.numeric) %>%
+  mutate(source = "FRED_CPILFESL")
+
+coreInflationQ <-   coreInflation %>%
+  mutate(quarter = case_when(month %in% c(1:3) ~ "Q1",
+                             month %in% c(4:6) ~ "Q2",
+                             month %in% c(7:9) ~ "Q3",
+                             month %in% c(10:12) ~ "Q4")) %>%
+  group_by(year, quarter) %>%
+  mutate(cpiQ = mean(cpi)) %>%
+  select(year, quarter, cpiQ) %>%
+  distinct() %>%
+  ungroup() %>%
+  mutate(cpiQdelta = (cpiQ - lag(cpiQ))/lag(cpiQ)) %>%
+  mutate(source = "coreInflation")
+```
+
+```{r}
+#| waring: false
+
+employment_cost_index <- FRED_ECIALLCIV %>%
+  separate_wider_delim(DATE, delim = "-", 
+                       names = c("year", "Q", "day")) %>%
+  select(year, Q, ECIALLCIV) %>%
+  rename(eci = ECIALLCIV) %>%
+  mutate(eci_q_delta = (eci - lag(eci, 1))/lag(eci, 1)) %>%
+  mutate(eci_year_delta = (eci-lag(eci, 4))/lag(eci, 4)) %>%
+  mutate_if(is.character, as.numeric) %>%
+  mutate(Q = case_when(Q == 1 ~ 1,
+                       Q == 4 ~ 2,
+                       Q == 7 ~ 3,
+                       Q == 10 ~ 4)) %>%
+  mutate(source = "FRED_ECIALLCIV")
+```
+
+```{r}
+#| waring: false
+
+housingStarts <- FRED_HOUST %>%
+  separate_wider_delim(DATE, delim = "-", 
+                       names = c("year", "month", "day")) %>%
+  select(year, month, HOUST) %>%
+  rename(houses = HOUST) %>%
+  mutate(housesDelta = (houses - lag(houses))/lag(houses)) %>%
+  mutate(housesYear = (houses-lag(houses, 12))/lag(houses, 12)) %>%
+  mutate_if(is.character, as.numeric) %>%
+  mutate(source = "FRED_HOUST")
+
+housingStartsQ <-   housingStarts %>%
+  mutate(quarter = case_when(month %in% c(1:3) ~ "Q1",
+                             month %in% c(4:6) ~ "Q2",
+                             month %in% c(7:9) ~ "Q3",
+                             month %in% c(10:12) ~ "Q4")) %>%
+  group_by(year, quarter) %>%
+  mutate(housesQ = mean(houses)) %>%
+  select(year, quarter, housesQ) %>%
+  distinct() %>%
+  ungroup() %>%
+  mutate(housesQdelta = (housesQ - lag(housesQ))/lag(housesQ)) %>%
+  mutate(source = "housingStarts")
+```
+
+```{r}
+#| waring: false
+
+PPI <- FRED_PPIFIS %>%
+  separate_wider_delim(DATE, delim = "-", 
+                       names = c("year", "month", "day")) %>%
+  select(year, month, PPIFIS) %>%
+  rename(ppi = PPIFIS) %>%
+  mutate(ppi_pct_delta = (ppi - lag(ppi))/lag(ppi)) %>%
+  mutate(ppi_year_delta = (ppi-lag(ppi, 12))/lag(ppi, 12)) %>%
+  mutate_if(is.character, as.numeric) %>%
+  mutate(source = "FRED_PPIFIS")
+
+PPIQ <-   PPI %>%
+  mutate(quarter = case_when(month %in% c(1:3) ~ "Q1",
+                             month %in% c(4:6) ~ "Q2",
+                             month %in% c(7:9) ~ "Q3",
+                             month %in% c(10:12) ~ "Q4")) %>%
+  group_by(year, quarter) %>%
+  mutate(ppiQ = mean(ppi)) %>%
+  select(year, quarter, ppiQ) %>%
+  distinct() %>%
+  ungroup() %>%
+  mutate(ppiQdelta = (ppiQ - lag(ppiQ))/lag(ppiQ)) %>%
+  mutate(source = "PPI")
+```
+
+```{r}
+#| warning: false
+
+unemploymentRate <- FRED_UNRATE %>%
+  separate_wider_delim(DATE, delim = "-", 
+                       names = c("year", "month", "day")) %>%
+  select(year, month, UNRATE) %>%
+  rename(unrate = UNRATE) %>%
+  group_by(year) %>%
+  mutate(unrateYear = mean(unrate)) %>%
+  ungroup() %>%
+  mutate(unrateDelta = (unrate - lag(unrate))/lag(unrate)) %>%
+  mutate(unrateYeardelta = (unrate-lag(unrate, 12))/lag(unrate, 12)) %>%
+  mutate_if(is.character, as.numeric) %>%
+  mutate(source = "FRED_UNRATE")
+
+unemploymentRateQ <-   unemploymentRate %>%
+  mutate(quarter = case_when(month %in% c(1:3) ~ "Q1",
+                             month %in% c(4:6) ~ "Q2",
+                             month %in% c(7:9) ~ "Q3",
+                             month %in% c(10:12) ~ "Q4")) %>%
+  group_by(year, quarter) %>%
+  mutate(unrateQ = mean(unrate)) %>%
+  select(year, quarter, unrateQ) %>%
+  distinct() %>%
+  ungroup() %>%
+  mutate(unrateQdelta = (unrateQ - lag(unrateQ))/lag(unrateQ)) %>%
+  mutate(source = "unemploymentRate")
+```
+
+```{r}
+#| output: true
+#| output-line-numbers: "here"
+
+dataList <- c("FDI", "GDPA", "GDPQ", "PIDA", "PIDQ", "FFRM", "FFRA", "FFRQ",
+               "coreInflation", "employment_cost_index", "housingStarts",
+               "PPI", "unemploymentRate")
+
+dataSummary <- tibble(source = as.character(),
+                     yearSpan = as.numeric(),
+                     obs = as.numeric(),
+                     nCols = as.numeric(),
+                     yearStart = as.numeric(),
+                     yearEnd = as.numeric())
+
+for (i in 1:length(dataList)) {
+  
+  tmpDf <- get(dataList[i])
+  yearRange <- range(tmpDf[, 1])
+  yearDiff <- yearRange[2] - yearRange[1]
+  rObs <- nrow(tmpDf)
+  cObs <- ncol(tmpDf)
+  dataSummary <- dataSummary %>%
+    add_row(source = dataList[i],
+            yearSpan = yearDiff,
+            obs = rObs,
+            nCols = cObs,
+            yearStart = yearRange[1],
+            yearEnd = yearRange[2])
+  }
+```
+
+```{r}
+
+recessionDates <- tibble(year = c(1958, 1958, 1960, 1960, 1960, 1961, 1970, 
+                                  1970, 1970, 1970, 1974, 1974, 1974, 1974, 
+                                  1975, 1980, 1980, 1980, 1981, 1981, 1982, 
+                                  1982, 1982, 1982, 1990, 1990, 1991, 2001,
+                                  2001, 2001, 2008, 2008, 2008, 2008, 2009,
+                                  2009, 2020),
+                         quarter = c("Q1", "Q2", "Q2", "Q3", "Q4", "Q1", "Q1", 
+                                     "Q2", "Q3", "Q4", "Q1", "Q2", "Q3", "Q4", 
+                                     "Q1", "Q1", "Q2", "Q3", "Q3", "Q4", "Q1",
+                                     "Q2", "Q3", "Q4", "Q3", "Q4", "Q1", "Q2",
+                                     "Q3", "Q4", "Q1", "Q2", "Q3", "Q4", "Q1",
+                                     "Q2", "Q2"))
+```
+
+## Sources
+Three major sources of data were used for analysis: The Bureau of Economic Analysis (BEA), The Federal Reserve Board (FRB), and The Bureau of Labor Statistics (BLS).[^1] We initially approached these sources[^2] by selecting commonly reported data about the economy, both on an annual and quarterly basis. Since this paper is introductory and limited in nature, we chose to focus on annual data that represented overall macroeconomic measures, covered a sufficient time period, and included a range of historical economic events.
+
+## Construction
+A primary challenge we encountered when selecting variables for analysis was the variability of time period coverage. Some data spanned from Depression Era 1929 all the way up to 2023. Looking at our final nine variables (see @fig-corr]) and the range of years available by by source (@fig-yearspan), we limited our years to 1958 - 2023 due to *CPIA* data having the smallest range of years.
+
+Some of the data was only available by month. In these cases we calculated annual changes by finding the difference between January of the current year and January of the previous year. Note, this reduced the number of years in our data set by one. We also standardized the data by converting non-rate based data to percent changes from the previous year to ensure consistency across all variables (@eq-generalpctchange). One feature of TDABM is that it can be sensitive to data with large scale differences. This not only reduces how precise you can be when selecting a parameter, but can also significantly increase computation time.
+
+Looking at our correlation table (@fig-corr), we observe moderate to strong correlations between the pairwise combinations of GDP, PCE, Ig, and Imports. We also see a strong correlation between CPI and Interest Rates. Since these correlations are moderate to high, it's worth noting that the shape of our output may be reflected by these correlations. They also could express themselves with similar coloring of TDABM graphs [@dlotko2019macroeconomy].
+
+[^1]: The Federal Reserve Economic Data (FRED) website was used to download BLS data.
+[^2]: See _Data Sources_
+
+
+# Methodology {#sec-methodology}
+
+
+## TDA BallMapper
+TDABM, and in general TDA, believes that data contains a "shape" to it. It pulls ideas from the branch of Mathematics, Topology. At a high-level, Topology focuses on the properties of geometric shapes when you deform them without breaking them, e.g. bend, twist, scrunch. The following is a basic overview of TDABM [^examples].
+
+
+## BallMapper Algorithm
+Before going over the algorithm there are a few
+For the following algorithm some useful definitions are as follows:
+- We will use the word pointcloud instead of dataset.
+- Conventionally the Euclidean distance metric is used; let $d = dist() is used as our distance metric, denote $
+The core steps of the TDABM algorithm are as follows:
+
+1. From your dataset (pointcloud) select a random point, $\alpha_n$, and draw circle with radius epsilon, $\epsilon$.
+2. For some distance metric where $d$ is the distance from, any points inside the circle will be associated with point $\alpha_n$.
+4. Repeat steps 1 - 3 until there are no more points to select and you have a set ${\alpha_1 \text{,...,} \alpha_n}$.
+5. Draw an edge between $\alpha_i$ and $\alpha_j$ if they share a point(s) for our set ${\alpha_1 \text{,...,} \alpha_n}$.
+
+Although the above list five steps, it should be noted that this is just the algorithm and is all done with one function call.[^software] From the steps above, the only thing the user of TDABM is responsible for is creation of a pointcloud and choosing an appropriate $\epsilon$.
+
+
+## Cloud Building
+In our [Data](#sec-data) section, we noted that some calculations were needed before our analysis. Additionally, for the Federal Funds Rate, the Unemployment Rate, and CPI we had to take extra steps and considerations while constructing out pointcloud. Since the Federal Funds Rate and the Unemployment Rate are already a rate-based measurements, instead of taking a percent change from the previous year, we instead took the standard non-weight average rate by each year. For CPI, this data was given on a monthly-basis, we calculated it using our [General Percent Change Formula](#eq-generalpctchange) with $k=12$.
+
+
+
+[^examples]: Some very good examples and explanations can be found in [@dlotko2022tdabmfinance] and [@dlotko2019financialratiosstockreturns] which touch on the finer details of TDABM algorithm. A very good illustrative example can be seen in the pre-print [@Dlotko2021].
+[^pointcloud]: Poincloud can be thought as: a high-dimensional dataset that contains n-rows and m-cols such that m > 1.
+
+[^software]: There are packages available both in R and Python under the names BallMapper and pyBallMapper, respectively.
+
+
+```{r}
+annualYears <- 1958:2023
+
+annualTbl <- merge(
+  GDPA %>% filter(year %in% annualYears) %>% select(!source),
+  FFRA %>% filter(year %in% annualYears) %>% select(!source),
+  by = "year") %>%
+  merge(coreInflation %>% 
+          filter(year %in% annualYears & month == 12) %>%
+          select(!c(source, month, cpi, cpiDelta))) %>%
+  merge(unemploymentRate %>% 
+          filter(year %in% annualYears & month == 12) %>%
+          select(!c(source, month, unrateDelta)))
+
+rownames(annualTbl) <- annualTbl[, 1]
+```
+
+
+```{r}
+#| label: Global BallMapper Conditions
+
+pcAnnual <- annualTbl[ ,c(2, 3, 8, 21, 15, 18, 26, 27, 29)]
+
+pcAnnualClean <- annualTbl %>%
+  anti_join(recessionDates, by = "year") %>%
+  select(c(2, 3, 8, 21, 15, 18, 26, 27, 29))
+
+  
+annualCorr <- correlate(pcAnnual, quiet = TRUE) %>%
+  rename("GDP" = 2, "PCE" = 3, "Ig" = 4, "Gov" = 5, "Exports" = 6, 
+         "Imports" = 7, "InterestRateA" = 8, "CPIA" = 9, "AvgUnrateA" = 10)
+```
+
+
+# Results {#sec-results}
+
+```{r}
+#| label: Annual BM-single
+#| include: false
+
+pcAclean <- pcAnnualClean %>% normalize_to_min_0_max_1()
+
+pcA <- pcAnnual %>% normalize_to_min_0_max_1()
+coloring <- annualTbl$year %>% as.data.frame()
+e = 0.45
+
+svglite("annualBM.svg", height = 6, width = 8)
+annualBm <- BallMapper(points = pcA, values = coloring, epsilon = e)
+ColorIgraphPlot(annualBm, seed_for_plotting = 29)
+title(main = "BallMapper output Colored by Year",
+      sub = paste("Epsilon", e, sep = ": "))
+dev.off()
+```
+
+
+```{r}
+#| label: Hide n Seek
+#| eval: false
+
+pcAnnual %>%
+  slice(points_covered_by_landmarks(annualBm, c(12:20))) %>%
+  rename("GDP" = 1, "PCE" = 2, "Ig" = 3, "Gov" = 4, "Exports" = 5, 
+         "Imports" = 6, "FFR" = 7, "CPI" = 8, "UnRate" = 9)
+```
+
+The analysis reportes here are guided by @dlotko2019macroeconomy's approach. We will be referencing our TDABM output in @fig-ballmapper for the remainder of this section.
+
+
+## Interpretation of TDA BallMapper Graphs, An Abridged Version
+In @fig-ballmapper we are presented with what looks like a graph, in the mathematical sense; a display of points (nodes) and edges --some connected while others are not connected at all (satellites). If we do not change the poincloud or $\epsilon$ of our TDABM graph, we will get the same "shape" of the graph regardless of the coloration we choose.
+
+Nodes are colored depending on the users interest. In @fit-ballmapper, we are focusing color by year. Coloration calculated by taking the average of the data that is "inside" each node, in our case the average value of the years. Further, if there is only one data point in a node (i.e. a satellite points), the node will appear small and the coloration will reflect as seen on the legend. Conversely, if the node is large, this indicates more data is "inside" the node, and the average value could be reflecting the mean values of a large or small variance.
+
+
+## General @fig-ballmapper Remarks
+We initially notice a large connected component[^connectedcomponent] (component A) on the right side of our graph, as well as a smaller connected component (component B) on the lower left side. Noting the coloration, there are three main sections: the right, bottom, and upper-left. On the bottom and sweeping upward to the left we see there are multiple satellite points. These can be of interest because they may indicate outliers in our data.[^outliers]  Focusing back towards component A, we notice that the two largest nodes, $28$ and $22$,  which seem to represent the late 2010s and the dot-Com boom, respectively. We also note that there is a arm coming off the upper-right portion of component A, as well as smaller, lollipop, features emerging at the bottom and top of component A.[^interpretation]
+
+
+## Time Travel
+Looking at @fig-ballmapper, we see that our graph is colored by year.[^supplement] In this section we will only highlight a few observations in detail due to the nature of this paper. Additional areas for investigation can be found in the [Conclusion](#sec-conclusion). 
+
+Mentioned above, we observed the satellite points in the lower half of the graph. If we look at the upper-right quadrant, we see that it consists of nodes $\{1, 16, 25, 27\}$. Looking at @tbl-covidplus we see that it covers the 2020 Pandemic and the Financial Crisis and its aftermath. Seeing a general coloration from the recent 10 - 15 years we would expect to see some of the recent outlier economic events here. Indeed, node $25$ consists of two of the most recent economic downturns, 2009 and 2020. However, what is interesting is that node $27$ consists of three years closely following the 2008-2009 Financial crisis. However, the years following the 2020 COVID Pandemic can be found scattered across nodes $\{6, 8, 24, 28, 29\}$. Looking at node $27$ we find that the common thread is high unemployment. In contrast, the years following the Pandemic are not the same year to year.[^aftercovid]
+
+Shfiting our focus towards component A, it consists of data most similar to the economic years between the 1990s - 2010s. Meanwhile, looking at component B and the general lower area of our graph, we see that it represents the Great Inflation period of the 1970s - early 1980s [ivestopedia article]. Looking at nodes $12 - 20$, we get exactly ten years of data[^greatinflation] where there was know high inflation, high unemployment, and in general know to be bad time economically for the US (@tbl-greatinflation). Something of interest to note is that nodes $14$ and $15$ consist of 1976 - 1978. This three year period based on data seems to show more normal economic conditions. On the other hand, we see that all the other years in this grouping (nodes $12 - 20$) show signs of a struggling economy in some way.
+
+[^connectedcomponent]: In graph theory, a connected component is one in which there exists a path from a node to every other node for a set of nodes and edges.
+[^outliers]: We have not found any literature yet on whether this observation is empirically true.
+[^interpretation]: The observations mentioned above good starting places for interpreting BallMapper graphs.
+[^supplement]: Supplementary graphs displaying coloration based on different variables can be found in Supplement_1.pdf.
+[^greatinflation]: 1974 - 1984
+[^aftercovid]: *2021:* An outlier, we see higher levels of unemployment and inflation. We see high PCE, Ig, and imports; *2022:* Nodes $\{8, 28\}$ we see that there is higher than normal inflation, export, and imports; *2023:* Nodes $\{6, 24\}$, we see low inflation and low unemployment.
+
+
+# Conclusion {#sec-conclusion}
+
+This paper serves as a proof-of-concept of the usefulness of TDABM as a methodology for exploratory data analysis. By no means is this a totally comprehensive method to gain insight into data, but instead TDA BallMapper proves itself to be useful tool wehen employed in addition to other traditional analyses. 
+
+In our [Results](#sec-results) section we briefly went over two ways to interpret TDABM graphs. As seen in many other, longer papers written by Dlotko and colleagues, there is a lot of room to expound our TDABM graph here,though that is beyond the scope of this paper. In general, though, we can see that TDBM can give insight into our data that we might not see otherwise. Seeing that there is data that is not like the others gives an indication that there is something to investigate. Consider our comparison of the 08' - 09' financial crisis and the 2020 COVID Pandemic: We see learned that the years following the financial crisis were similar economically. Another way to view this is, clustering revels that the financial crisis was a singular problem that spurred the collapse of the financial system. Conversely, the COVID pandemic was a singular issue but exposed many different weaknesses in our current world.
+
+For the future development of TDABM, and TDA in general, there are many possibilities of future research and one glaring downside. The downside to TDA is that it is a high barrier to entry to understand the methodologies inner workings. Those with a technical background will have an easier time, but nonetheless a higher barrier than methods such as linear regressions.  Subject wise, TDA has an advantage in some of the social sciences because it can be somewhat of a bridge between qualitative and quantitative analyses. TDABM has been used to analyze the Brexit Vote data, seeking to understand quantitative and qualitative motivations behind its outcome @Rudkin2023. TDA also has the advantages of dimension reduction which could be useful to the life-sciences. Fields such as genetics, chemistry, and biology have many fields of data, and being able to consolidate it into an understandable form could benefit the body of knowledge greatly.
+
+
+# Endnotes {.unnumbered}
+
+
+General Percent Change Formula $$\Delta p_n = \frac{p_n - p_{n-k}}{p_{n-k}} \text{ for some } p \in P \text{ and } n > 0$${#eq-generalpctchange}
+where $P$ is a column of our data with $x_1,...,x_n$ observations and $k$ is a lag integer such that $k>0$.
+
+\newpage
+# Appendix {.unnumbered}
+
+```{r}
+#| label: tbl-summarystats
+#| tbl-cap: Summary Statistics (%)
+
+summaryStatsA <- pcAnnual %>%
+  rename("GDP" = 1, "PCE" = 2, "Ig" = 3, "Exports" = 4, "Imports" = 5,
+         "Gov" = 6, "InterestRateA" = 7, "CPIA" = 8, "AvgUnrateA" = 9) %>%
+  summarise(across(everything(), list(Minimum = min,
+                                      Q25 = ~quantile(., 0.25),
+                                      Median = median,
+                                      Q75 = ~quantile(., 0.75),
+                                      Maximum = max,
+                                      Mean = mean,
+                                      SD = sd,
+                                      VAR = var))) %>%
+  pivot_longer(everything(), names_to = "var", values_to = "val") %>%
+  separate_wider_delim(var, delim = "_", 
+                       names = c("measure", "statistic")) %>%
+  pivot_wider(names_from = statistic, values_from = val)
+
+summaryStatsA %>%
+  kable(digits = 2)
+```
+
+
+```{r}
+#| label: tbl-covidplus
+#| tbl-cap: COVID-19+ (% change)
+
+pcAnnual %>%
+  slice(points_covered_by_landmarks(annualBm, c(1, 16, 25, 27))) %>%
+  rename("GDP" = 1, "PCE" = 2, "Ig" = 3, "Gov" = 4, "Exports" = 5, 
+         "Imports" = 6, "FFR" = 7, "CPI" = 8, "UnRate" = 9) %>%
+  kable()
+```
+
+
+```{r}
+#| label: tbl-greatinflation
+#| tbl-cap: The Great Inflation (% change)
+
+pcAnnual %>%
+  slice(points_covered_by_landmarks(annualBm, c(12:20))) %>%
+  rename("GDP" = 1, "PCE" = 2, "Ig" = 3, "Gov" = 4, "Exports" = 5, 
+         "Imports" = 6, "FFR" = 7, "CPI" = 8, "UnRate" = 9) %>%
+  kable()
+```
+
+
+```{r}
+#| label: fig-yearspan
+#| fig-cap: Year Coverage by Data Source
+
+dataSummary %>%
+  filter(source %in% c("GDPA", "FFRA", "coreInflation", "unemploymentRate")) %>%
+  mutate(source =  c("BEA GDP", "FRB FFR", "BLS CPI", "BLS UnRate")) %>%
+  ggplot(aes(x = yearSpan,
+             y = fct_reorder(source, yearSpan))) +
+  geom_col(fill = "orchid4") +
+  geom_text(aes(x = 0, label = yearSpan), hjust = -0.2) +
+  labs(x = "Year Span", y = "Source") +
+  xlim(0, 100) +
+  theme(plot.title.position = 'plot')
+```
+
+
+```{r}
+#| label: fig-corr
+#| warning: false
+
+annualCorr %>%
+  mutate(term = names(.)[-1]) %>%
+  shave() %>%
+  stretch() %>%
+  mutate(x = factor(x, levels = c("GDP", "PCE", "Ig", "Gov", "Exports", 
+                                  "Imports", "InterestRateA", "CPIA", 
+                                  "AvgUnrateA")),
+         y = factor(y, levels = c("GDP", "PCE", "Ig", "Gov", "Exports", 
+                                  "Imports", "InterestRateA", "CPIA", 
+                                  "AvgUnrateA") |> rev())) %>%
+  ggplot(aes(x = x, y = y)) + 
+  geom_tile(aes(fill = r)) +
+  geom_text(aes(label = round(r, 2)), size = 3) +
+  scale_fill_viridis(na.value = "white", limits = c(-1, 1)) +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 0.95, vjust = 1)) +
+  labs(title = "TDA Point Cloud: Annual",
+       subtitle = "Pearson Correlation Values",
+       fill = "Correlation") +
+  coord_cartesian(expand = FALSE)
+```
+
+
+![Data is normalized on a \[0,1\] scale due to all varialbe not being normally distributed See Supplement_2.pdf.](annualBM.svg){#fig-ballmapper}
+
+\newpage
+# References {.unnumbered}
+
+::: {#refs}
+:::
+
+## Data Sources {.unnumbered}
+
+- Bureau of Economic Analysis
+    -   [Real Exports and Imports](https://apps.bea.gov/iTable/?reqid=19&step=2&isuri=1&categories=survey#eyJhcHBpZCI6MTksInN0ZXBzIjpbMSwyLDNdLCJkYXRhIjpbWyJjYXRlZ29yaWVzIiwiU3VydmV5Il0sWyJOSVBBX1RhYmxlX0xpc3QiLCIxMjkiXV19)
+    -   [New Foreign Direct Investment in the United States](https://apps.bea.gov/iTable/?reqid=2&step=3&isuri=1&step1prompt1=1&step2prompt3=1&step1prompt2=3#eyJhcHBpZCI6Miwic3RlcHMiOlsxLDIsMyw0LDUsNywxMF0sImRhdGEiOltbInN0ZXAxcHJvbXB0MSIsIjEiXSxbInN0ZXAycHJvbXB0MyIsIjEiXSxbInN0ZXAxcHJvbXB0MiIsIjMiXSxbIlN0ZXAzUHJvbXB0NCIsIjYyIl0sWyJTdGVwNFByb21wdDUiLCI5OSJdLFsiU3RlcDVQcm9tcHQ2IiwiMSwyIl0sWyJTdGVwN1Byb21wdDgiLFsiNjgiLCI2NiIsIjY1IiwiNjEiLCI2MCIsIjU4IiwiNTYiLCI1NSIsIjUyIiwiNDkiXV0sWyJTdGVwOFByb21wdDlBIixbIjI4OSJdXSxbIlN0ZXA4UHJvbXB0MTBBIixbIjk0Il1dXX0=)
+    -   [Real GDP](https://apps.bea.gov/iTable/?reqid=19&step=2&isuri=1&categories=survey#eyJhcHBpZCI6MTksInN0ZXBzIjpbMSwyLDNdLCJkYXRhIjpbWyJjYXRlZ29yaWVzIiwiU3VydmV5Il0sWyJOSVBBX1RhYmxlX0xpc3QiLCIxIl1dfQ==)
+    -   [Personal Income and Its Disposition](https://apps.bea.gov/iTable/?reqid=19&step=2&isuri=1&categories=survey#eyJhcHBpZCI6MTksInN0ZXBzIjpbMSwyLDNdLCJkYXRhIjpbWyJjYXRlZ29yaWVzIiwiU3VydmV5Il0sWyJOSVBBX1RhYmxlX0xpc3QiLCI1OCJdXX0=)
+
+- Federal Reserve Bank
+    -   [Selected Interests Rates](https://www.federalreserve.gov/releases/h15/)
+
+- Bureau of Labor Statistics
+    -   [CPI](https://fred.stlouisfed.org/series/CPILFESL)
+    -   [Employment Cost Index](https://fred.stlouisfed.org/series/ECIALLCIV)
+    -   [PPI](https://fred.stlouisfed.org/series/PPIFIS)
+    -   [Housing Starts](https://fred.stlouisfed.org/series/HOUST)
+    -   [Unemployment Rate](https://fred.stlouisfed.org/series/UNRATE)
+
+
+
+```{r}
+#| label: Histogram Graphs Annual
+#| include: false
+
+pdf(paste(getwd(), "supp/histogram_annualTbl_all.pdf", sep = "/"))
+for(v in 1:ncol(pcAnnual)){
+  
+  g <- ggplot(pcAnnual, aes(pcAnnual[, v])) +
+    geom_histogram(bins = 20) +
+    labs(title = paste("Histogram of", names(pcAnnual[v]), sep = ": "),
+         x = paste(names(pcAnnual)[v], "% change", sep = " "))
+  
+  print(g)
+}
+dev.off()
+```
+
+
+
+```{r}
+#| label: Loop Annual BM
+#| eval: false
+
+epsilon_list <- seq(0.3, 0.7, 0.01)
+
+pdf(paste(getwd(), "supp/bmExploration.pdf", sep = "/"))
+for(x in epsilon_list){
+  
+  annualBm <- BallMapper(points = pcA, values = coloring, epsilon = x)
+  ColorIgraphPlot(annualBm, seed_for_plotting = 29)
+  title(main = "BallMapper Output Colored by Year",
+        sub = paste("Epsilon", x, sep = ": "))
+}
+dev.off()
+```
+
+
+```{r}
+#| label: Loop Annual BM-Dimensions
+#| eval: false
+
+dimensionListA <- names(pcA)
+
+pdf(paste(getwd(), "supp/bmDimensions.pdf", sep = "/"))
+for(x in dimensionListA){
+  
+  
+  coloring <- pcAnnual[, x] %>% as.data.frame()
+  annualBm <- BallMapper(points = pcA, values = coloring, epsilon = e)
+  ColorIgraphPlot(annualBm, seed_for_plotting = 29)
+  title(main = paste("BallMapper output colored by:", x, sep = "\n"),
+      sub = paste("N", e, sep = ": "))
+}
+dev.off()
+```
+
