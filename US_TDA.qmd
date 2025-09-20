@@ -1,8 +1,8 @@
 ---
 editor: source
-execute: 
-  echo: false
-
+editor_options:
+  chunk_output_type: inline
+echo: false
 format:
   pdf:
     link-citations: true
@@ -15,91 +15,125 @@ format:
     indent: true
     geometry: 
       - margin = 1in
-
-
 title: "Mapping the United States through TDA"
 subtitle: Instructor - Rubana Syed, ECON 111-800
 author: 
   -  Ryan Johnson
 date: 2024-12-11 (Revised Jun - Spet 2025)
-
 bibliography: references.bib
 ---
 
 \newpage
 # Introduction[^supplements]
 
-Since the late 19th Century, statistical techniques have been applied to the field of Economics. Common methodologies include generalized linear models or time series analysis. Although technology has advanced we still use these traditional methods but increasingly, new methods are being tested and developed.
+Since the late 19th Century, statistical techniques have been applied to the field of Economics. Common methodologies include generalized linear models or time series analysis. Although technology has advanced we still use these traditional methods. However, increasingly, new methods are being tested and developed.
 
-The goal of this paper is examine the macroeconomic landscape of the United States of America (US) through a lens of Topological Data Analysis (TDA). Specifically, we are going to apply a TDA algorithm called BallMapper (TDABM) developed by Pawel Dlotko. This new algorithm simplifies traditional TDA methods by reducing the need for the user to pass data through multiple functions. Dlotoko demonstrates that, mathematically, TDABM produces a near similar to that of traditional TDA methods for certain dimensions via a fuctor map [@dlotko2019ballmapper]. Thus, one benefit of TDABM compared to the traditional methods is, for those who have the tools and introductory understanding in Topology or TDA, TDABM could be a good entry point to the field of TDA.
+The goal of this paper is examine the macroeconomic landscape of the United States of America (US) through a lens of Topological Data Analysis (TDA). Specifically, we are going to apply a TDA algorithm called BallMapper (TDABM) developed by [Pawel Dlotko](https://scholar.google.com/citations?hl=en&user=-_znDLoAAAAJ). This new algorithm simplifies traditional TDA methods by reducing the need for the user to pass data through multiple functions. Dlotoko demonstrates that, mathematically, TDABM produces a near similar output to that of traditional TDA methods via a fuctor map [@dlotko2019ballmapper]. Thus, one benefit of TDABM compared to the traditional methods is, for those who have the tools and introductory understanding in Topology or TDA, TDABM could be a good entry point to the field.
 
-What follows below is primarily a proof-of-concept for TDA BallMapper and closely follows other papers that have applied TDABM. We will begin with a general overview of TDABM, current published literature, and useful concepts to know about TDABM. We then will describe out data and the reasoning behind their selection for analysis. Our [Methodology](#sec-methodology) and [Results](#sec-results) will touch on more mathematical concepts of TDABM and a couple of findings, respectively.
+What follows below is primarily a proof-of-concept for TDA BallMapper and closely follows other papers that have applied TDABM. We will begin with a general overview of TDABM: current published literature and useful concepts to know. We then will describe our data and reasoning behind their selection. Our [Methodology](#sec-methodology) and [Results](#sec-results) will touch on more theoretical concepts behind TDABM and then adress a couple of findings, respectively.
 
-Our hope here is for the reader to walk away understanding the general motivation behind TDA BallMapper, how it differs from other common statistical methods, and how methods such as TDA are additive to our current body of mathematical tools.
+Our hope here is for the reader to walk away understanding the general motivation behind TDA BallMapper, how it differs from other common statistical methods, and how methods such as TDA could be additive to our current body of mathematical tools.
 
 [^supplements]: Supplementary materials referenced are available upon request via email: johnson.ryan1019@gmail.com.
 
 # Literature
-TDA is a relatively new field and is increasingly being applied to various areas of research such as genetics, financial fraud, biology, and image detection. From the small body of literature we have reviewed, TDABM has removed many of the parameters that are required for more traditional methods of TDA. Generally speaking, traditional TDA contains four broad steps, each with multiple user-defined parameters. Conversely, TDABM has reduced this process to an algorithm (FIXTHIS) and requires the user to select an epsilon value -- details on this follow below. What should be noted is that, although TDABM reduces the number of steps needed to produce similar outcomes of traditional TDA methods, we lose control of fine tuning of parameters. We also find that interpreting results becomes more difficult; however, TDABM is still in its infancy, so there is not a large body of research on interpretation [@dlotko2019ballmapper]. As mentioned earlier, this paper adds to the literature by providing another proof-of-concept case for TDABM. One major motivation for this paper is a paper written by @dlotko2019macroeconomy that applied TDABM to a global macroeconomic dataset to compare how countries have evolved over time, their transformation from the Great Depression Era, and various views on wealth and inequality. We, however, have not found any literature found specifically focused on the macroeconomic economy of singular countries; hence, our topic of choice.
+TDA is a relatively new field and is increasingly being applied to various areas of research such as genetics, financial fraud, biology, and image detection. From the small body of literature we have reviewed, TDABM has removed many of the parameters that are required for more traditional methods of TDA. Generally speaking, traditional TDA contains four broad steps, each with multiple user-defined parameters. Conversely, TDABM has reduced this process to an the user selecting their data, a coloring variable and an epsilon value -- details on this follow below. What should be noted, although TDABM reduces the number of steps needed to produce similar outcomes of traditional TDA methods, we lose control of being able fine tune out outputs. We also find that interpreting results becomes more difficult. However, TDABM is still in its infancy, so there is not a large body of research on interpretation. [@dlotko2019ballmapper] One major motivation for this paper is a paper written by @dlotko2019macroeconomy that applied TDABM to a global macroeconomic dataset to compare how countries have evolved over time, their transformation from the Great Depression Era, and various views on wealth and inequality. We could not find other TDA literature found specifically focused on the macroeconomic economy of singular countries. Hence, our topic of choice.
 
 
 # Data {#sec-data}
 
+## Sources
+Three major sources of data were used for analysis: The Bureau of Economic Analysis (BEA), The Federal Reserve Board (FRB), and The Bureau of Labor Statistics (BLS).[^1] We initially approached these sources[^2] by selecting commonly reported data about the economy, both on an annual and quarterly basis. Since this paper is introductory and limited in nature, we chose to focus on annual data that represented overall macroeconomic measures, covered a sufficient time period, and included a range of historical economic events.
+
+## Construction
+A primary challenge we encountered when selecting variables for analysis was the variability of time period coverage. Some data spanned from Depression Era 1929 all the way up to 2023. Looking at our final nine variables (see @fig-corr]) and the range of years available by by source (@fig-yearspan), we limited our years to 1958 - 2023 due to *CPIA* data having the smallest range of years.
+
+Some of the data was only available by month. In these cases we calculated annual changes by finding the difference between January of the current year and January of the previous year. Note, this reduced the number of years in our data set by one. We also standardized the data by converting non-rate based data to percent changes from the previous year to ensure consistency across all variables (@eq-generalpctchange). One feature of TDABM is that it can be sensitive to data with large scale differences. This not only reduces how precise you can be when selecting a parameter, but can also significantly increase computation time.
+
+Looking at our correlation table (@fig-corr), we observe moderate to strong correlations between the pairwise combinations of GDP, PCE, Ig, and Imports. We also see a strong correlation between CPI and Interest Rates. Since these correlations are moderate to high, it's worth noting that the shape of our output may be reflected by these correlations. They also could express themselves with similar coloring of TDABM graphs [@dlotko2019macroeconomy].
+
+[^1]: The Federal Reserve Economic Data (FRED) website was used to download BLS data.
+[^2]: See _Data Sources_
+
 ```{r}
+#| label: Load Packages and Dependencies
 #| include: false
 
 library(tidyverse)
 library(corrr)
-library(data.table)
 library(viridis)
 library(knitr)
 library(kableExtra)
 library(BallMapper)
+library(bea.R)
 library(svglite)
+source("beaKey.R")
+
+beaConfig <- list('UserID' = beaKey,
+                  'Method' = 'GetData',
+                  'datasetname' = 'NIPA',
+                  'Year' = 'X',    # Get All Years Available
+                  'ResultFormat' = 'json')
 ```
 
 ```{r}
+#| label: Import and Format BEA - GDP %Change
 #| warning: false
 
-rawData <- list.files(paste(getwd(), "data/raw", sep = "/"), recursive = TRUE)
-for (f in rawData) {
-    dT <- fread(paste(getwd(), "data/raw", f, sep = "/"))
-    assign(sub("/", "_", f) |> str_remove(".csv"), dT)
-}
+## Annual GDP
+gdpA_list <- append(beaConfig, list('TableName' = 'T10101',
+                                    'Frequency' = 'A'))
+
+GDP_A <- beaGet(gdpA_list) %>%
+  pivot_longer(cols = !(TableName:UNIT_MULT),
+               names_to = "time",
+               values_to = "pctChange") %>%
+  mutate(year = str_extract(time, "[0-9]{4}")) %>%
+  select(!c(time, UNIT_MULT))
+
+## GDP Quartly  
+gdpQ_list <- append(beaConfig, list('TableName' = 'T10101', 
+                                    'Frequency' = 'Q'))
+GDP_Q <- beaGet(gdpQ_list) %>%
+  pivot_longer(cols = !(TableName:UNIT_MULT), 
+               names_to = "time",
+               values_to = "pctChange") %>%
+  mutate(year = str_extract(time, "[0-9]{4}"),
+         quarter = str_extract(time, "\\d$")) %>%
+  select(!c(time, UNIT_MULT))
+
+## cleanup
+rm(gdpA_list, gdpQ_list)
+
 ```
 
 ```{r}
+#| label: Import and Format BEA - Exports and Imports %Change
+#| warning: false
 
-NEIA <- BEA_export_imports_A[c(1, 3, 27, 52:58), !1] %>%
-  .[1,1:="catagory"] %>%
-  setnames(paste(.[1])) %>%
-  .[!1] %>%
-  mutate(catagory = str_trim(catagory)) %>%
-  mutate_if(is.numeric, as.character) %>%
-  pivot_longer(!catagory, names_to = "year", values_to = "pctDelta") %>%
-  pivot_wider(names_from = catagory, values_from = pctDelta) %>%
-  mutate_if(is.character, as.numeric) %>%
-  setnames(paste("neia", gsub(" ", "_", names(.)), sep = "")) %>%
-  rename("year" = names(.)[1]) %>%
-  mutate(source = "BEA_exportsImportsA")
+## Annual Exports/Imports
+exImA_list <- append(beaConfig, list('TableName' = 'T40201',
+                                     'Frequency' = 'A'))
+exIm_A <- beaGet(exImA_list) %>%
+  pivot_longer(cols = !(TableName:UNIT_MULT), 
+               names_to = "time",
+               values_to = "pctChange") %>%
+  mutate(year = str_extract(time, "[0-9]{4}")) %>%
+  select(!c(time, UNIT_MULT))
+  
+## Quarterly Exports/Imports
+exImQ_list <- append(beaConfig, list('TableName' = 'T40201',
+                                     'Frequency' = 'Q'))  
+exIm_Q <- beaGet(exImQ_list) %>%
+  pivot_longer(cols = !(TableName:UNIT_MULT), 
+               names_to = "time",
+               values_to = "pctChange") %>%
+  mutate(year = str_extract(time, "[0-9]{4}"),
+         quarter = str_extract(time, "\\d$")) %>%
+  select(!c(time, UNIT_MULT))
 
-NEIQ <- BEA_export_imports_Q[c(1:3, 27, 52:58), !1] %>%
-  .[1,1:="catagory"] %>%
-  .[2,1:="Quarter"] %>%
-  setnames(paste(.[1], .[2], sep = "_")) %>%
-  .[!1:2] %>%
-  rename(catagory = catagory_Quarter) %>%
-  mutate(catagory = str_trim(catagory)) %>%
-  pivot_longer(!catagory, 
-               names_to = c("year", "quarter"), names_sep = "_",
-               values_to = "pctDelta") %>%
-  pivot_wider(names_from = catagory, values_from = pctDelta) %>%
-  mutate_at(c(1, 3:ncol(.)), as.numeric) %>%
-  setnames(paste("neiq", gsub(" ", "_", names(.)), sep = "")) %>%
-  rename("year" = names(.)[1]) %>%
-  rename("quarter" = names(.)[2]) %>%
-  mutate(source = "BEA_exports_imports_Q")
-
+## cleanup
+rm(exImA_list, exImQ_list)
 ```
 
 ```{r}
@@ -431,18 +465,6 @@ recessionDates <- tibble(year = c(1958, 1958, 1960, 1960, 1960, 1961, 1970,
                                      "Q2", "Q2"))
 ```
 
-## Sources
-Three major sources of data were used for analysis: The Bureau of Economic Analysis (BEA), The Federal Reserve Board (FRB), and The Bureau of Labor Statistics (BLS).[^1] We initially approached these sources[^2] by selecting commonly reported data about the economy, both on an annual and quarterly basis. Since this paper is introductory and limited in nature, we chose to focus on annual data that represented overall macroeconomic measures, covered a sufficient time period, and included a range of historical economic events.
-
-## Construction
-A primary challenge we encountered when selecting variables for analysis was the variability of time period coverage. Some data spanned from Depression Era 1929 all the way up to 2023. Looking at our final nine variables (see @fig-corr]) and the range of years available by by source (@fig-yearspan), we limited our years to 1958 - 2023 due to *CPIA* data having the smallest range of years.
-
-Some of the data was only available by month. In these cases we calculated annual changes by finding the difference between January of the current year and January of the previous year. Note, this reduced the number of years in our data set by one. We also standardized the data by converting non-rate based data to percent changes from the previous year to ensure consistency across all variables (@eq-generalpctchange). One feature of TDABM is that it can be sensitive to data with large scale differences. This not only reduces how precise you can be when selecting a parameter, but can also significantly increase computation time.
-
-Looking at our correlation table (@fig-corr), we observe moderate to strong correlations between the pairwise combinations of GDP, PCE, Ig, and Imports. We also see a strong correlation between CPI and Interest Rates. Since these correlations are moderate to high, it's worth noting that the shape of our output may be reflected by these correlations. They also could express themselves with similar coloring of TDABM graphs [@dlotko2019macroeconomy].
-
-[^1]: The Federal Reserve Economic Data (FRED) website was used to download BLS data.
-[^2]: See _Data Sources_
 
 
 # Methodology {#sec-methodology}
