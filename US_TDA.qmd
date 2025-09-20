@@ -43,7 +43,7 @@ TDA is a relatively new field and is increasingly being applied to various areas
 # Data {#sec-data}
 
 ## Sources
-Three major sources of data were used for analysis: The Bureau of Economic Analysis (BEA), The Federal Reserve Board (FRB), and The Bureau of Labor Statistics (BLS).[^1] We initially approached these sources[^2] by selecting commonly reported data about the economy, both on an annual and quarterly basis. Since this paper is introductory and limited in nature, we chose to focus on annual data that represented overall macroeconomic measures, covered a sufficient time period, and included a range of historical economic events.
+Three major sources of data were used for analysis: The Bureau of Economic Analysis (BEA), The Federal Reserve Board (FRB), and The Bureau of Labor Statistics (BLS).[^1] We initially approached these sources by selecting commonly reported data about the economy, both on an annual and quarterly basis. Since this paper is introductory, we chose to focus on annual data that represented overall macroeconomic measures, covered a sufficient time period, and included a range of historical economic events Future versions of this paper should quarterly time ranges, or even smaller, and other data sources which might bring valuable insight. This will be touched more in the results and discussion section.
 
 ## Construction
 A primary challenge we encountered when selecting variables for analysis was the variability of time period coverage. Some data spanned from Depression Era 1929 all the way up to 2023. Looking at our final nine variables (see @fig-corr]) and the range of years available by by source (@fig-yearspan), we limited our years to 1958 - 2023 due to *CPIA* data having the smallest range of years.
@@ -53,7 +53,6 @@ Some of the data was only available by month. In these cases we calculated annua
 Looking at our correlation table (@fig-corr), we observe moderate to strong correlations between the pairwise combinations of GDP, PCE, Ig, and Imports. We also see a strong correlation between CPI and Interest Rates. Since these correlations are moderate to high, it's worth noting that the shape of our output may be reflected by these correlations. They also could express themselves with similar coloring of TDABM graphs [@dlotko2019macroeconomy].
 
 [^1]: The Federal Reserve Economic Data (FRED) website was used to download BLS data.
-[^2]: See _Data Sources_
 
 ```{r}
 #| label: Load Packages and Dependencies
