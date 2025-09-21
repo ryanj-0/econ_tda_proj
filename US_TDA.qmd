@@ -66,12 +66,12 @@ library(kableExtra)
 library(BallMapper)
 library(bea.R)
 library(svglite)
-source("beaKey.R")
+source("my_beaKey.R")
 
-beaConfig <- list('UserID' = beaKey,
+# NIPA tables config
+beaConfig <- list('UserID' = my_beaKey,
                   'Method' = 'GetData',
-                  'datasetname' = 'NIPA',
-                  'Year' = 'X',    # Get All Years Available
+                  'Year' = 'ALL',    # Get All Years Available
                   'ResultFormat' = 'json')
 ```
 
@@ -80,25 +80,27 @@ beaConfig <- list('UserID' = beaKey,
 #| warning: false
 
 ## Annual GDP
-gdpA_list <- append(beaConfig, list('TableName' = 'T10101',
+gdpA_list <- append(beaConfig, list('datasetname' = 'NIPA',
+                                    'TableName' = 'T10101',
                                     'Frequency' = 'A'))
 
-GDP_A <- beaGet(gdpA_list) %>%
+GDP_A <- beaGet(gdpA_list) |>
   pivot_longer(cols = !(TableName:UNIT_MULT),
                names_to = "time",
-               values_to = "pctChange") %>%
-  mutate(year = str_extract(time, "[0-9]{4}")) %>%
+               values_to = "pctChange") |>
+  mutate(year = str_extract(time, "[0-9]{4}")) |>
   select(!c(time, UNIT_MULT))
 
 ## GDP Quartly  
-gdpQ_list <- append(beaConfig, list('TableName' = 'T10101', 
+gdpQ_list <- append(beaConfig, list('datasetname' = 'NIPA',
+                                    'TableName' = 'T10101', 
                                     'Frequency' = 'Q'))
-GDP_Q <- beaGet(gdpQ_list) %>%
+GDP_Q <- beaGet(gdpQ_list) |>
   pivot_longer(cols = !(TableName:UNIT_MULT), 
                names_to = "time",
-               values_to = "pctChange") %>%
+               values_to = "pctChange") |>
   mutate(year = str_extract(time, "[0-9]{4}"),
-         quarter = str_extract(time, "\\d$")) %>%
+         quarter = str_extract(time, "\\d$")) |>
   select(!c(time, UNIT_MULT))
 
 ## cleanup
@@ -111,24 +113,27 @@ rm(gdpA_list, gdpQ_list)
 #| warning: false
 
 ## Annual Exports/Imports
-exImA_list <- append(beaConfig, list('TableName' = 'T40201',
+exImA_list <- append(beaConfig, list('datasetname' = 'NIPA',
+                                     'TableName' = 'T40201',
                                      'Frequency' = 'A'))
-exIm_A <- beaGet(exImA_list) %>%
+
+exIm_A <- beaGet(exImA_list) |>
   pivot_longer(cols = !(TableName:UNIT_MULT), 
                names_to = "time",
-               values_to = "pctChange") %>%
-  mutate(year = str_extract(time, "[0-9]{4}")) %>%
+               values_to = "pctChange") |>
+  mutate(year = str_extract(time, "[0-9]{4}")) |>
   select(!c(time, UNIT_MULT))
   
 ## Quarterly Exports/Imports
-exImQ_list <- append(beaConfig, list('TableName' = 'T40201',
+exImQ_list <- append(beaConfig, list('datasetname' = 'NIPA',
+                                     'TableName' = 'T40201',
                                      'Frequency' = 'Q'))  
-exIm_Q <- beaGet(exImQ_list) %>%
+exIm_Q <- beaGet(exImQ_list) |>
   pivot_longer(cols = !(TableName:UNIT_MULT), 
                names_to = "time",
-               values_to = "pctChange") %>%
+               values_to = "pctChange") |>
   mutate(year = str_extract(time, "[0-9]{4}"),
-         quarter = str_extract(time, "\\d$")) %>%
+         quarter = str_extract(time, "\\d$")) |>
   select(!c(time, UNIT_MULT))
 
 ## cleanup
@@ -136,71 +141,70 @@ rm(exImA_list, exImQ_list)
 ```
 
 ```{r}
+#| label: Foreign Direct Investment 
 #| warning: false
 
-FE <- BEA_foreign_direct_invesment[, 2:11] %>%
-  setnames(paste(.[3])) %>%
-  .[!1:3] %>%
-  pivot_longer(1:ncol(.), names_to = "year", values_to = "FE") %>%
-  mutate_if(is.character, as.numeric)
-  
-PE <- BEA_foreign_direct_invesment[, 12:21] %>%
-  setnames(paste(.[3])) %>%
-  .[!1:3] %>%
-  pivot_longer(1:ncol(.), names_to = "year", values_to = "PE") %>%
-  mutate_if(is.character, as.numeric)
-
-FDI <- merge(PE, FE, by = "year") %>%
-  mutate(DE = PE-FE) %>%
-  setnames(paste("fdi_", gsub(" ", "_", names(.)), sep = "")) %>%
-  rename("year" = names(.)[1]) %>%
-  mutate(source = "BEA_FDI")
+FDI_A <- beaGet(list('UserID' = my_beaKey,
+                     'Method' = 'GetData',
+                     'datasetname' = 'MNE',
+                     'DirectionOfInvestment' = 'Inward',
+                     'Classification' = 'Industry',
+                     'Year' = "All")) |>
+  filter(Column %in% c("First-year expenditures", 
+                        "Planned total expenditures"),
+         Row == "All Industries Total") |>
+  pivot_longer(cols = !SeriesID:TableRowDisplayOrder,
+               names_to = "time",
+               values_to = "expenditures") |>
+  mutate(year = str_extract(time, "[0-9]{4}")) |>
+  drop_na(expenditures) |>
+  select(Row, Column, TableScale, year, expenditures)
 
 ```
 
 ```{r}
 #| warning: false
 
-GDPA <- BEA_gdp_A[!c(2, 16:17, 29:30), !1] %>%
-  .[1, 1:="catagory"] %>%
-  .[4, 1:= "Personal Goods"] %>%
-  .[7, 1:= "Personal Services"] %>%
-  .[16, 1:= "Export Goods"] %>%
-  .[17, 1:= "Export Services"] %>%
-  .[19, 2:= "Import Goods"] %>%
-  .[20, 2:= "Import Services"] %>%
-  setnames(paste(.[1])) %>%
-  .[!1] %>%
-  mutate(catagory = str_trim(catagory)) %>%
-  pivot_longer(!catagory, names_to = "year", values_to = "pct_delta") %>%
-  pivot_wider(names_from = catagory, values_from = pct_delta) %>%
-  mutate_if(is.character, as.numeric) %>%
-  setnames(paste("gdpa", gsub(" ", "_", names(.)), sep = "")) %>%
-  rename("year" = names(.)[1]) %>%
+GDPA <- BEA_gdp_A[!c(2, 16:17, 29:30), !1] |>
+  .[1, 1:="catagory"] |>
+  .[4, 1:= "Personal Goods"] |>
+  .[7, 1:= "Personal Services"] |>
+  .[16, 1:= "Export Goods"] |>
+  .[17, 1:= "Export Services"] |>
+  .[19, 2:= "Import Goods"] |>
+  .[20, 2:= "Import Services"] |>
+  setnames(paste(.[1])) |>
+  .[!1] |>
+  mutate(catagory = str_trim(catagory)) |>
+  pivot_longer(!catagory, names_to = "year", values_to = "pct_delta") |>
+  pivot_wider(names_from = catagory, values_from = pct_delta) |>
+  mutate_if(is.character, as.numeric) |>
+  setnames(paste("gdpa", gsub(" ", "_", names(.)), sep = "")) |>
+  rename("year" = names(.)[1]) |>
   mutate(source = "BEA_gdp_A")
 
 
-GDPQ <- BEA_gdp_Q[!c(16:17, 29:30), !1] %>%
-  .[1, 1:="catagory"] %>%
-  .[2, 1:="Q"] %>%
-  .[5, 1:= "Personal Goods"] %>%
-  .[8, 1:= "Personal Services"] %>%
-  .[17, 1:= "Export Goods"] %>%
-  .[18, 1:= "Export Services"] %>%
-  .[20, 2:= "Import Goods"] %>%
-  .[21, 2:= "Import Services"] %>%
-  setnames(paste(.[1], .[2], sep = "_")) %>%
-  .[!1:2] %>%
-  rename(catagory = catagory_Q) %>%
-  mutate(catagory = str_trim(catagory)) %>%
+GDPQ <- BEA_gdp_Q[!c(16:17, 29:30), !1] |>
+  .[1, 1:="catagory"] |>
+  .[2, 1:="Q"] |>
+  .[5, 1:= "Personal Goods"] |>
+  .[8, 1:= "Personal Services"] |>
+  .[17, 1:= "Export Goods"] |>
+  .[18, 1:= "Export Services"] |>
+  .[20, 2:= "Import Goods"] |>
+  .[21, 2:= "Import Services"] |>
+  setnames(paste(.[1], .[2], sep = "_")) |>
+  .[!1:2] |>
+  rename(catagory = catagory_Q) |>
+  mutate(catagory = str_trim(catagory)) |>
   pivot_longer(!catagory, 
                names_to = c("year", "Q"), names_sep = "_", 
-               values_to = "pct_delta") %>%
-  pivot_wider(names_from = catagory, values_from = pct_delta) %>%
-  mutate_at(c(1,3:ncol(.)), as.numeric) %>%
-  setnames(paste("gdpq", gsub(" ", "_", names(.)), sep = "")) %>%
-  rename("year" = names(.)[1]) %>%
-  rename("quarter" = names(.)[2]) %>%
+               values_to = "pct_delta") |>
+  pivot_wider(names_from = catagory, values_from = pct_delta) |>
+  mutate_at(c(1,3:ncol(.)), as.numeric) |>
+  setnames(paste("gdpq", gsub(" ", "_", names(.)), sep = "")) |>
+  rename("year" = names(.)[1]) |>
+  rename("quarter" = names(.)[2]) |>
   mutate(source = "BEA_gdp_Q")
 ```
 
@@ -211,208 +215,208 @@ value_cols <- c(2:10, 12:14)
 pctChg <- function(x){((x-lag(x))/lag(x))*100}
 
 PIDA <- BEA_personal_income_and_disposition_A[
-  c(1, 3:4, 11, 14:15, 18, 28, 29, 36:37, 41, 44:45, 49), !1] %>%
-  .[1, 1:="catagory"] %>%
-  .[13, 1:=str_c(.[13, 1], ".per_capita")] %>%
-  .[15, 1:=str_c(.[15, 1], ".pct_delta")] %>%
-  setnames(paste(.[1])) %>%
-  .[!1] %>%
-  mutate(catagory = str_trim(catagory)) %>%
-  mutate_if(is.numeric, as.character) %>%
-  pivot_longer(!catagory, names_to = "year", values_to = "total_M") %>%
-  pivot_wider(names_from = catagory, values_from = total_M) %>%
-  mutate_if(is.character, as.numeric) %>%
-  setnames(paste("pida", gsub(" ", "_", names(.)), sep = "")) %>%
-  mutate(across(value_cols, pctChg)) %>%
-  rename("year" = names(.)[1]) %>%
+  c(1, 3:4, 11, 14:15, 18, 28, 29, 36:37, 41, 44:45, 49), !1] |>
+  .[1, 1:="catagory"] |>
+  .[13, 1:=str_c(.[13, 1], ".per_capita")] |>
+  .[15, 1:=str_c(.[15, 1], ".pct_delta")] |>
+  setnames(paste(.[1])) |>
+  .[!1] |>
+  mutate(catagory = str_trim(catagory)) |>
+  mutate_if(is.numeric, as.character) |>
+  pivot_longer(!catagory, names_to = "year", values_to = "total_M") |>
+  pivot_wider(names_from = catagory, values_from = total_M) |>
+  mutate_if(is.character, as.numeric) |>
+  setnames(paste("pida", gsub(" ", "_", names(.)), sep = "")) |>
+  mutate(across(value_cols, pctChg)) |>
+  rename("year" = names(.)[1]) |>
   mutate(source = "BEA_PID_A")
 
 PIDQ <- BEA_personal_income_and_disposition_Q[
-  c(1:4, 11, 14:15, 18, 28, 29, 36:37, 41, 44:45, 49), !1] %>%
-  .[1, 1:="catagory"]%>%
-  .[2, 1:="Q"] %>%
-  .[14, 1:=str_c(.[14, 1], ".per_capita")] %>%
-  .[16, 1:=str_c(.[16, 1], ".pct_delta")] %>%
-  setnames(paste(.[1], .[2], sep = "_")) %>%
-  .[!1:2] %>%
-  rename(catagory = catagory_Q) %>%
-  mutate(catagory = str_trim(catagory)) %>%
+  c(1:4, 11, 14:15, 18, 28, 29, 36:37, 41, 44:45, 49), !1] |>
+  .[1, 1:="catagory"]|>
+  .[2, 1:="Q"] |>
+  .[14, 1:=str_c(.[14, 1], ".per_capita")] |>
+  .[16, 1:=str_c(.[16, 1], ".pct_delta")] |>
+  setnames(paste(.[1], .[2], sep = "_")) |>
+  .[!1:2] |>
+  rename(catagory = catagory_Q) |>
+  mutate(catagory = str_trim(catagory)) |>
   pivot_longer(!catagory, 
                names_to = c("year", "Q"), names_sep = "_", 
-               values_to = "total_M") %>%
-  pivot_wider(names_from = catagory, values_from = total_M) %>%
-  mutate_at(c(1, 3:ncol(.)), as.numeric) %>%
-  setnames(paste("pidq", gsub(" ", "_", names(.)), sep = "")) %>%
-  mutate(across(value_cols + 1  , pctChg)) %>%
-  rename("year" = names(.)[1]) %>%
-  rename("quarter" = names(.)[2]) %>%
+               values_to = "total_M") |>
+  pivot_wider(names_from = catagory, values_from = total_M) |>
+  mutate_at(c(1, 3:ncol(.)), as.numeric) |>
+  setnames(paste("pidq", gsub(" ", "_", names(.)), sep = "")) |>
+  mutate(across(value_cols + 1  , pctChg)) |>
+  rename("year" = names(.)[1]) |>
+  rename("quarter" = names(.)[2]) |>
   mutate(source = "BEA_PID_Q")
 ```
 
 ```{r}
 #| warning: false
 
-FFRM <- FRB_FFER_M[!1:5] %>%
-  rename(date = "Series Description") %>%
-  rename(rate = "Federal funds effective rate") %>%
-  separate_wider_delim(date, delim = "-", names = c("year", "month")) %>%
-  mutate_if(is.character, as.numeric) %>%
-  setnames(paste("ffrm_", gsub(" ", "_", names(.)), sep = "")) %>%
-  rename("year" = names(.)[1]) %>%
+FFRM <- FRB_FFER_M[!1:5] |>
+  rename(date = "Series Description") |>
+  rename(rate = "Federal funds effective rate") |>
+  separate_wider_delim(date, delim = "-", names = c("year", "month")) |>
+  mutate_if(is.character, as.numeric) |>
+  setnames(paste("ffrm_", gsub(" ", "_", names(.)), sep = "")) |>
+  rename("year" = names(.)[1]) |>
   mutate(source = "FRB_FFER_M")
 
-FFRA <- FRB_FFER_A[!1:5] %>%
-  rename(year = "Series Description") %>%
-  rename(rate = "Federal funds effective rate") %>%
-  mutate_if(is.character, as.numeric) %>%
-  setnames(paste("ffra", gsub(" ", "_", names(.)), sep = "")) %>%
-  rename("year" = names(.)[1]) %>%
+FFRA <- FRB_FFER_A[!1:5] |>
+  rename(year = "Series Description") |>
+  rename(rate = "Federal funds effective rate") |>
+  mutate_if(is.character, as.numeric) |>
+  setnames(paste("ffra", gsub(" ", "_", names(.)), sep = "")) |>
+  rename("year" = names(.)[1]) |>
   mutate(source = "FRB_FFER_A")
 ```
 
 ```{r}
 #| warning: false
 
-FFRQ <- FFRM %>%
+FFRQ <- FFRM |>
   mutate(quarter = case_when(ffrm_month %in% c(1:3) ~ "Q1",
                              ffrm_month %in% c(4:6) ~ "Q2",
                              ffrm_month %in% c(7:9) ~ "Q3",
-                             ffrm_month %in% c(10:12) ~ "Q4")) %>%
-  group_by(year, quarter) %>%
-  mutate(ffrQ = mean(ffrm_rate)) %>%
-  select(year, quarter, ffrQ) %>%
-  distinct() %>%
-  ungroup() %>%
-  mutate(ffrQ_delta = (ffrQ - lag(ffrQ))/lag(ffrQ)) %>%
+                             ffrm_month %in% c(10:12) ~ "Q4")) |>
+  group_by(year, quarter) |>
+  mutate(ffrQ = mean(ffrm_rate)) |>
+  select(year, quarter, ffrQ) |>
+  distinct() |>
+  ungroup() |>
+  mutate(ffrQ_delta = (ffrQ - lag(ffrQ))/lag(ffrQ)) |>
   mutate(source = "FFRM")
 ```
 
 ```{r}
 #| waring: false
 
-coreInflation <- FRED_CPILFESL %>%
+coreInflation <- FRED_CPILFESL |>
   separate_wider_delim(DATE, delim = "-", 
-                       names = c("year", "month", "day")) %>%
-  select(year, month, CPILFESL) %>%
-  rename(cpi = CPILFESL) %>%
-  mutate(cpiDelta = (cpi - lag(cpi))/lag(cpi)) %>%
-  mutate(cpiYear = ((cpi-lag(cpi, 12))/lag(cpi, 12))*100) %>%
-  mutate_if(is.character, as.numeric) %>%
+                       names = c("year", "month", "day")) |>
+  select(year, month, CPILFESL) |>
+  rename(cpi = CPILFESL) |>
+  mutate(cpiDelta = (cpi - lag(cpi))/lag(cpi)) |>
+  mutate(cpiYear = ((cpi-lag(cpi, 12))/lag(cpi, 12))*100) |>
+  mutate_if(is.character, as.numeric) |>
   mutate(source = "FRED_CPILFESL")
 
-coreInflationQ <-   coreInflation %>%
+coreInflationQ <-   coreInflation |>
   mutate(quarter = case_when(month %in% c(1:3) ~ "Q1",
                              month %in% c(4:6) ~ "Q2",
                              month %in% c(7:9) ~ "Q3",
-                             month %in% c(10:12) ~ "Q4")) %>%
-  group_by(year, quarter) %>%
-  mutate(cpiQ = mean(cpi)) %>%
-  select(year, quarter, cpiQ) %>%
-  distinct() %>%
-  ungroup() %>%
-  mutate(cpiQdelta = (cpiQ - lag(cpiQ))/lag(cpiQ)) %>%
+                             month %in% c(10:12) ~ "Q4")) |>
+  group_by(year, quarter) |>
+  mutate(cpiQ = mean(cpi)) |>
+  select(year, quarter, cpiQ) |>
+  distinct() |>
+  ungroup() |>
+  mutate(cpiQdelta = (cpiQ - lag(cpiQ))/lag(cpiQ)) |>
   mutate(source = "coreInflation")
 ```
 
 ```{r}
 #| waring: false
 
-employment_cost_index <- FRED_ECIALLCIV %>%
+employment_cost_index <- FRED_ECIALLCIV |>
   separate_wider_delim(DATE, delim = "-", 
-                       names = c("year", "Q", "day")) %>%
-  select(year, Q, ECIALLCIV) %>%
-  rename(eci = ECIALLCIV) %>%
-  mutate(eci_q_delta = (eci - lag(eci, 1))/lag(eci, 1)) %>%
-  mutate(eci_year_delta = (eci-lag(eci, 4))/lag(eci, 4)) %>%
-  mutate_if(is.character, as.numeric) %>%
+                       names = c("year", "Q", "day")) |>
+  select(year, Q, ECIALLCIV) |>
+  rename(eci = ECIALLCIV) |>
+  mutate(eci_q_delta = (eci - lag(eci, 1))/lag(eci, 1)) |>
+  mutate(eci_year_delta = (eci-lag(eci, 4))/lag(eci, 4)) |>
+  mutate_if(is.character, as.numeric) |>
   mutate(Q = case_when(Q == 1 ~ 1,
                        Q == 4 ~ 2,
                        Q == 7 ~ 3,
-                       Q == 10 ~ 4)) %>%
+                       Q == 10 ~ 4)) |>
   mutate(source = "FRED_ECIALLCIV")
 ```
 
 ```{r}
 #| waring: false
 
-housingStarts <- FRED_HOUST %>%
+housingStarts <- FRED_HOUST |>
   separate_wider_delim(DATE, delim = "-", 
-                       names = c("year", "month", "day")) %>%
-  select(year, month, HOUST) %>%
-  rename(houses = HOUST) %>%
-  mutate(housesDelta = (houses - lag(houses))/lag(houses)) %>%
-  mutate(housesYear = (houses-lag(houses, 12))/lag(houses, 12)) %>%
-  mutate_if(is.character, as.numeric) %>%
+                       names = c("year", "month", "day")) |>
+  select(year, month, HOUST) |>
+  rename(houses = HOUST) |>
+  mutate(housesDelta = (houses - lag(houses))/lag(houses)) |>
+  mutate(housesYear = (houses-lag(houses, 12))/lag(houses, 12)) |>
+  mutate_if(is.character, as.numeric) |>
   mutate(source = "FRED_HOUST")
 
-housingStartsQ <-   housingStarts %>%
+housingStartsQ <-   housingStarts |>
   mutate(quarter = case_when(month %in% c(1:3) ~ "Q1",
                              month %in% c(4:6) ~ "Q2",
                              month %in% c(7:9) ~ "Q3",
-                             month %in% c(10:12) ~ "Q4")) %>%
-  group_by(year, quarter) %>%
-  mutate(housesQ = mean(houses)) %>%
-  select(year, quarter, housesQ) %>%
-  distinct() %>%
-  ungroup() %>%
-  mutate(housesQdelta = (housesQ - lag(housesQ))/lag(housesQ)) %>%
+                             month %in% c(10:12) ~ "Q4")) |>
+  group_by(year, quarter) |>
+  mutate(housesQ = mean(houses)) |>
+  select(year, quarter, housesQ) |>
+  distinct() |>
+  ungroup() |>
+  mutate(housesQdelta = (housesQ - lag(housesQ))/lag(housesQ)) |>
   mutate(source = "housingStarts")
 ```
 
 ```{r}
 #| waring: false
 
-PPI <- FRED_PPIFIS %>%
+PPI <- FRED_PPIFIS |>
   separate_wider_delim(DATE, delim = "-", 
-                       names = c("year", "month", "day")) %>%
-  select(year, month, PPIFIS) %>%
-  rename(ppi = PPIFIS) %>%
-  mutate(ppi_pct_delta = (ppi - lag(ppi))/lag(ppi)) %>%
-  mutate(ppi_year_delta = (ppi-lag(ppi, 12))/lag(ppi, 12)) %>%
-  mutate_if(is.character, as.numeric) %>%
+                       names = c("year", "month", "day")) |>
+  select(year, month, PPIFIS) |>
+  rename(ppi = PPIFIS) |>
+  mutate(ppi_pct_delta = (ppi - lag(ppi))/lag(ppi)) |>
+  mutate(ppi_year_delta = (ppi-lag(ppi, 12))/lag(ppi, 12)) |>
+  mutate_if(is.character, as.numeric) |>
   mutate(source = "FRED_PPIFIS")
 
-PPIQ <-   PPI %>%
+PPIQ <-   PPI |>
   mutate(quarter = case_when(month %in% c(1:3) ~ "Q1",
                              month %in% c(4:6) ~ "Q2",
                              month %in% c(7:9) ~ "Q3",
-                             month %in% c(10:12) ~ "Q4")) %>%
-  group_by(year, quarter) %>%
-  mutate(ppiQ = mean(ppi)) %>%
-  select(year, quarter, ppiQ) %>%
-  distinct() %>%
-  ungroup() %>%
-  mutate(ppiQdelta = (ppiQ - lag(ppiQ))/lag(ppiQ)) %>%
+                             month %in% c(10:12) ~ "Q4")) |>
+  group_by(year, quarter) |>
+  mutate(ppiQ = mean(ppi)) |>
+  select(year, quarter, ppiQ) |>
+  distinct() |>
+  ungroup() |>
+  mutate(ppiQdelta = (ppiQ - lag(ppiQ))/lag(ppiQ)) |>
   mutate(source = "PPI")
 ```
 
 ```{r}
 #| warning: false
 
-unemploymentRate <- FRED_UNRATE %>%
+unemploymentRate <- FRED_UNRATE |>
   separate_wider_delim(DATE, delim = "-", 
-                       names = c("year", "month", "day")) %>%
-  select(year, month, UNRATE) %>%
-  rename(unrate = UNRATE) %>%
-  group_by(year) %>%
-  mutate(unrateYear = mean(unrate)) %>%
-  ungroup() %>%
-  mutate(unrateDelta = (unrate - lag(unrate))/lag(unrate)) %>%
-  mutate(unrateYeardelta = (unrate-lag(unrate, 12))/lag(unrate, 12)) %>%
-  mutate_if(is.character, as.numeric) %>%
+                       names = c("year", "month", "day")) |>
+  select(year, month, UNRATE) |>
+  rename(unrate = UNRATE) |>
+  group_by(year) |>
+  mutate(unrateYear = mean(unrate)) |>
+  ungroup() |>
+  mutate(unrateDelta = (unrate - lag(unrate))/lag(unrate)) |>
+  mutate(unrateYeardelta = (unrate-lag(unrate, 12))/lag(unrate, 12)) |>
+  mutate_if(is.character, as.numeric) |>
   mutate(source = "FRED_UNRATE")
 
-unemploymentRateQ <-   unemploymentRate %>%
+unemploymentRateQ <-   unemploymentRate |>
   mutate(quarter = case_when(month %in% c(1:3) ~ "Q1",
                              month %in% c(4:6) ~ "Q2",
                              month %in% c(7:9) ~ "Q3",
-                             month %in% c(10:12) ~ "Q4")) %>%
-  group_by(year, quarter) %>%
-  mutate(unrateQ = mean(unrate)) %>%
-  select(year, quarter, unrateQ) %>%
-  distinct() %>%
-  ungroup() %>%
-  mutate(unrateQdelta = (unrateQ - lag(unrateQ))/lag(unrateQ)) %>%
+                             month %in% c(10:12) ~ "Q4")) |>
+  group_by(year, quarter) |>
+  mutate(unrateQ = mean(unrate)) |>
+  select(year, quarter, unrateQ) |>
+  distinct() |>
+  ungroup() |>
+  mutate(unrateQdelta = (unrateQ - lag(unrateQ))/lag(unrateQ)) |>
   mutate(source = "unemploymentRate")
 ```
 
@@ -438,7 +442,7 @@ for (i in 1:length(dataList)) {
   yearDiff <- yearRange[2] - yearRange[1]
   rObs <- nrow(tmpDf)
   cObs <- ncol(tmpDf)
-  dataSummary <- dataSummary %>%
+  dataSummary <- dataSummary |>
     add_row(source = dataList[i],
             yearSpan = yearDiff,
             obs = rObs,
@@ -503,14 +507,14 @@ In our [Data](#sec-data) section, we noted that some calculations were needed be
 annualYears <- 1958:2023
 
 annualTbl <- merge(
-  GDPA %>% filter(year %in% annualYears) %>% select(!source),
-  FFRA %>% filter(year %in% annualYears) %>% select(!source),
-  by = "year") %>%
-  merge(coreInflation %>% 
-          filter(year %in% annualYears & month == 12) %>%
-          select(!c(source, month, cpi, cpiDelta))) %>%
-  merge(unemploymentRate %>% 
-          filter(year %in% annualYears & month == 12) %>%
+  GDPA |> filter(year %in% annualYears) |> select(!source),
+  FFRA |> filter(year %in% annualYears) |> select(!source),
+  by = "year") |>
+  merge(coreInflation |> 
+          filter(year %in% annualYears & month == 12) |>
+          select(!c(source, month, cpi, cpiDelta))) |>
+  merge(unemploymentRate |> 
+          filter(year %in% annualYears & month == 12) |>
           select(!c(source, month, unrateDelta)))
 
 rownames(annualTbl) <- annualTbl[, 1]
@@ -522,12 +526,12 @@ rownames(annualTbl) <- annualTbl[, 1]
 
 pcAnnual <- annualTbl[ ,c(2, 3, 8, 21, 15, 18, 26, 27, 29)]
 
-pcAnnualClean <- annualTbl %>%
-  anti_join(recessionDates, by = "year") %>%
+pcAnnualClean <- annualTbl |>
+  anti_join(recessionDates, by = "year") |>
   select(c(2, 3, 8, 21, 15, 18, 26, 27, 29))
 
   
-annualCorr <- correlate(pcAnnual, quiet = TRUE) %>%
+annualCorr <- correlate(pcAnnual, quiet = TRUE) |>
   rename("GDP" = 2, "PCE" = 3, "Ig" = 4, "Gov" = 5, "Exports" = 6, 
          "Imports" = 7, "InterestRateA" = 8, "CPIA" = 9, "AvgUnrateA" = 10)
 ```
@@ -539,10 +543,10 @@ annualCorr <- correlate(pcAnnual, quiet = TRUE) %>%
 #| label: Annual BM-single
 #| include: false
 
-pcAclean <- pcAnnualClean %>% normalize_to_min_0_max_1()
+pcAclean <- pcAnnualClean |> normalize_to_min_0_max_1()
 
-pcA <- pcAnnual %>% normalize_to_min_0_max_1()
-coloring <- annualTbl$year %>% as.data.frame()
+pcA <- pcAnnual |> normalize_to_min_0_max_1()
+coloring <- annualTbl$year |> as.data.frame()
 e = 0.45
 
 svglite("annualBM.svg", height = 6, width = 8)
@@ -558,8 +562,8 @@ dev.off()
 #| label: Hide n Seek
 #| eval: false
 
-pcAnnual %>%
-  slice(points_covered_by_landmarks(annualBm, c(12:20))) %>%
+pcAnnual |>
+  slice(points_covered_by_landmarks(annualBm, c(12:20))) |>
   rename("GDP" = 1, "PCE" = 2, "Ig" = 3, "Gov" = 4, "Exports" = 5, 
          "Imports" = 6, "FFR" = 7, "CPI" = 8, "UnRate" = 9)
 ```
@@ -614,9 +618,9 @@ where $P$ is a column of our data with $x_1,...,x_n$ observations and $k$ is a l
 #| label: tbl-summarystats
 #| tbl-cap: Summary Statistics (%)
 
-summaryStatsA <- pcAnnual %>%
+summaryStatsA <- pcAnnual |>
   rename("GDP" = 1, "PCE" = 2, "Ig" = 3, "Exports" = 4, "Imports" = 5,
-         "Gov" = 6, "InterestRateA" = 7, "CPIA" = 8, "AvgUnrateA" = 9) %>%
+         "Gov" = 6, "InterestRateA" = 7, "CPIA" = 8, "AvgUnrateA" = 9) |>
   summarise(across(everything(), list(Minimum = min,
                                       Q25 = ~quantile(., 0.25),
                                       Median = median,
@@ -624,13 +628,13 @@ summaryStatsA <- pcAnnual %>%
                                       Maximum = max,
                                       Mean = mean,
                                       SD = sd,
-                                      VAR = var))) %>%
-  pivot_longer(everything(), names_to = "var", values_to = "val") %>%
+                                      VAR = var))) |>
+  pivot_longer(everything(), names_to = "var", values_to = "val") |>
   separate_wider_delim(var, delim = "_", 
-                       names = c("measure", "statistic")) %>%
+                       names = c("measure", "statistic")) |>
   pivot_wider(names_from = statistic, values_from = val)
 
-summaryStatsA %>%
+summaryStatsA |>
   kable(digits = 2)
 ```
 
@@ -639,10 +643,10 @@ summaryStatsA %>%
 #| label: tbl-covidplus
 #| tbl-cap: COVID-19+ (% change)
 
-pcAnnual %>%
-  slice(points_covered_by_landmarks(annualBm, c(1, 16, 25, 27))) %>%
+pcAnnual |>
+  slice(points_covered_by_landmarks(annualBm, c(1, 16, 25, 27))) |>
   rename("GDP" = 1, "PCE" = 2, "Ig" = 3, "Gov" = 4, "Exports" = 5, 
-         "Imports" = 6, "FFR" = 7, "CPI" = 8, "UnRate" = 9) %>%
+         "Imports" = 6, "FFR" = 7, "CPI" = 8, "UnRate" = 9) |>
   kable()
 ```
 
@@ -651,10 +655,10 @@ pcAnnual %>%
 #| label: tbl-greatinflation
 #| tbl-cap: The Great Inflation (% change)
 
-pcAnnual %>%
-  slice(points_covered_by_landmarks(annualBm, c(12:20))) %>%
+pcAnnual |>
+  slice(points_covered_by_landmarks(annualBm, c(12:20))) |>
   rename("GDP" = 1, "PCE" = 2, "Ig" = 3, "Gov" = 4, "Exports" = 5, 
-         "Imports" = 6, "FFR" = 7, "CPI" = 8, "UnRate" = 9) %>%
+         "Imports" = 6, "FFR" = 7, "CPI" = 8, "UnRate" = 9) |>
   kable()
 ```
 
@@ -663,9 +667,9 @@ pcAnnual %>%
 #| label: fig-yearspan
 #| fig-cap: Year Coverage by Data Source
 
-dataSummary %>%
-  filter(source %in% c("GDPA", "FFRA", "coreInflation", "unemploymentRate")) %>%
-  mutate(source =  c("BEA GDP", "FRB FFR", "BLS CPI", "BLS UnRate")) %>%
+dataSummary |>
+  filter(source %in% c("GDPA", "FFRA", "coreInflation", "unemploymentRate")) |>
+  mutate(source =  c("BEA GDP", "FRB FFR", "BLS CPI", "BLS UnRate")) |>
   ggplot(aes(x = yearSpan,
              y = fct_reorder(source, yearSpan))) +
   geom_col(fill = "orchid4") +
@@ -680,16 +684,16 @@ dataSummary %>%
 #| label: fig-corr
 #| warning: false
 
-annualCorr %>%
-  mutate(term = names(.)[-1]) %>%
-  shave() %>%
-  stretch() %>%
+annualCorr |>
+  mutate(term = names(.)[-1]) |>
+  shave() |>
+  stretch() |>
   mutate(x = factor(x, levels = c("GDP", "PCE", "Ig", "Gov", "Exports", 
                                   "Imports", "InterestRateA", "CPIA", 
                                   "AvgUnrateA")),
          y = factor(y, levels = c("GDP", "PCE", "Ig", "Gov", "Exports", 
                                   "Imports", "InterestRateA", "CPIA", 
-                                  "AvgUnrateA") |> rev())) %>%
+                                  "AvgUnrateA") |> rev())) |>
   ggplot(aes(x = x, y = y)) + 
   geom_tile(aes(fill = r)) +
   geom_text(aes(label = round(r, 2)), size = 3) +
@@ -779,7 +783,7 @@ pdf(paste(getwd(), "supp/bmDimensions.pdf", sep = "/"))
 for(x in dimensionListA){
   
   
-  coloring <- pcAnnual[, x] %>% as.data.frame()
+  coloring <- pcAnnual[, x] |> as.data.frame()
   annualBm <- BallMapper(points = pcA, values = coloring, epsilon = e)
   ColorIgraphPlot(annualBm, seed_for_plotting = 29)
   title(main = paste("BallMapper output colored by:", x, sep = "\n"),
