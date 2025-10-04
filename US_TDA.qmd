@@ -45,7 +45,7 @@ TDA is a relatively new field and is increasingly being applied to various areas
 ## Sources
 Three major sources of data were used for analysis: The Bureau of Economic Analysis (BEA), The Federal Reserve Board (FRB), and The Bureau of Labor Statistics (BLS).[^1] We initially approached these sources by selecting commonly reported data about the economy, both on an annual and quarterly basis. Since this paper is introductory, we chose to focus on annual data that represented overall macroeconomic measures, covered a sufficient time period, and included a range of historical economic events Future versions of this paper should quarterly time ranges, or even smaller, and other data sources which might bring valuable insight. This will be touched more in the results and discussion section.
 
-## Construction
+## Pointcloud Construction
 A primary challenge we encountered when selecting variables for analysis was the variability of time period coverage. Some data spanned from Depression Era 1929 all the way up to 2023. Looking at our final nine variables (see @fig-corr]) and the range of years available by by source (@fig-yearspan), we limited our years to 1958 - 2023 due to *CPIA* data having the smallest range of years.
 
 Some of the data was only available by month. In these cases we calculated annual changes by finding the difference between January of the current year and January of the previous year. Note, this reduced the number of years in our data set by one. We also standardized the data by converting non-rate based data to percent changes from the previous year to ensure consistency across all variables (@eq-generalpctchange). One feature of TDABM is that it can be sensitive to data with large scale differences. This not only reduces how precise you can be when selecting a parameter, but can also significantly increase computation time.
@@ -88,8 +88,15 @@ GDP_A <- beaGet(gdpA_list) |>
   pivot_longer(cols = !(TableName:UNIT_MULT),
                names_to = "time",
                values_to = "pctChange") |>
-  mutate(year = str_extract(time, "[0-9]{4}")) |>
-  select(!c(time, UNIT_MULT))
+  mutate(year = str_extract(time, "[0-9]{4}"),
+         LineDescription = case_when(LineNumber == 17 ~ "ExportGoods",
+                                     LineNumber == 18 ~ "ExportServices",
+                                     LineNumber == 20 ~ "ImportGoods",
+                                     LineNumber == 21 ~ "ImportServices",
+                                     .default = LineDescription)) |>
+  select(LineDescription, CL_UNIT, year, pctChange) |>
+  pivot_wider(names_from = LineDescription, 
+              values_from = pctChange)
 
 ## GDP Quartly  
 gdpQ_list <- append(beaConfig, list('datasetname' = 'NIPA',
@@ -99,45 +106,20 @@ GDP_Q <- beaGet(gdpQ_list) |>
   pivot_longer(cols = !(TableName:UNIT_MULT), 
                names_to = "time",
                values_to = "pctChange") |>
-  mutate(year = str_extract(time, "[0-9]{4}"),
-         quarter = str_extract(time, "\\d$")) |>
-  select(!c(time, UNIT_MULT))
+  mutate(year = str_extract(time, "[0-9]{4}",),
+         quarter = str_extract(time, "\\d$"),
+         LineDescription = case_when(LineNumber == 17 ~ "ExportGoods",
+                                     LineNumber == 18 ~ "ExportServices",
+                                     LineNumber == 20 ~ "ImportGoods",
+                                     LineNumber == 21 ~ "ImportServices",
+                                     .default = LineDescription)) |>
+  select(LineDescription, CL_UNIT, year, quarter, pctChange) |>
+  pivot_wider(names_from = LineDescription, 
+              values_from = pctChange)
 
 ## cleanup
 rm(gdpA_list, gdpQ_list)
 
-```
-
-```{r}
-#| label: Import and Format BEA - Exports and Imports %Change
-#| warning: false
-
-## Annual Exports/Imports
-exImA_list <- append(beaConfig, list('datasetname' = 'NIPA',
-                                     'TableName' = 'T40201',
-                                     'Frequency' = 'A'))
-
-exIm_A <- beaGet(exImA_list) |>
-  pivot_longer(cols = !(TableName:UNIT_MULT), 
-               names_to = "time",
-               values_to = "pctChange") |>
-  mutate(year = str_extract(time, "[0-9]{4}")) |>
-  select(!c(time, UNIT_MULT))
-  
-## Quarterly Exports/Imports
-exImQ_list <- append(beaConfig, list('datasetname' = 'NIPA',
-                                     'TableName' = 'T40201',
-                                     'Frequency' = 'Q'))  
-exIm_Q <- beaGet(exImQ_list) |>
-  pivot_longer(cols = !(TableName:UNIT_MULT), 
-               names_to = "time",
-               values_to = "pctChange") |>
-  mutate(year = str_extract(time, "[0-9]{4}"),
-         quarter = str_extract(time, "\\d$")) |>
-  select(!c(time, UNIT_MULT))
-
-## cleanup
-rm(exImA_list, exImQ_list)
 ```
 
 ```{r}
@@ -162,51 +144,6 @@ FDI_A <- beaGet(list('UserID' = my_beaKey,
 
 ```
 
-```{r}
-#| warning: false
-
-GDPA <- BEA_gdp_A[!c(2, 16:17, 29:30), !1] |>
-  .[1, 1:="catagory"] |>
-  .[4, 1:= "Personal Goods"] |>
-  .[7, 1:= "Personal Services"] |>
-  .[16, 1:= "Export Goods"] |>
-  .[17, 1:= "Export Services"] |>
-  .[19, 2:= "Import Goods"] |>
-  .[20, 2:= "Import Services"] |>
-  setnames(paste(.[1])) |>
-  .[!1] |>
-  mutate(catagory = str_trim(catagory)) |>
-  pivot_longer(!catagory, names_to = "year", values_to = "pct_delta") |>
-  pivot_wider(names_from = catagory, values_from = pct_delta) |>
-  mutate_if(is.character, as.numeric) |>
-  setnames(paste("gdpa", gsub(" ", "_", names(.)), sep = "")) |>
-  rename("year" = names(.)[1]) |>
-  mutate(source = "BEA_gdp_A")
-
-
-GDPQ <- BEA_gdp_Q[!c(16:17, 29:30), !1] |>
-  .[1, 1:="catagory"] |>
-  .[2, 1:="Q"] |>
-  .[5, 1:= "Personal Goods"] |>
-  .[8, 1:= "Personal Services"] |>
-  .[17, 1:= "Export Goods"] |>
-  .[18, 1:= "Export Services"] |>
-  .[20, 2:= "Import Goods"] |>
-  .[21, 2:= "Import Services"] |>
-  setnames(paste(.[1], .[2], sep = "_")) |>
-  .[!1:2] |>
-  rename(catagory = catagory_Q) |>
-  mutate(catagory = str_trim(catagory)) |>
-  pivot_longer(!catagory, 
-               names_to = c("year", "Q"), names_sep = "_", 
-               values_to = "pct_delta") |>
-  pivot_wider(names_from = catagory, values_from = pct_delta) |>
-  mutate_at(c(1,3:ncol(.)), as.numeric) |>
-  setnames(paste("gdpq", gsub(" ", "_", names(.)), sep = "")) |>
-  rename("year" = names(.)[1]) |>
-  rename("quarter" = names(.)[2]) |>
-  mutate(source = "BEA_gdp_Q")
-```
 
 ```{r}
 #| warning: false
