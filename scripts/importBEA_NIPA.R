@@ -5,10 +5,13 @@
 ########################################################
 
 # Global config for NIPA Tables
-beaConfig <- list('UserID' = my_beaKey,
+nipaConfig <- list('UserID' = my_beaKey,
                   'Method' = 'GetData',
                   'Year' = 'ALL',    # Get All Years Available
                   'ResultFormat' = 'json')
+
+
+# GDP ---------------------------------------------------------------------
 
 # Annual GDP
 gdpA_list <- append(beaConfig, list('datasetname' = 'NIPA',
@@ -47,3 +50,15 @@ GDP_Q <- beaGet(gdpQ_list) |>
     select(LineDescription, CL_UNIT, year, quarter, pctChange) |>
     pivot_wider(names_from = LineDescription,
                 values_from = pctChange)
+
+
+# Personal Income ---------------------------------------------------------
+pidaA_list <- append(beaConfig, list('datasetname' = 'NIPA',
+                                     'TableName' = 'T20100',
+                                     'Frequency' = 'A'))
+pidaA <- beaGet(pidaA_list) |>
+    pivot_longer(cols = !(TableName:UNIT_MULT),
+                 names_to = "time",
+                 values_to = "dollars") |>
+    mutate(year = str_extract(time, "[0-9]{4}"))
+
