@@ -16,10 +16,10 @@ format:
     geometry: 
       - margin = 1in
 title: "Mapping the United States through TDA"
-subtitle: Instructor - Rubana Syed, ECON 111-800
+subtitle: FA24 Honors Macroeconomics Project - Revised Sept 2025
 author: 
   -  Ryan Johnson
-date: 2024-12-11 (Revised Jun - Spet 2025)
+date: October 2025
 bibliography: references.bib
 ---
 
@@ -55,92 +55,27 @@ Looking at our correlation table (@fig-corr), we observe moderate to strong corr
 [^1]: The Federal Reserve Economic Data (FRED) website was used to download BLS data.
 
 ```{r}
-#| label: Load Packages and Dependencies
+#| label: Load Packages and API Key
 #| include: false
 
-library(tidyverse)
-library(corrr)
-library(viridis)
-library(knitr)
-library(kableExtra)
-library(BallMapper)
-library(bea.R)
-library(svglite)
+source(paste(getwd(), "scripts/systemConfig.R", sep = "/"))
 source("my_beaKey.R")
 
-# NIPA tables config
-beaConfig <- list('UserID' = my_beaKey,
-                  'Method' = 'GetData',
-                  'Year' = 'ALL',    # Get All Years Available
-                  'ResultFormat' = 'json')
 ```
 
 ```{r}
-#| label: Import and Format BEA - GDP %Change
+#| label: Import BEA: GDP
 #| warning: false
 
-## Annual GDP
-gdpA_list <- append(beaConfig, list('datasetname' = 'NIPA',
-                                    'TableName' = 'T10101',
-                                    'Frequency' = 'A'))
-
-GDP_A <- beaGet(gdpA_list) |>
-  pivot_longer(cols = !(TableName:UNIT_MULT),
-               names_to = "time",
-               values_to = "pctChange") |>
-  mutate(year = str_extract(time, "[0-9]{4}"),
-         LineDescription = case_when(LineNumber == 17 ~ "ExportGoods",
-                                     LineNumber == 18 ~ "ExportServices",
-                                     LineNumber == 20 ~ "ImportGoods",
-                                     LineNumber == 21 ~ "ImportServices",
-                                     .default = LineDescription)) |>
-  select(LineDescription, CL_UNIT, year, pctChange) |>
-  pivot_wider(names_from = LineDescription, 
-              values_from = pctChange)
-
-## GDP Quartly  
-gdpQ_list <- append(beaConfig, list('datasetname' = 'NIPA',
-                                    'TableName' = 'T10101', 
-                                    'Frequency' = 'Q'))
-GDP_Q <- beaGet(gdpQ_list) |>
-  pivot_longer(cols = !(TableName:UNIT_MULT), 
-               names_to = "time",
-               values_to = "pctChange") |>
-  mutate(year = str_extract(time, "[0-9]{4}",),
-         quarter = str_extract(time, "\\d$"),
-         LineDescription = case_when(LineNumber == 17 ~ "ExportGoods",
-                                     LineNumber == 18 ~ "ExportServices",
-                                     LineNumber == 20 ~ "ImportGoods",
-                                     LineNumber == 21 ~ "ImportServices",
-                                     .default = LineDescription)) |>
-  select(LineDescription, CL_UNIT, year, quarter, pctChange) |>
-  pivot_wider(names_from = LineDescription, 
-              values_from = pctChange)
-
-## cleanup
-rm(gdpA_list, gdpQ_list)
+source(paste(getwd(), "scripts/importBEA_GDP.R", sep = "/"))
 
 ```
 
 ```{r}
-#| label: Foreign Direct Investment 
+#| label: Import BEA: Foreign Direct Investment 
 #| warning: false
 
-FDI_A <- beaGet(list('UserID' = my_beaKey,
-                     'Method' = 'GetData',
-                     'datasetname' = 'MNE',
-                     'DirectionOfInvestment' = 'Inward',
-                     'Classification' = 'Industry',
-                     'Year' = "All")) |>
-  filter(Column %in% c("First-year expenditures", 
-                        "Planned total expenditures"),
-         Row == "All Industries Total") |>
-  pivot_longer(cols = !SeriesID:TableRowDisplayOrder,
-               names_to = "time",
-               values_to = "expenditures") |>
-  mutate(year = str_extract(time, "[0-9]{4}")) |>
-  drop_na(expenditures) |>
-  select(Row, Column, TableScale, year, expenditures)
+source(paste(getwd(), "scripts/importBEA_FDI.R", sep = "/"))
 
 ```
 
