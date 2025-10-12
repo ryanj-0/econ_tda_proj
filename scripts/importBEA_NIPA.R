@@ -1,7 +1,8 @@
 ########################################################
 ## Loading Data From Beureau of Economic Analysis (BEA):
-## National Income and Product Accounts (NIPA)
+## National Income and Product Accounts (NIPA) Tables
 ## - GDP
+## - Personal Income and Its Disposition
 ########################################################
 
 # Global config for NIPA Tables
@@ -14,7 +15,7 @@ nipaConfig <- list('UserID' = my_beaKey,
 # GDP ---------------------------------------------------------------------
 
 # Annual GDP
-gdpA_list <- append(beaConfig, list('datasetname' = 'NIPA',
+gdpA_list <- append(nipaConfig, list('datasetname' = 'NIPA',
                                     'TableName' = 'T10101',
                                     'Frequency' = 'A'))
 
@@ -33,7 +34,7 @@ GDP_A <- beaGet(gdpA_list) |>
                 values_from = pctChange)
 
 # GDP Quartly
-gdpQ_list <- append(beaConfig, list('datasetname' = 'NIPA',
+gdpQ_list <- append(nipaConfig, list('datasetname' = 'NIPA',
                                     'TableName' = 'T10101',
                                     'Frequency' = 'Q'))
 GDP_Q <- beaGet(gdpQ_list) |>
@@ -53,12 +54,31 @@ GDP_Q <- beaGet(gdpQ_list) |>
 
 
 # Personal Income ---------------------------------------------------------
-pidaA_list <- append(beaConfig, list('datasetname' = 'NIPA',
+
+# Persional Income and Outlays Annual
+pidA_list <- append(nipaConfig, list('datasetname' = 'NIPA',
                                      'TableName' = 'T20100',
                                      'Frequency' = 'A'))
-pidaA <- beaGet(pidaA_list) |>
+PID_A <- beaGet(pidA_list) |>
     pivot_longer(cols = !(TableName:UNIT_MULT),
                  names_to = "time",
                  values_to = "dollars") |>
-    mutate(year = str_extract(time, "[0-9]{4}"))
+    mutate(year = str_extract(time, "[0-9]{4}")) |>
+    select(LineDescription, year, dollars) |>
+    pivot_wider(names_from = LineDescription,
+                values_from = dollars)
 
+
+# Persional Income and Outlays Quarterly
+pidQ_list <- append(nipaConfig, list('datasetname' = 'NIPA',
+                                     'TableName' = 'T20100',
+                                     'Frequency' = 'Q'))
+PID_Q <- beaGet(pidQ_list) |>
+    pivot_longer(cols = !(TableName:UNIT_MULT),
+                 names_to = "time",
+                 values_to = "dollars") |>
+    mutate(year = str_extract(time, "[0-9]{4}"),
+           quarter = str_extract(time, "\\d$")) |>
+    select(LineDescription, year, quarter, dollars) |>
+    pivot_wider(names_from = LineDescription,
+                values_from = dollars)
