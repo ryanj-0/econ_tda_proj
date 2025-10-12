@@ -55,19 +55,24 @@ Looking at our correlation table (@fig-corr), we observe moderate to strong corr
 [^1]: The Federal Reserve Economic Data (FRED) website was used to download BLS data.
 
 ```{r}
-#| label: Load Packages and API Key
+#| label: Load Packages and API Keys
 #| include: false
 
 source(paste(getwd(), "scripts/systemConfig.R", sep = "/"))
-source("my_beaKey.R")
+
 
 ```
 
 ```{r}
-#| label: Import BEA: GDP
+#| label: Import BEA NIPA Data
 #| warning: false
 
-source(paste(getwd(), "scripts/importBEA_GDP.R", sep = "/"))
+# Data includes Annual and Quartely
+# - GDP
+# - Personal Income and Its Disposition
+source(paste(getwd(), "scripts/importBEA_NIPA.R", sep = "/"))
+
+
 
 ```
 
@@ -79,51 +84,7 @@ source(paste(getwd(), "scripts/importBEA_FDI.R", sep = "/"))
 
 ```
 
-
-```{r}
-#| warning: false
-
-value_cols <- c(2:10, 12:14)
-pctChg <- function(x){((x-lag(x))/lag(x))*100}
-
-PIDA <- BEA_personal_income_and_disposition_A[
-  c(1, 3:4, 11, 14:15, 18, 28, 29, 36:37, 41, 44:45, 49), !1] |>
-  .[1, 1:="catagory"] |>
-  .[13, 1:=str_c(.[13, 1], ".per_capita")] |>
-  .[15, 1:=str_c(.[15, 1], ".pct_delta")] |>
-  setnames(paste(.[1])) |>
-  .[!1] |>
-  mutate(catagory = str_trim(catagory)) |>
-  mutate_if(is.numeric, as.character) |>
-  pivot_longer(!catagory, names_to = "year", values_to = "total_M") |>
-  pivot_wider(names_from = catagory, values_from = total_M) |>
-  mutate_if(is.character, as.numeric) |>
-  setnames(paste("pida", gsub(" ", "_", names(.)), sep = "")) |>
-  mutate(across(value_cols, pctChg)) |>
-  rename("year" = names(.)[1]) |>
-  mutate(source = "BEA_PID_A")
-
-PIDQ <- BEA_personal_income_and_disposition_Q[
-  c(1:4, 11, 14:15, 18, 28, 29, 36:37, 41, 44:45, 49), !1] |>
-  .[1, 1:="catagory"]|>
-  .[2, 1:="Q"] |>
-  .[14, 1:=str_c(.[14, 1], ".per_capita")] |>
-  .[16, 1:=str_c(.[16, 1], ".pct_delta")] |>
-  setnames(paste(.[1], .[2], sep = "_")) |>
-  .[!1:2] |>
-  rename(catagory = catagory_Q) |>
-  mutate(catagory = str_trim(catagory)) |>
-  pivot_longer(!catagory, 
-               names_to = c("year", "Q"), names_sep = "_", 
-               values_to = "total_M") |>
-  pivot_wider(names_from = catagory, values_from = total_M) |>
-  mutate_at(c(1, 3:ncol(.)), as.numeric) |>
-  setnames(paste("pidq", gsub(" ", "_", names(.)), sep = "")) |>
-  mutate(across(value_cols + 1  , pctChg)) |>
-  rename("year" = names(.)[1]) |>
-  rename("quarter" = names(.)[2]) |>
-  mutate(source = "BEA_PID_Q")
-```
+  
 
 ```{r}
 #| warning: false
