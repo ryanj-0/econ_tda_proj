@@ -1,6 +1,6 @@
-###########################
-## Load System Cofiguration
-###########################
+############################
+## Load System Configuration
+############################
 
 # Clear Memory
 rm(list = ls())
@@ -13,10 +13,20 @@ if(!require("pacman")){
 # Will install following packages if not already installed
 pacman::p_load(
     tidyverse,
+    bea.R,
+    fredr,
     BallMapper,
     viridis,
     knitr,
     kableExtra,
-    bea.R,
     svglite
 )
+
+
+# API Keys ------------------------------------------------------------
+
+# Load API Keys
+source("my_apiKeys.R")
+
+# Set FRED API Key
+fredr_set_key(my_fredKey)
