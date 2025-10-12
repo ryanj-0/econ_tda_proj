@@ -23,6 +23,14 @@ pacman::p_load(
 )
 
 
+# Source Functions --------------------------------------------------------
+
+fxnList <-
+    list.files(paste(getwd(), "functions", sep = "/"),
+               full.names = TRUE)
+
+lapply(fxnList, source) |> invisible()
+
 # API Keys ------------------------------------------------------------
 
 # Load API Keys
