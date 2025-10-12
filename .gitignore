@@ -1,5 +1,5 @@
 .R*
-my_beaKey.R
+my_apiKeys.R
 US_TDA_files/
 *.Rproj
 .Rproj.user
