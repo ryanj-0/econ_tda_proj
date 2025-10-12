@@ -1,8 +1,12 @@
 ##########################################################
 ## Loading Data From Federal Reserve Economic Data (FRED):
-## - Federal Funds Effective Rate: Monthly, Yearly
+## - Federal Funds Effective Rate (FFR)
 ## - Consumer Price Index (CPI)
 ## - Employment Cost Index (ECI)
+## - Housing Starts
+## - Producer Price Index (PPI)
+##       - All Commodities
+##       - Final Demand
 
 
 ## Notes on calculations:
@@ -11,6 +15,9 @@
 ## obtain a value for our interested time frequency, we
 ## take the arithmetic mean. Comments below will indicate
 ## when series is calculated.
+##     For the Producer Price Index (PPI), we chose to
+## include both All Commodities and Final Goods because
+## they show us different aspects of the macroeconomy.
 ##########################################################
 
 
@@ -23,21 +30,7 @@ FFR_M <-
 
 # Quarterly Rate (calculated)
 # Q1 = 1:3, Q2 = 4:6, Q3 = 7:9, Q4 = 10:12
-FFR_Q <-
-    FFR_M |>
-    mutate(year = format(date, "%Y") |> as.numeric(),
-           month = format(date, "%m") |> as.numeric(),
-           quarter = case_when(month %in% c(1:3) ~ 1,
-                               month %in% c(4:6) ~ 2,
-                               month %in% c(7:9) ~ 3,
-                               month %in% c(10:12) ~ 4),
-           yearQuarter = paste0(year, quarter) #need a unique groupby var.
-    ) |>
-    group_by(yearQuarter) |>
-    mutate(avgRate_Q = mean(value)) |>
-    ungroup() |>
-    select(series_id, year, quarter, avgRate_Q) |>
-    unique()
+FFR_Q <- changeToQuarterly(FFR_M)
 
 # Yearly Rate
 FFR_A <-
@@ -56,30 +49,10 @@ CPI_M <-
 
 # Quarterly (calculated)
 # Q1 = 1:3, Q2 = 4:6, Q3 = 7:9, Q4 = 10:12
-CPI_Q <-
-    CPI_M |>
-    mutate(year = format(date, "%Y") |> as.numeric(),
-           month = format(date, "%m") |> as.numeric(),
-           quarter = case_when(month %in% c(1:3) ~ 1,
-                               month %in% c(4:6) ~ 2,
-                               month %in% c(7:9) ~ 3,
-                               month %in% c(10:12) ~ 4),
-           yearQuarter = paste0(year, quarter) # need a unique group_by var
-    ) |>
-    group_by(yearQuarter) |>
-    mutate(avgQ = mean(value)) |>
-    ungroup() |>
-    select(series_id, year, quarter, avgQ) |>
-    unique()
+CPI_Q <- changeToQuarterly(CPI_M)
 
 # Annual (calculated)
-CPI_A <-
-    CPI_Q
-    group_by(year) |>
-    mutate(avgA = mean(avgQ)) |>
-    ungroup() |>
-    select(series_id, year, avgA) |>
-    unique()
+CPI_A <- changeTOAnnually(CPI_Q)
 
 
 # Employment Cost Index - Total Compensation ------------------------------
@@ -108,31 +81,37 @@ ECI_A <-
 # Housing Starts: Private -------------------------------------------------
 
 # Monthly
-housingStart_M <-
+housingStarts_M <-
     fredr(series_id = "HOUST")
 
 # Quarterly (calculated)
-housingStarts_Q <-
-    housingStart_M |>
-    mutate(year = format(date, "%Y") |> as.numeric(),
-           month = format(date, "%m") |> as.numeric(),
-           quarter = case_when(month %in% c(1:3) ~ 1,
-                               month %in% c(4:6) ~ 2,
-                               month %in% c(7:9) ~ 3,
-                               month %in% c(10:12) ~ 4),
-           yearQuarter = paste0(year, quarter) # need a unique group_by var
-    ) |>
-    group_by(yearQuarter) |>
-    mutate(avgQ = mean(value)) |>
-    ungroup() |>
-    select(series_id, year, quarter, avgQ) |>
-    unique()
+housingStarts_Q <- changeToQuarterly(housingStarts_M)
 
 # Annual (calculated)
-housingStarts_A <-
-    housingStarts_Q |>
-    group_by(year) |>
-    mutate(avgA = mean(avgQ)) |>
-    ungroup() |>
-    select(series_id, year, avgA) |>
-    unique()
+housingStarts_A <- changeTOAnnually(housingStarts_Q)
+
+
+# Producer Price Index - All Commodities ----------------------------------
+
+# Monthly
+PPI_All_M <-
+    fredr(series_id = "PPIACO")
+
+# Quarterly (calculated)
+PPI_All_Q <- changeToQuarterly(PPI_All_M)
+
+PPI_ALL_A <- changeTOAnnually(PPI_All_Q)
+
+
+# Producer Price Index - Final Demand -------------------------------------
+
+# Monthly
+PPI_Final_M <-
+    fredr(series_id = "PPIFIS")
+
+# Quarterly (calculated)
+PPI_Final_Q <- changeToQuarterly(PPI_All_M)
+
+PPI_Final_A <- changeTOAnnually(PPI_All_Q)
+
+
