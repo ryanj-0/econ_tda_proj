@@ -2,19 +2,26 @@
 ## Loading Data From Federal Reserve Economic Data (FRED):
 ## - Federal Funds Effective Rate: Monthly, Yearly
 ## - Consumer Price Index (CPI)
-########################################################
+## - Employment Cost Index (ECI)
+
+
+## Notes on calculations:
+##     Some data is only given on a monthly frequency.
+## We are interested in Quarterly and Annual data. So to
+## obtain a value for our interested time frequency, we
+## take the arithmetic mean. Comments below will indicate
+## when series is calculated.
+##########################################################
 
 
 # Federal Funds Effective Rate --------------------------------------------
-# 1954 - Current
 
 # Monthly Rate
 FFR_M <-
     fredr(series_id = "FEDFUNDS")
 
 
-# Quarterly Rate
-# Transformed using arithmetic mean with quarters defined:
+# Quarterly Rate (calculated)
 # Q1 = 1:3, Q2 = 4:6, Q3 = 7:9, Q4 = 10:12
 FFR_Q <-
     FFR_M |>
@@ -27,9 +34,9 @@ FFR_Q <-
            yearQuarter = paste0(year, quarter) #need a unique groupby var.
     ) |>
     group_by(yearQuarter) |>
-    mutate(avgRate = mean(value)) |>
+    mutate(avgRate_Q = mean(value)) |>
     ungroup() |>
-    select(series_id, year, quarter, avgRate) |>
+    select(series_id, year, quarter, avgRate_Q) |>
     unique()
 
 # Yearly Rate
@@ -40,14 +47,14 @@ FFR_A <-
     select(series_id, year, rate)
 
 
-# Consumer Price Index ----------------------------------------------------
+# Consumer Price Index (CPI) ----------------------------------------------
 
-# Monthly Consumer Price Index (CPI)
+
+# Monthly
 CPI_M <-
     fredr(series_id = "CPIAUCSL")
 
-# Quarterly
-# Transformed using arithmetic mean with quarters defined:
+# Quarterly (calculated)
 # Q1 = 1:3, Q2 = 4:6, Q3 = 7:9, Q4 = 10:12
 CPI_Q <-
     CPI_M |>
@@ -60,18 +67,18 @@ CPI_Q <-
            yearQuarter = paste0(year, quarter) # need a unique group_by var
     ) |>
     group_by(yearQuarter) |>
-    mutate(avgRate = mean(value)) |>
+    mutate(avgQ = mean(value)) |>
     ungroup() |>
-    select(series_id, year, quarter, avgRate) |>
+    select(series_id, year, quarter, avgQ) |>
     unique()
 
+# Annual (calculated)
 CPI_A <-
-    CPI_M |>
-    mutate(year = format(date, "%Y") |> as.numeric()) |>
+    CPI_Q
     group_by(year) |>
-    mutate(avgRate = mean(value)) |>
+    mutate(avgA = mean(avgQ)) |>
     ungroup() |>
-    select(series_id, year, avgRate) |>
+    select(series_id, year, avgA) |>
     unique()
 
 
@@ -88,13 +95,44 @@ ECI_Q <-
                                month %in% c(10:12) ~ 4)) |>
     select(series_id, year, quarter, value)
 
-# Annual
-# Transformed using arithmetic mean
+# Annual (calculated)
 ECI_A <-
     ECI_Q |>
     group_by(year) |>
-    mutate(avg = mean(value)) |>
+    mutate(avgA = mean(value)) |>
     ungroup() |>
-    select(series_id, year, avg) |>
+    select(series_id, year, avgA) |>
     unique()
 
+
+# Housing Starts: Private -------------------------------------------------
+
+# Monthly
+housingStart_M <-
+    fredr(series_id = "HOUST")
+
+# Quarterly (calculated)
+housingStarts_Q <-
+    housingStart_M |>
+    mutate(year = format(date, "%Y") |> as.numeric(),
+           month = format(date, "%m") |> as.numeric(),
+           quarter = case_when(month %in% c(1:3) ~ 1,
+                               month %in% c(4:6) ~ 2,
+                               month %in% c(7:9) ~ 3,
+                               month %in% c(10:12) ~ 4),
+           yearQuarter = paste0(year, quarter) # need a unique group_by var
+    ) |>
+    group_by(yearQuarter) |>
+    mutate(avgQ = mean(value)) |>
+    ungroup() |>
+    select(series_id, year, quarter, avgQ) |>
+    unique()
+
+# Annual (calculated)
+housingStarts_A <-
+    housingStarts_Q |>
+    group_by(year) |>
+    mutate(avgA = mean(avgQ)) |>
+    ungroup() |>
+    select(series_id, year, avgA) |>
+    unique()
