@@ -7,7 +7,7 @@
 ## - Producer Price Index (PPI)
 ##       - All Commodities
 ##       - Final Demand
-
+## - Unemployment Rate
 
 ## Notes on calculations:
 ##     Some data is only given on a monthly frequency.
@@ -18,6 +18,10 @@
 ##     For the Producer Price Index (PPI), we chose to
 ## include both All Commodities and Final Goods because
 ## they show us different aspects of the macroeconomy.
+
+## Notes on Data
+##     We try and use seasonally adjusted date when
+## available.
 ##########################################################
 
 
@@ -38,21 +42,6 @@ FFR_A <-
     mutate(year = str_extract(date, "[0-9]{4}")) |>
     rename(rate = value) |>
     select(series_id, year, rate)
-
-
-# Consumer Price Index (CPI) ----------------------------------------------
-
-
-# Monthly
-CPI_M <-
-    fredr(series_id = "CPIAUCSL")
-
-# Quarterly (calculated)
-# Q1 = 1:3, Q2 = 4:6, Q3 = 7:9, Q4 = 10:12
-CPI_Q <- changeToQuarterly(CPI_M)
-
-# Annual (calculated)
-CPI_A <- changeTOAnnually(CPI_Q)
 
 
 # Employment Cost Index - Total Compensation ------------------------------
@@ -78,40 +67,37 @@ ECI_A <-
     unique()
 
 
-# Housing Starts: Private -------------------------------------------------
+# Provided Monthly Data Only ----------------------------------------------
+#     All data in following section is data which is provided monthly and
+# is calculated to quarterly and annual based on our calculation notes
+# above.
 
-# Monthly
-housingStarts_M <-
-    fredr(series_id = "HOUST")
+seriesTable <-
+    tibble(
+        id = c("CPIAUCSL", "HOUST", "PPIACO", "PPIFIS",
+               "UNRATE"),
+        name = c("CPI", "housingStarts", "PPI_All", "PPI_Final",
+                  "unemployment")
+        )
 
-# Quarterly (calculated)
-housingStarts_Q <- changeToQuarterly(housingStarts_M)
+FRED_data <- mapply(
+    FUN =
+        function(id, name) {
+            # Get Data
+                monthlyData <- fredr(series_id = id)
+                quarterlyData <- changeToQuarterly(monthlyData)
+                annualData <- changeTOAnnually(quarterlyData)
+                #return data
+                return(
+                    list(monthly = quarterlyData,
+                         annual = annualData)
+                    )
+                },
+    # columns used for mapply
+    seriesTable$id,
+    seriesTable$name,
+    SIMPLIFY = TRUE
+)
 
-# Annual (calculated)
-housingStarts_A <- changeTOAnnually(housingStarts_Q)
-
-
-# Producer Price Index - All Commodities ----------------------------------
-
-# Monthly
-PPI_All_M <-
-    fredr(series_id = "PPIACO")
-
-# Quarterly (calculated)
-PPI_All_Q <- changeToQuarterly(PPI_All_M)
-
-PPI_ALL_A <- changeTOAnnually(PPI_All_Q)
-
-
-# Producer Price Index - Final Demand -------------------------------------
-
-# Monthly
-PPI_Final_M <-
-    fredr(series_id = "PPIFIS")
-
-# Quarterly (calculated)
-PPI_Final_Q <- changeToQuarterly(PPI_All_M)
-
-PPI_Final_A <- changeTOAnnually(PPI_All_Q)
-
-
+# makes return list navigation easier
+names(FRED_data) <- seriesTable$name
