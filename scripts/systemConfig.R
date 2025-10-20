@@ -34,7 +34,8 @@ lapply(fxnList, source) |> invisible()
 # API Keys ------------------------------------------------------------
 
 # Load API Keys
-source("my_apiKeys.R")
+source(paste(getwd(), "my_apiKeys.R", sep = "/"))
 
 # Set FRED API Key
 fredr_set_key(my_fredKey)
+
