@@ -28,8 +28,7 @@
 # Federal Funds Effective Rate --------------------------------------------
 
 # Monthly Rate
-FFR_M <-
-    fredr(series_id = "FEDFUNDS")
+FFR_M <- fredr(series_id = "FEDFUNDS")
 
 
 # Quarterly Rate (calculated)
@@ -37,8 +36,7 @@ FFR_M <-
 FFR_Q <- changeToQuarterly(FFR_M)
 
 # Yearly Rate
-FFR_A <-
-    fredr(series_id = "RIFSPFFNA") |>
+FFR_A <- fredr(series_id = "RIFSPFFNA") |>
     mutate(year = str_extract(date, "[0-9]{4}")) |>
     rename(rate = value) |>
     select(series_id, year, rate)
@@ -47,19 +45,21 @@ FFR_A <-
 # Employment Cost Index - Total Compensation ------------------------------
 
 # Quarterly
-ECI_Q <-
-    fredr(series_id = "ECIALLCIV") |>
-    mutate(year = format(date, "%Y") |> as.numeric(),
-           month = format(date, "%m") |> as.numeric(),
-           quarter = case_when(month %in% c(1:3) ~ 1,
-                               month %in% c(4:6) ~ 2,
-                               month %in% c(7:9) ~ 3,
-                               month %in% c(10:12) ~ 4)) |>
+ECI_Q <- fredr(series_id = "ECIALLCIV") |>
+    mutate(
+        year = format(date, "%Y") |> as.numeric(),
+        month = format(date, "%m") |> as.numeric(),
+        quarter = case_when(
+            month %in% c(1:3) ~ 1,
+            month %in% c(4:6) ~ 2,
+            month %in% c(7:9) ~ 3,
+            month %in% c(10:12) ~ 4
+        )
+    ) |>
     select(series_id, year, quarter, value)
 
 # Annual (calculated)
-ECI_A <-
-    ECI_Q |>
+ECI_A <- ECI_Q |>
     group_by(year) |>
     mutate(avgA = mean(value)) |>
     ungroup() |>
@@ -72,32 +72,39 @@ ECI_A <-
 # is calculated to quarterly and annual based on our calculation notes
 # above.
 
-seriesTable <-
-    tibble(
-        id = c("CPIAUCSL", "HOUST", "PPIACO", "PPIFIS",
-               "UNRATE"),
-        name = c("CPI", "housingStarts", "PPI_All", "PPI_Final",
-                  "unemployment")
-        )
-
-FRED_data <- mapply(
-    FUN =
-        function(id, name) {
-            # Get Data
-                monthlyData <- fredr(series_id = id)
-                quarterlyData <- changeToQuarterly(monthlyData)
-                annualData <- changeTOAnnually(quarterlyData)
-                #return data
-                return(
-                    list(monthly = quarterlyData,
-                         annual = annualData)
-                    )
-                },
-    # columns used for mapply
-    seriesTable$id,
-    seriesTable$name,
-    SIMPLIFY = TRUE
+seriesTable <- tibble(
+    id = c("CPIAUCSL", "HOUST", "PPIACO", "PPIFIS", "UNRATE"),
+    name = c("CPI", "housingStarts", "PPI_All", "PPI_Final", "unemployment")
 )
 
-# makes return list navigation easier
-names(FRED_data) <- seriesTable$name
+FRED_data <-
+    purrr::map(seriesTable$id, ~ {
+        monthlyData <- fredr(series_id = .x)
+        quarterlyData <- changeToQuarterly(monthlyData)
+        annualData <- changeTOAnnually(quarterlyData)
+        list(quarterly = quarterlyData, annual = annualData) # return
+    }) |>
+    set_names(seriesTable$name)
+
+
+
+# Recession Dates ---------------------------------------------------------
+
+
+nberRecessions <-
+    fredr(series_id = "USRECQ") |>
+    mutate(
+        year = format(date, "%Y") |> as.numeric(),
+        month = format(date, "%m") |> as.numeric(),
+        quarter = case_when(
+            month %in% c(1:3) ~ 1,
+            month %in% c(4:6) ~ 2,
+            month %in% c(7:9) ~ 3,
+            month %in% c(10:12) ~ 4
+        )
+    ) |>
+    filter(value == 1) |>
+    group_by(year) |>
+    mutate(fullYear = n() / 4) |>
+    ungroup() |>
+    select(series_id, year, quarter, fullYear)
