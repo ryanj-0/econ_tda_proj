@@ -37,7 +37,7 @@ FFR_Q <- changeToQuarterly(FFR_M)
 
 # Yearly Rate
 FFR_A <- fredr(series_id = "RIFSPFFNA") |>
-    mutate(year = str_extract(date, "[0-9]{4}")) |>
+    mutate(year = str_extract(date, "[0-9]{4}") |> as.numeric()) |>
     rename(rate = value) |>
     select(series_id, year, rate)
 

@@ -32,7 +32,7 @@ GDP_A <- beaGet(gdpA_list) |>
         values_to = "pctChange"
     ) |>
     mutate(
-        year = str_extract(time, "[0-9]{4}"),
+        year = str_extract(time, "[0-9]{4}") |> as.numeric(),
         LineDescription = case_when(
             LineNumber == 17 ~ "ExportGoods",
             LineNumber == 18 ~ "ExportServices",
@@ -43,8 +43,8 @@ GDP_A <- beaGet(gdpA_list) |>
     ) |>
     select(LineDescription, year, pctChange) |>
     pivot_wider(names_from = LineDescription, values_from = pctChange) |>
-    rename_with( ~ gsub(" ", "_", .x)) |>
-    rename_with( ~ paste0(.x, "_%"), .cols = -year)
+    rename_with(~ gsub(" ", "_", .x)) |>
+    rename_with(~ paste0(.x, "_%"), .cols = -year)
 
 # GDP Quartly
 gdpQ_list <- append(nipaConfig,
@@ -61,8 +61,8 @@ GDP_Q <- beaGet(gdpQ_list) |>
         values_to = "pctChange"
     ) |>
     mutate(
-        year = str_extract(time, "[0-9]{4}", ),
-        quarter = str_extract(time, "\\d$"),
+        year = str_extract(time, "[0-9]{4}", ) |> as.numeric(),
+        quarter = str_extract(time, "\\d$") |> as.numeric(),
         LineDescription = case_when(
             LineNumber == 17 ~ "ExportGoods",
             LineNumber == 18 ~ "ExportServices",
@@ -73,8 +73,8 @@ GDP_Q <- beaGet(gdpQ_list) |>
     ) |>
     select(LineDescription, year, quarter, pctChange) |>
     pivot_wider(names_from = LineDescription, values_from = pctChange) |>
-    rename_with( ~ gsub(" ", "_", .x)) |>
-    rename_with( ~ paste0(.x, "_%"), .cols = -c(year, quarter))
+    rename_with(~ gsub(" ", "_", .x)) |>
+    rename_with(~ paste0(.x, "_%"), .cols = -c(year, quarter))
 
 
 # Personal Income ---------------------------------------------------------
@@ -87,13 +87,14 @@ pidA_list <- append(nipaConfig,
                         'Frequency' = 'A'
                     ))
 
+
 PID_A <- beaGet(pidA_list) |>
     pivot_longer(
         cols = !(TableName:UNIT_MULT),
         names_to = "time",
         values_to = "dollars"
     ) |>
-    mutate(year = str_extract(time, "[0-9]{4}")) |>
+    mutate(year = str_extract(time, "[0-9]{4}") |> as.numeric()) |>
     select(LineDescription, year, dollars) |>
     pivot_wider(names_from = LineDescription, values_from = dollars) |>
     rename_with( ~ gsub(" ", "_", .x)) |>
@@ -114,9 +115,11 @@ PID_Q <- beaGet(pidQ_list) |>
         names_to = "time",
         values_to = "dollars"
     ) |>
-    mutate(year = str_extract(time, "[0-9]{4}"),
-           quarter = str_extract(time, "\\d$")) |>
+    mutate(
+        year = str_extract(time, "[0-9]{4}") |> as.numeric(),
+        quarter = str_extract(time, "\\d$") |> as.numeric()
+    ) |>
     select(LineDescription, year, quarter, dollars) |>
     pivot_wider(names_from = LineDescription, values_from = dollars) |>
-    rename_with( ~ gsub(" ", "_", .x)) |>
-    rename_with( ~ paste0(.x, "_M"), .cols = -c(year, quarter))
+    rename_with(~ gsub(" ", "_", .x)) |>
+    rename_with(~ paste0(.x, "_M"), .cols = -c(year, quarter))

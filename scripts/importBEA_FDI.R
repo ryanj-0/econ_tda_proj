@@ -23,6 +23,8 @@ FDI_A <- beaGet(
         names_to = "time",
         values_to = "expenditures"
         ) |>
-    mutate(year = str_extract(time, "[0-9]{4}")) |>
+    mutate(year = str_extract(time, "[0-9]{4}") |> as.numeric()) |>
     drop_na(expenditures) |>
-    select(Row, Column, TableScale, year, expenditures)
+    select(year, Column, expenditures) |>
+    rename(Type = Column) |>
+    rename("expenditures_M" = expenditures)

@@ -18,7 +18,8 @@ pacman::p_load(tidyverse,
                viridis,
                knitr,
                kableExtra,
-               svglite)
+               svglite,
+               showtext)
 
 
 # Source Functions --------------------------------------------------------
@@ -34,3 +35,8 @@ source(paste(getwd(), "scripts/my_apiKeys.R", sep = "/"))
 
 # Set FRED API Key
 fredr_set_key(my_fredKey)
+
+
+# Font Configuration ------------------------------------------------------
+font_add_google("EB Garamond")
+showtext_auto()
