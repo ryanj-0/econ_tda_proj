@@ -1,0 +1,189 @@
+``
+Figures
+``
+
+``
+Tables
+``
+
+``
+Plots
+``
+```{r}
+#| label: Annual BM-single
+#| include: false
+
+pcAclean <- pcAnnualClean |> normalize_to_min_0_max_1()
+
+pcA <- pcAnnual |> normalize_to_min_0_max_1()
+coloring <- annualTbl$year |> as.data.frame()
+e = 0.45
+
+svglite("annualBM.svg", height = 6, width = 8)
+annualBm <- BallMapper(points = pcA, values = coloring, epsilon = e)
+ColorIgraphPlot(annualBm, seed_for_plotting = 29)
+title(main = "BallMapper output Colored by Year",
+      sub = paste("Epsilon", e, sep = ": "))
+dev.off()
+```
+
+
+```{r}
+#| label: Hide n Seek
+#| eval: false
+
+pcAnnual |>
+    slice(points_covered_by_landmarks(annualBm, c(12:20))) |>
+    rename("GDP" = 1, "PCE" = 2, "Ig" = 3, "Gov" = 4, "Exports" = 5,
+           "Imports" = 6, "FFR" = 7, "CPI" = 8, "UnRate" = 9)
+```
+
+## Appendix
+```{r}
+#| label: tbl-summarystats
+#| tbl-cap: Summary Statistics (%)
+
+summaryStatsA <- pcAnnual |>
+    rename("GDP" = 1, "PCE" = 2, "Ig" = 3, "Exports" = 4, "Imports" = 5,
+           "Gov" = 6, "InterestRateA" = 7, "CPIA" = 8, "AvgUnrateA" = 9) |>
+    summarise(across(everything(), list(Minimum = min,
+                                        Q25 = ~quantile(., 0.25),
+                                        Median = median,
+                                        Q75 = ~quanbtile(., 0.75),
+                                        Maximum = max,
+                                        Mean = mean,
+                                        SD = sd,
+                                        VAR = var))) |>
+    pivot_longer(everything(), names_to = "var", values_to = "val") |>
+    separate_wider_delim(var, delim = "_",
+                         names = c("measure", "statistic")) |>
+    pivot_wider(names_from = statistic, values_from = val)
+
+summaryStatsA |>
+    kable(digits = 2)
+```
+
+
+```{r}
+#| label: tbl-covidplus
+#| tbl-cap: COVID-19+ (% change)
+
+pcAnnual |>
+    slice(points_covered_by_landmarks(annualBm, c(1, 16, 25, 27))) |>
+    rename("GDP" = 1, "PCE" = 2, "Ig" = 3, "Gov" = 4, "Exports" = 5,
+           "Imports" = 6, "FFR" = 7, "CPI" = 8, "UnRate" = 9) |>
+    kable()
+```
+
+
+```{r}
+#| label: tbl-greatinflation
+#| tbl-cap: The Great Inflation (% change)
+
+pcAnnual |>
+    slice(points_covered_by_landmarks(annualBm, c(12:20))) |>
+    rename("GDP" = 1, "PCE" = 2, "Ig" = 3, "Gov" = 4, "Exports" = 5,
+           "Imports" = 6, "FFR" = 7, "CPI" = 8, "UnRate" = 9) |>
+    kable()
+```
+
+
+```{r}
+#| label: fig-yearspan
+#| fig-cap: Year Coverage by Data Source
+
+dataSummary |>
+    filter(source %in% c("GDPA", "FFRA", "coreInflation", "unemploymentRate")) |>
+    mutate(source =  c("BEA GDP", "FRB FFR", "BLS CPI", "BLS UnRate")) |>
+    ggplot(aes(x = yearSpan,
+               y = fct_reorder(source, yearSpan))) +
+    geom_col(fill = "orchid4") +
+    geom_text(aes(x = 0, label = yearSpan), hjust = -0.2) +
+    labs(x = "Year Span", y = "Source") +
+    xlim(0, 100) +
+    theme(plot.title.position = 'plot')
+```
+
+
+```{r}
+#| label: fig-corr
+#| warning: false
+
+annualCorr |>
+    mutate(term = names(.)[-1]) |>
+    shave() |>
+    stretch() |>
+    mutate(x = factor(x, levels = c("GDP", "PCE", "Ig", "Gov", "Exports",
+                                    "Imports", "InterestRateA", "CPIA",
+                                    "AvgUnrateA")),
+           y = factor(y, levels = c("GDP", "PCE", "Ig", "Gov", "Exports",
+                                    "Imports", "InterestRateA", "CPIA",
+                                    "AvgUnrateA") |> rev())) |>
+    ggplot(aes(x = x, y = y)) +
+    geom_tile(aes(fill = r)) +
+    geom_text(aes(label = round(r, 2)), size = 3) +
+    scale_fill_viridis(na.value = "white", limits = c(-1, 1)) +
+    theme_minimal() +
+    theme(axis.title = element_blank(),
+          axis.text.x = element_text(angle = 45, hjust = 0.95, vjust = 1)) +
+    labs(title = "TDA Point Cloud: Annual",
+         subtitle = "Pearson Correlation Values",
+         fill = "Correlation") +
+    coord_cartesian(expand = FALSE)
+```
+
+```{r}
+#| label: Histogram Graphs Annual
+#| include: false
+
+pdf(paste(getwd(), "supp/histogram_annualTbl_all.pdf", sep = "/"))
+for(v in 1:ncol(pcAnnual)){
+
+    g <- ggplot(pcAnnual, aes(pcAnnual[, v])) +
+        geom_histogram(bins = 20) +
+        labs(title = paste("Histogram of", names(pcAnnual[v]), sep = ": "),
+             x = paste(names(pcAnnual)[v], "% change", sep = " "))
+
+    print(g)
+}
+dev.off()
+```
+
+
+
+```{r}
+#| label: Loop Annual BM
+#| eval: false
+
+epsilon_list <- seq(0.3, 0.7, 0.01)
+
+pdf(paste(getwd(), "supp/bmExploration.pdf", sep = "/"))
+for(x in epsilon_list){
+
+    annualBm <- BallMapper(points = pcA, values = coloring, epsilon = x)
+    ColorIgraphPlot(annualBm, seed_for_plotting = 29)
+    title(main = "BallMapper Output Colored by Year",
+          sub = paste("Epsilon", x, sep = ": "))
+}
+dev.off()
+```
+
+
+```{r}
+#| label: Loop Annual BM-Dimensions
+#| eval: false
+
+dimensionListA <- names(pcA)
+
+pdf(paste(getwd(), "supp/bmDimensions.pdf", sep = "/"))
+for(x in dimensionListA){
+
+
+    coloring <- pcAnnual[, x] |> as.data.frame()
+    annualBm <- BallMapper(points = pcA, values = coloring, epsilon = e)
+    ColorIgraphPlot(annualBm, seed_for_plotting = 29)
+    title(main = paste("BallMapper output colored by:", x, sep = "\n"),
+          sub = paste("N", e, sep = ": "))
+}
+dev.off()
+```

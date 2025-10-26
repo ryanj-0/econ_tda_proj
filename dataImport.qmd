@@ -1,0 +1,134 @@
+``
+Data Sourcing
+``
+
+```{r}
+#| label: Load Packages and API Keys
+#| include: false
+
+source(paste(getwd(), "scripts/systemConfig.R", sep = "/"))
+```
+
+
+```{r}
+#| label: Import BEA NIPA Data
+#| include: false
+
+# Data includes Annual and Quartely
+# - GDP
+# - Personal Income and Its Disposition
+source(paste(getwd(), "scripts/importBEA_NIPA.R", sep = "/"))
+
+# Clean up
+rm(nipaConfig,
+   gdpA_list, gdpQ_list,
+   pidA_list, pidQ_list)
+```
+
+```{r}
+#| label: Import BEA- Foreign Direct Investment
+#| include: false
+
+source(paste(getwd(), "scripts/importBEA_FDI.R", sep = "/"))
+
+```
+
+```{r}
+#| label: Import FRED Data
+
+# Data Sources: 
+# - CPI
+# - Housing Starts
+# - PPI: All Commodities
+# - PPI: Final Demand
+# - Unemployment
+
+source(paste(getwd(), "scripts/importFRED.R", sep = "/"))
+
+# clean up
+rm(FFR_M, seriesTable)
+```
+
+
+```{r}
+#| output: true
+
+dataList <- c("FDI", "GDPA", "GDPQ", "PIDA", "PIDQ", "FFRM", "FFRA", "FFRQ",
+               "coreInflation", "employment_cost_index", "housingStarts",
+               "PPI", "unemploymentRate")
+
+dataSummary <- tibble(source = as.character(),
+                     yearSpan = as.numeric(),
+                     obs = as.numeric(),
+                     nCols = as.numeric(),
+                     yearStart = as.numeric(),
+                     yearEnd = as.numeric())
+
+for (i in 1:length(dataList)) {
+  
+  tmpDf <- get(dataList[i])
+  yearRange <- range(tmpDf[, 1])
+  yearDiff <- yearRange[2] - yearRange[1]
+  rObs <- nrow(tmpDf)
+  cObs <- ncol(tmpDf)
+  dataSummary <- dataSummary |>
+    add_row(source = dataList[i],
+            yearSpan = yearDiff,
+            obs = rObs,
+            nCols = cObs,
+            yearStart = yearRange[1],
+            yearEnd = yearRange[2])
+  }
+```
+
+```{r}
+
+recessionDates <- tibble(year = c(1958, 1958, 1960, 1960, 1960, 1961, 1970, 
+                                  1970, 1970, 1970, 1974, 1974, 1974, 1974, 
+                                  1975, 1980, 1980, 1980, 1981, 1981, 1982, 
+                                  1982, 1982, 1982, 1990, 1990, 1991, 2001,
+                                  2001, 2001, 2008, 2008, 2008, 2008, 2009,
+                                  2009, 2020),
+                         quarter = c("Q1", "Q2", "Q2", "Q3", "Q4", "Q1", "Q1", 
+                                     "Q2", "Q3", "Q4", "Q1", "Q2", "Q3", "Q4", 
+                                     "Q1", "Q1", "Q2", "Q3", "Q3", "Q4", "Q1",
+                                     "Q2", "Q3", "Q4", "Q3", "Q4", "Q1", "Q2",
+                                     "Q3", "Q4", "Q1", "Q2", "Q3", "Q4", "Q1",
+                                     "Q2", "Q2"))
+```
+
+## Methodology
+```{r}
+annualYears <- 1958:2023
+
+annualTbl <- merge(
+  GDPA |> filter(year %in% annualYears) |> select(!source),
+  FFRA |> filter(year %in% annualYears) |> select(!source),
+  by = "year") |>
+  merge(coreInflation |> 
+          filter(year %in% annualYears & month == 12) |>
+          select(!c(source, month, cpi, cpiDelta))) |>
+  merge(unemploymentRate |> 
+          filter(year %in% annualYears & month == 12) |>
+          select(!c(source, month, unrateDelta)))
+
+rownames(annualTbl) <- annualTbl[, 1]
+```
+
+
+```{r}
+#| label: Global BallMapper Conditions
+
+pcAnnual <- annualTbl[ ,c(2, 3, 8, 21, 15, 18, 26, 27, 29)]
+
+pcAnnualClean <- annualTbl |>
+  anti_join(recessionDates, by = "year") |>
+  select(c(2, 3, 8, 21, 15, 18, 26, 27, 29))
+
+  
+annualCorr <- correlate(pcAnnual, quiet = TRUE) |>
+  rename("GDP" = 2, "PCE" = 3, "Ig" = 4, "Gov" = 5, "Exports" = 6, 
+         "Imports" = 7, "InterestRateA" = 8, "CPIA" = 9, "AvgUnrateA" = 10)
+```
+
+
