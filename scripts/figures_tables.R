@@ -3,8 +3,9 @@
 ##############################################
 
 
-# Fig 1 -------------------------------------------------------------------
+# Figure 1 ----------------------------------------------------------------
 
+## The Data
 yearSpan <- map(all_annual, ~ .x$year |> unique())
 
 yearRanges <- map_df(
@@ -23,28 +24,28 @@ yearRanges <- map_df(
         ),
         data_source = fct_reorder(data_source, start_year, .desc = TRUE),
         startLabel = if_else(
-            start_year %% 5 != 0,
+            start_year %% 25 != 0,
             paste0("'", str_sub(start_year, 3, 4)),
             NA_character_
         ),
         endLabel = if_else(
-            end_year %% 5 != 0,
+            end_year %% 25 != 0,
             paste0("'", str_sub(end_year, 3, 4)),
             NA_character_
         ),
         roundStart = if_else(
-            start_year %% 5 == 0,
+            start_year %% 25 == 0,
             paste0("'", str_sub(start_year, 3, 4)),
             NA_character_
         ),
         roundEnd = if_else(
-            end_year %% 5 == 0,
+            end_year %% 25 == 0,
             paste0("'", str_sub(end_year, 3, 4)),
             NA_character_
         )
     )
 
-
+## The Plot
 yearSpan_plot <- ggplot(yearRanges, aes(y = data_source)) +
     geom_segment(
         aes(x = start_year, xend = end_year),
@@ -58,7 +59,7 @@ yearSpan_plot <- ggplot(yearRanges, aes(y = data_source)) +
     geom_text(
         aes(x = start_year, label = startLabel),
         size = 3,
-        hjust = 0,
+        hjust = 1,
         vjust = 0,
         nudge_y = -0.5
     ) +
@@ -66,7 +67,7 @@ yearSpan_plot <- ggplot(yearRanges, aes(y = data_source)) +
     geom_text(
         aes(x = start_year, label = roundStart),
         size = 3,
-        hjust = 0,
+        hjust = 1,
         vjust = 0,
         nudge_y = -0.5,
         alpha = 0.5
@@ -75,7 +76,7 @@ yearSpan_plot <- ggplot(yearRanges, aes(y = data_source)) +
     geom_text(
         aes(x = end_year, label = endLabel),
         size = 3,
-        hjust = 0,
+        hjust = 1,
         vjust = 0,
         nudge_y = -0.5
     ) +
