@@ -43,12 +43,10 @@ source(paste(getwd(), "scripts/figures_tables.R", sep = "/"))
 
 # United States macroeconomic Analyis with BallMapper
 
-*Ryan Johnson*\textsuperscript{*}
+*Ryan Johnson*\textsuperscript{*} \newline
+*University Here*
 
-*Unversity Here*
-
-Student: *johson.ryan1019@gmail.com*
-
+Student: *johnson.ryan1019@gmail.com* \newline
 Mentor: *scook25@alaska.edu*
 
 # KEYWORDS
@@ -57,35 +55,55 @@ Topological Data Analysis; Economics; BallMapper; Macroeconomics;
 # ABSTRACT
 This paper set outs to explore the general use of Ball Mapper (BM) in data analysis as well as add to the small body of current research applying Ball Mapper. We carry out this analysis with economic data from three United States sources: the Bureau of Economic Analysis (BEA), the Federal Reserve Bank (FRB), and Bureau of Labor Statistics. We aim to show the reader how Ball Mapper is used for exploratory data analysis, interpretations of BM graphs, and the stability of Ball Mapper Results.
 
+
+# Reading Key [Removed after Review]
+- [?] - Need reference here or as of writing seems like an appropriate place for reference.
+- [fn?] - Would a footnote be helpful?
+- [any words] - phrasing to keep writing momentum but think it needs changed.
+
+Outline:
+
+- Methods and Procedures
+  - Procedures
+    - Literature
+    - Data
+    - Mapper/BallMapper
+  - Methods
+    - Descriptive Analysis of BM Graph
+      - Groupings
+      - Statistical correlation and other known interpretations
+      - difference epsilon testing
+    - time travel - coloring by year
+    - robustness check with randomization
+    - other colorings?
+  - Results
+- Discussion
+- Conclusion
+- References
+
+\newpage
 # INTRODUCTION
 
-[TDA stuff here. Blurb, blurb blurb. Talk about TDA and Mapper algorithm. Mention that there are variations on mapper including BallMapper; our interest.]
+In this analysis, we are going examine the macroeconomic landscape of the United States of America (U.S.) through a lens an [adjacent mapper-inspired algorithm] called BallMapper (BM). This methodology was developed by Paweł Dłotko in 2019, algorithm is of interest to us because BallMapper significantly reduces the parameters to create a topological map.\footnote{Need to explain what Topological map is?} BallMapper simplifies traditional Mapper by reducing the need for the user to pass data through multiple functions each with their own parameters.\footnote{add reference, seems appropriate here.}
+One benefit to this reduction in parameters is that it removes some of the barriers to entry to learning Mapper (or Mapper-like algorithms), and more generally, Topological Data Analysis (TDA). Those who have a mathematical background, introductory course in Topology, or conceptual knowledge of data science methods and algorithms will fare much easier. However, if you are not equipped with any of the aforementioned knowledge, TDA will seem unnecessarily complicated for data analysis.
+        
+What follows starts by summarizing our literature review of the traditional Mapper algorithm followed by the BallMapper algorithm, and its differences. We then have few notes about current research done with BallMapper, and conclude out literature section talking about [...]. 
+We them move to describing our data sources, how we obtained them, and why. We then continue to address any data challenges we faced, calculations needed for analysis, and description of the final data set.
 
+At the end of our procedures we begin by explaining some of the theory behind Mapper and BallMapper, and segue into our methodology: exploratory data analysis, changing algorithm parameters, and provide some tests for robustness of the algorithm.
 
-In this analysis, we are going examine the macroeconomic landscape of the United States of America (U.S.) through a lens an [adjacent mapper-inspired algorithm] called BallMapper (BM) developed by Paweł Dłotko. This methodology is of interest to us because BallMapper significantly reduce .^1^
-This new algorithm simplifies traditional TDA methods by reducing the need for the user to pass data through multiple functions. Dlotoko demonstrates that, mathematically, TDABM produces a near similar output to that of traditional TDA methods via a fuctor map [@dlotko2019ballmapper]. Thus, one benefit of TDABM compared to the traditional methods is, for those who have the tools and introductory understanding in Topology or TDA, TDABM could be a good entry point to the field.
+The [key takeaways] that we want the reader to leave with is, first, to show that BallMapper is another useful tool in the world of Topological Data Analysis. Add to the small body of literature on BallMapper and it's applications. Be an accessible paper to interested in TDA, Mapper and adjacent algorithms such a BallMapper. And [...]. 
 
-What follows below is primarily a proof-of-concept for TDA BallMapper and closely follows other papers that have applied TDABM. We will begin with a general overview of TDABM: current published literature and useful concepts to know. We then will describe our data and reasoning behind their selection. Our [Methodology](#sec-methodology) and [Results](#sec-results) will touch on more theoretical concepts behind TDABM and then adress a couple of findings, respectively.
+^1^: https://arxiv.org/pdf/1901.07410
 
-Our hope here is for the reader to walk away understanding the general motivation behind TDA BallMapper, how it differs from other common statistical methods, and how methods such as TDA could be additive to our current body of mathematical tools.
-
----
-^1^ https://arxiv.org/pdf/1901.07410
-
-
+\newpage
 # METHODS AND PROCEDURES
 
-## Data
+## Literature
+TDA is a relatively new field and is increasingly being applied to various areas of research such as genetics, financial fraud, biology, and image detection. From the small body of literature we have reviewed, TDABM has removed many of the parameters that are required for more traditional methods of TDA. Generally speaking, traditional TDA contains four broad steps, each with multiple user-defined parameters. Conversely, TDABM has reduced this process to an the user selecting their data, a coloring variable and an epsilon value -- details on this follow below. What should be noted, although TDABM reduces the number of steps needed to produce similar outcomes of traditional TDA methods, we lose control of being able fine tune out outputs. We also find that interpreting results becomes more difficult. However, TDABM is still in its infancy, so there is not a large body of research on interpretation. [@dlotko2019ballmapper] One major motivation for this paper is a paper written by @dlotko2019macroeconomy that applied TDABM to a global macroeconomic dataset to compare how countries have evolved over time, their transformation from the Great Depression Era, and various views on wealth and inequality. We could not find other TDA literature found specifically focused on the macroeconomic economy of singular countries. Hence, our topic of choice.
 
-### Sources
-This paper relied on three publicly available data from US government sources. The Bureau of Economic Analysis (BEA), The Federal Reserve Board (FRB), and The Bureau of Labor Statistics (BLS). The data were gathered using R using two application programming interfaces (APIs): one for data from the BEA, and the other from the Federal Reserve Economic Data (FRED) API. FRED aggregates data from national and international sources, as well as public and private sources. Relevant to this paper, we used additional data, recession dates, based on business cycle contractions and expansions provided by the National Bureau of Economic Research.
 
-These agencies were selected because of they are authoritative sources for U.S. economic data. Their widespread use in both the private and public sector gives us high confidence in the accuracy and integrity of the data.[^1]
-
-While both quarterly and annual data were collected, the following analysis is focused on an annual timescale. The choice of an annual time frame was to keep consistency with other literature applying BallMapper to economic data on a yearly basis. 
-
-Looking at the time ranges in @fig-YearSpan, we elected to exclude Employment Cost Index (ECI) and Foreign Direct Investment (FDI) due to their limited available years. Additionally, we took a subset of years from the Producer Price Index - All Commodities (PPI_All), Personal Income and its Disposition (PID), and Gross Domestic Product (GDP). This allowed us to keep as much data as possible for analysis while also maintaining a range of notable economic events.
-
+## Sources
 ```{r}
 #| label: fig-YearSpan
 #| fig-cap: "Span of Years by Economic Data Source"
@@ -94,15 +112,18 @@ Looking at the time ranges in @fig-YearSpan, we elected to exclude Employment Co
 yearSpan_plot
 ```
 
+This paper relied on three publicly available data from US government sources. The Bureau of Economic Analysis (BEA), The Federal Reserve Board (FRB), and The Bureau of Labor Statistics (BLS). The data were gathered using R using two application programming interfaces (APIs): one for data from the BEA, and the other from the Federal Reserve Economic Data (FRED) API. FRED aggregates data from national and international sources, as well as public and private sources. Relevant to this paper, we used additional data, recession dates, based on business cycle contractions and expansions provided by the National Bureau of Economic Research.
+
+These agencies were selected because of they are authoritative sources for U.S. economic data. Their widespread use in both the private and public sector gives us high confidence in the accuracy and integrity of the data.[^1]
+
+While both quarterly and annual data were collected, the following analysis is focused on an annual timescale. The choice of an annual time frame was to keep consistency with other literature applying BallMapper to economic data on a yearly basis. 
+
+Looking at the time ranges in @fig-YearSpan, we elected to exclude Employment Cost Index (ECI) and Foreign Direct Investment (FDI) due to their limited available years. Additionally, we took a subset of years from the Producer Price Index - All Commodities (PPI_All), Personal Income and its Disposition (PID), and Gross Domestic Product (GDP). This allowed us to keep as much data as possible for analysis while also maintaining a range of notable economic events.
+
+
+
 
 [^1]: Hughes-Cromwick, Ellen, and Julia Coronado. 2019. "The Value of US Government Data to US Business Decisions." Journal of Economic Perspectives 33 (1): 131\u201346. DOI: 10.1257/jep.33.1.131
-
-## Literature
-TDA is a relatively new field and is increasingly being applied to various areas of research such as genetics, financial fraud, biology, and image detection. From the small body of literature we have reviewed, TDABM has removed many of the parameters that are required for more traditional methods of TDA. Generally speaking, traditional TDA contains four broad steps, each with multiple user-defined parameters. Conversely, TDABM has reduced this process to an the user selecting their data, a coloring variable and an epsilon value -- details on this follow below. What should be noted, although TDABM reduces the number of steps needed to produce similar outcomes of traditional TDA methods, we lose control of being able fine tune out outputs. We also find that interpreting results becomes more difficult. However, TDABM is still in its infancy, so there is not a large body of research on interpretation. [@dlotko2019ballmapper] One major motivation for this paper is a paper written by @dlotko2019macroeconomy that applied TDABM to a global macroeconomic dataset to compare how countries have evolved over time, their transformation from the Great Depression Era, and various views on wealth and inequality. We could not find other TDA literature found specifically focused on the macroeconomic economy of singular countries. Hence, our topic of choice.
-
-
-
-
 
 
 
@@ -232,3 +253,7 @@ where $P$ is a column of our data with $x_1,...,x_n$ observations and $k$ is a l
 
 
 
+# Old Intro Material
+
+Dłotko demonstrates that, mathematically, TDABM produces a near similar output to that of traditional TDA methods via a fuctor map [@dlotko2019ballmapper].
+TDA BallMapper and closely follows other papers that have applied TDABM. We will begin with a general overview of TDABM: current published literature and useful concepts to know. We then will describe our data and reasoning behind their selection. Our [Methodology](#sec-methodology) and [Results](#sec-results) will touch on more theoretical concepts behind TDABM and then adress a couple of findings, respectively.
