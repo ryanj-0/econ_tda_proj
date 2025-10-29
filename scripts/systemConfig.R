@@ -38,5 +38,5 @@ fredr_set_key(my_fredKey)
 
 
 # Font Configuration ------------------------------------------------------
-font_add_google("EB Garamond")
-showtext_auto()
+sysfonts::font_add_google("EB Garamond")
+showtext::showtext_auto()
