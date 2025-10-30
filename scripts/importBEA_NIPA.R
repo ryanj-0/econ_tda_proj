@@ -98,7 +98,9 @@ PID_A <- beaGet(pidA_list) |>
     select(LineDescription, year, dollars) |>
     pivot_wider(names_from = LineDescription, values_from = dollars) |>
     rename_with( ~ gsub(" ", "_", .x)) |>
-    rename_with( ~ paste0(.x, "_M"), .cols = -year)
+    rename_with( ~ paste0(.x, "_M"), .cols = -year) |>
+    mutate(across(-year, ~ (.x - lag(.x))/lag(.x), .names = "{.col}_%"))
+
 
 
 # Persional Income and Outlays Quarterly

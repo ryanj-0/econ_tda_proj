@@ -44,7 +44,8 @@ if(Sys.Date() > lastPulled + 90) {
     rm(FFR_M, seriesTable)
 
 } else
-    message("Data within 90 days of last pull, loading local data.")
+    message("Last Date Pulled: ", lastPulled, "\n",
+            "Data within 90 days of last pull, loading local data.")
 
 
 

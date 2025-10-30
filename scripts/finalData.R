@@ -23,12 +23,13 @@ if(Sys.Date() > lastPulled + 90) {
     # Dropping "PPI_Final" b/c short year range
     FRED_quarterly[["PPI_Final"]] <- NULL
 
-    all_quarterly <- c(list(GDP = GDP_Q,
-                            PID = PID_Q,
-                            FFR = FFR_Q,
-                            ECI = ECI_Q
-    ),
-    FRED_quarterly
+    all_quarterly <- c(
+        list(GDP = GDP_Q,
+             PID = PID_Q,
+             FFR = FFR_Q,
+             ECI = ECI_Q
+        ),
+        FRED_quarterly
     )
 
 
@@ -41,13 +42,14 @@ if(Sys.Date() > lastPulled + 90) {
     # Dropping "PPI_Final" b/c short year range
     FRED_annual[["PPI_Final"]] <- NULL
 
-    all_annual <- c(list(GDP = GDP_A,
-                         PID = PID_A,
-                         FDI = FDI_A,
-                         FFR = FFR_A,
-                         ECI = ECI_A
-    ),
-    FRED_annual
+    all_annual <- c(
+        list(GDP = GDP_A,
+             PID = PID_A,
+             FDI = FDI_A,
+             FFR = FFR_A,
+             ECI = ECI_A
+        ),
+        FRED_annual
     )
 
     # Save Updated Data

@@ -36,21 +36,20 @@ source(paste(getwd(), "scripts/dataImport.R", sep = "/"))
 
 # Final Data
 source(paste(getwd(), "scripts/finalData.R", sep = "/"))
-
-# Figures and Tables
-source(paste(getwd(), "scripts/figures_tables.R", sep = "/"))
 ```
 
 # United States macroeconomic Analyis with BallMapper
 
-*Ryan Johnson*\textsuperscript{*} \newline
-*University Here*
+*Ryan Johnson*\textsuperscript{*}
 
-Student: *johnson.ryan1019@gmail.com* \newline
+*[?] Department of Mathematics, University of Alaska Anchorage, Anchorage, AK*
+
+Student: *johnson.ryan1019@gmail.com*\textsuperscript{*} \newline
 Mentor: *scook25@alaska.edu*
 
 # KEYWORDS
-Topological Data Analysis; Economics; BallMapper; Macroeconomics;
+Topological Data Analysis; BallMapper; Data Science;
+Economics; Macroeconomics; Topology;
 
 # ABSTRACT
 This paper set outs to explore the general use of Ball Mapper (BM) in data analysis as well as add to the small body of current research applying Ball Mapper. We carry out this analysis with economic data from three United States sources: the Bureau of Economic Analysis (BEA), the Federal Reserve Bank (FRB), and Bureau of Labor Statistics. We aim to show the reader how Ball Mapper is used for exploratory data analysis, interpretations of BM graphs, and the stability of Ball Mapper Results.
@@ -83,32 +82,34 @@ Outline:
 
 \newpage
 # INTRODUCTION
+Topological Data Analysis (TDA) is a newer data analysis methodology that is gaining popularity. Traditionally, TDA has two parts to its analysis: graph creation and persistence of common features across many graphs.\footnote{https://arxiv.org/pdf/2504.09042} The first part, graph creation, is commonly carried out with an algorithm called Mapper which produces a topological map.\footnote{Need to explain what Topological map is?} The second, persistence, creates many graphs and analyzes common features of each topological map to understand the underlying relationships in data. These underlying relationships in data form a central argument for TDA: data contains an underlying structure.
 
-In this analysis, we are going examine the macroeconomic landscape of the United States of America (U.S.) through a lens an [adjacent mapper-inspired algorithm] called BallMapper (BM). This methodology was developed by Paweł Dłotko in 2019, algorithm is of interest to us because BallMapper significantly reduces the parameters to create a topological map.\footnote{Need to explain what Topological map is?} BallMapper simplifies traditional Mapper by reducing the need for the user to pass data through multiple functions each with their own parameters.\footnote{add reference, seems appropriate here.}
+For this analysis we will be focusing on the graph creation portion of TDA. Specifically, we are examining various macroeconomic indicators of the United States of America (U.S.) using a Mapper-adjacent algorithm called BallMapper (BM).\footnote{https://arxiv.org/pdf/1901.07410} BallMapper is of particular interest to us because it significantly reduces the parameters to create a topological map. It simplifies traditional Mapper by reducing the need for the user to pass data through multiple functions, each with their own parameters.\footnote{add reference, seems appropriate here.}
+
 One benefit to this reduction in parameters is that it removes some of the barriers to entry to learning Mapper (or Mapper-like algorithms), and more generally, Topological Data Analysis (TDA). Those who have a mathematical background, introductory course in Topology, or conceptual knowledge of data science methods and algorithms will fare much easier. However, if you are not equipped with any of the aforementioned knowledge, TDA will seem unnecessarily complicated for data analysis.
+
+One main objective of this paper is serve as an on-ramp for anyone interested in TDA but feels inundated upon early stage researching. We also want to add to the small body of research whose main analysis is with BallMapper. Our last goal is to improve literature on how to discern BallMapper graphs.
         
-What follows starts by summarizing our literature review of the traditional Mapper algorithm followed by the BallMapper algorithm, and its differences. We then have few notes about current research done with BallMapper, and conclude out literature section talking about [...]. 
-We them move to describing our data sources, how we obtained them, and why. We then continue to address any data challenges we faced, calculations needed for analysis, and description of the final data set.
+What follows is a summary of current literature and motivation for this paper. We then address our data sources and calculations for analysis. Third we will talk about BallMapper and Mapper theory, giving both technical and non-technical understanding. We then will touch on tools and test for [robustness] of BM. Our results comprise of: exploratory data analysis, changing BallMapper parameters, and the robustness checks. The discussion and conclusion will elaborate on where BallMapper fits into the TDA ecosystem, as well as talk about future work and applications.
 
-At the end of our procedures we begin by explaining some of the theory behind Mapper and BallMapper, and segue into our methodology: exploratory data analysis, changing algorithm parameters, and provide some tests for robustness of the algorithm.
 
-The [key takeaways] that we want the reader to leave with is, first, to show that BallMapper is another useful tool in the world of Topological Data Analysis. Add to the small body of literature on BallMapper and it's applications. Be an accessible paper to interested in TDA, Mapper and adjacent algorithms such a BallMapper. And [...]. 
-
-^1^: https://arxiv.org/pdf/1901.07410
-
-\newpage
 # METHODS AND PROCEDURES
 
 ## Literature
-TDA is a relatively new field and is increasingly being applied to various areas of research such as genetics, financial fraud, biology, and image detection. From the small body of literature we have reviewed, TDABM has removed many of the parameters that are required for more traditional methods of TDA. Generally speaking, traditional TDA contains four broad steps, each with multiple user-defined parameters. Conversely, TDABM has reduced this process to an the user selecting their data, a coloring variable and an epsilon value -- details on this follow below. What should be noted, although TDABM reduces the number of steps needed to produce similar outcomes of traditional TDA methods, we lose control of being able fine tune out outputs. We also find that interpreting results becomes more difficult. However, TDABM is still in its infancy, so there is not a large body of research on interpretation. [@dlotko2019ballmapper] One major motivation for this paper is a paper written by @dlotko2019macroeconomy that applied TDABM to a global macroeconomic dataset to compare how countries have evolved over time, their transformation from the Great Depression Era, and various views on wealth and inequality. We could not find other TDA literature found specifically focused on the macroeconomic economy of singular countries. Hence, our topic of choice.
+TDA's increasing popularity since the early 21st century and has led to a wide array of applications as well as development in software packages.\footnote{Chazal F and Michel B (2021) An Introduction to Topological Data Analysis: Fundamental and Practical Aspects for Data Scientists. Front. Artif. Intell. 4:667963. doi: 10.3389/frai.2021.667963}
 
 
-## Sources
+
+and is increasingly being applied to From the small body of literature we have reviewed, TDABM has removed many of the parameters that are required for more traditional methods of TDA. Generally speaking, traditional TDA contains four broad steps, each with multiple user-defined parameters. Conversely, TDABM has reduced this process to an the user selecting their data, a coloring variable and an epsilon value -- details on this follow below. What should be noted, although TDABM reduces the number of steps needed to produce similar outcomes of traditional TDA methods, we lose control of being able fine tune out outputs. We also find that interpreting results becomes more difficult. However, TDABM is still in its infancy, so there is not a large body of research on interpretation. [@dlotko2019ballmapper] One major motivation for this paper is a paper written by @dlotko2019macroeconomy that applied TDABM to a global macroeconomic dataset to compare how countries have evolved over time, their transformation from the Great Depression Era, and various views on wealth and inequality. We could not find other TDA literature found specifically focused on the macroeconomic economy of singular countries. Hence, our topic of choice.
+
+
+## *Sources*
 ```{r}
 #| label: fig-YearSpan
 #| fig-cap: "Span of Years by Economic Data Source"
 #| warning: false
 
+source(paste(getwd(), "scripts/Figure1_yearSpan.R", sep = "/"))
 yearSpan_plot
 ```
 
@@ -118,14 +119,16 @@ These agencies were selected because of they are authoritative sources for U.S. 
 
 While both quarterly and annual data were collected, the following analysis is focused on an annual timescale. The choice of an annual time frame was to keep consistency with other literature applying BallMapper to economic data on a yearly basis. 
 
-Looking at the time ranges in @fig-YearSpan, we elected to exclude Employment Cost Index (ECI) and Foreign Direct Investment (FDI) due to their limited available years. Additionally, we took a subset of years from the Producer Price Index - All Commodities (PPI_All), Personal Income and its Disposition (PID), and Gross Domestic Product (GDP). This allowed us to keep as much data as possible for analysis while also maintaining a range of notable economic events.
+Looking at the time ranges in @fig-YearSpan, we elected to exclude Employment Cost Index (ECI) and Foreign Direct Investment (FDI) due to their limited available years. Since our Housing Starts data has the smallest range of years, we will limit the rest of our data sources to the years 1959 - 2024.
 
 
 
 
 [^1]: Hughes-Cromwick, Ellen, and Julia Coronado. 2019. "The Value of US Government Data to US Business Decisions." Journal of Economic Perspectives 33 (1): 131\u201346. DOI: 10.1257/jep.33.1.131
 
-
+## *Data*
+PPI_All only include Farm products, processed foods and feeds, Industrials, and other commodities such as rubber, lumber, machinery, and aircrafts since 1959.
+Most all services only have data series from 2009 onwards.
 
 
 ### TDA BallMapper
@@ -148,6 +151,8 @@ Although the above list five steps, it should be noted that this is just the alg
 
 
 ## Procedures
+
+
 
 ### Pointcloud Construction
 A primary challenge we encountered when selecting variables for analysis was the variability of time period coverage. Some data spanned from Depression Era 1929 all the way up to 2024. Looking at our final nine variables (see @fig-corr]) and the range of years available by by source (@fig-yearspan), we limited our years to 1959 - 2024 due to Housing Starts data having the smallest range of years.

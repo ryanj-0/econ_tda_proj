@@ -1,3 +1,4 @@
-*.R*
+.R*
 my_apiKeys.R
-.Rproj.user
+*.Rproj
+
