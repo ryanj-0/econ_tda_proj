@@ -2,3 +2,4 @@
 my_apiKeys.R
 *.Rproj
 
+.Rproj.user
