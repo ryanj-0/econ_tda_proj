@@ -11,24 +11,25 @@ dataSources <- c("PPI_All",
                  "FFR",
                  "housingStarts")
 
-analysisData <- map(dataSources, ~all_annual[[.x]])
-names(analysisData) <- dataSources
-
+analysisNames <- names(analysisData)
+change_tbl <- c("PPI_ALL", "CPI", "housingStarts")
 # Reduce tables to select years
 analysisYears <- c(1959:2024)
+
+analysisData <- map(dataSources, ~all_annual[[.x]]) |>
+    map2(analysisData, names(analysisData),
+         ~ {
+             if(.y %in% change_tbl) {
+                 mutate(.x,
+                        pctChange = (avgA - lag(avgA))/lag(avgA))
+             } else {
+                 .x
+             }
+         }
+    )
+
+
 
 analysisData <- map(analysisData, ~ filter(.x, year %in% analysisYears))
 
 
-# Col. to change to pct change
-change_cols <- c("PPI_All",
-                 "PID",
-                 "CPI",
-                 "housingStarts")
-
-changtToPercent <- map(analysisData,
-                       ~ {
-                           if(.x %in% change_cols) {
-                               mutate(.x, chnage)
-                           }
-                       })
