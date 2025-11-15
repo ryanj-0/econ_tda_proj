@@ -32,10 +32,10 @@ editor: source
 source(paste(getwd(), "scripts/systemConfig.R", sep = "/"))
 
 # Import Raw Data
-source(paste(getwd(), "scripts/dataImport.R", sep = "/"))
+source(paste(getwd(), "scripts/Data_Import.R", sep = "/"))
 
 # Final Data
-source(paste(getwd(), "scripts/finalData.R", sep = "/"))
+source(paste(getwd(), "scripts/Final_Data.R", sep = "/"))
 ```
 
 # United States macroeconomic Analyis with BallMapper
@@ -127,8 +127,14 @@ Looking at the time ranges in @fig-YearSpan, we elected to exclude Employment Co
 [^1]: Hughes-Cromwick, Ellen, and Julia Coronado. 2019. "The Value of US Government Data to US Business Decisions." Journal of Economic Perspectives 33 (1): 131\u201346. DOI: 10.1257/jep.33.1.131
 
 ## *Data*
-PPI_All only include Farm products, processed foods and feeds, Industrials, and other commodities such as rubber, lumber, machinery, and aircrafts since 1959.
+PPI_All only include Farm products, processed foods and feeds, Industrials, and other commodities such as rubber, lumber, machinery, and aircraft since 1959.
 Most all services only have data series from 2009 onwards.
+
+
+Data for analysis is on an annual change. Converted data which are not a rate (fed funds rate and unemployment) or changes year over year (gdp), to reflect percent change from year to year.
+For persona income and it's disposition, also need to calculate the real amounts instead of the reported nominal [**insert reference**]. For this we will take the nominal value/cpi X 100 for the real value, and then take the log difference year to year to measure changes by year. \footnote{https://econbrowser.com/archives/2014/02/use-of-logarithms-in-economics}
+
+Some of our data was only available in monthly time frames [insert data names] and were initially interested in quarterly and annual data. So to get representative data on our time periods of interest we took the arithmetic mean of their respective time intervals see in **equation_quarterly** and **equation_annual**.
 
 
 ### TDA BallMapper
@@ -155,7 +161,7 @@ Although the above list five steps, it should be noted that this is just the alg
 
 
 ### Pointcloud Construction
-A primary challenge we encountered when selecting variables for analysis was the variability of time period coverage. Some data spanned from Depression Era 1929 all the way up to 2024. Looking at our final nine variables (see @fig-corr]) and the range of years available by by source (@fig-yearspan), we limited our years to 1959 - 2024 due to Housing Starts data having the smallest range of years.
+A primary challenge we encountered when selecting variables for analysis was the variability of time period coverage. Some data spanned from Depression Era 1929 all the way up to 2024. Looking at our final nine variables (see @fig-corr]) and the range of years available by by source (@fig-yearspan), we limited our years to 1960 - 2024 due to Housing Starts data having the smallest range of years.
 
 Some of the data was only available by month. In these cases we calculated annual changes by finding the difference between January of the current year and January of the previous year. Note, this reduced the number of years in our data set by one. We also standardized the data by converting non-rate based data to percent changes from the previous year to ensure consistency across all variables (@eq-generalpctchange). One feature of TDABM is that it can be sensitive to data with large scale differences. This not only reduces how precise you can be when selecting a parameter, but can also significantly increase computation time.
 
