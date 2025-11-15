@@ -16,7 +16,7 @@
 ## take the arithmetic mean. Comments below will indicate
 ## when series is calculated.
 ##     For the Producer Price Index (PPI), we chose to
-## include both All Commodities and Final Goods because
+## include both, All Commodities and Final Goods, because
 ## they show us different aspects of the macroeconomy.
 
 ## Notes on Data
@@ -39,7 +39,8 @@ FFR_Q <- changeToQuarterly(FFR_M)
 FFR_A <- fredr(series_id = "RIFSPFFNA") |>
     mutate(year = str_extract(date, "[0-9]{4}") |> as.numeric()) |>
     rename(rate = value) |>
-    select(series_id, year, rate)
+    select(series_id, year, rate) |>
+    rename_with(~ paste0(.x, "_FFR"), rate)
 
 
 # Employment Cost Index - Total Compensation ------------------------------
@@ -69,8 +70,8 @@ ECI_A <- ECI_Q |>
 
 # Provided Monthly Data Only ----------------------------------------------
 #     All data in following section is data which is provided monthly and
-# is calculated to quarterly and annual based on our calculation notes
-# above.
+# is calculated to  reflect average quarterly and average annual based
+# on our calculation notes above.
 
 seriesTable <- tibble(
     id = c("CPIAUCSL", "HOUST", "PPIACO", "PPIFIS", "UNRATE"),
@@ -81,7 +82,7 @@ FRED_data <-
     purrr::map(seriesTable$id, ~ {
         monthlyData <- fredr(series_id = .x)
         quarterlyData <- changeToQuarterly(monthlyData)
-        annualData <- changeTOAnnually(quarterlyData)
+        annualData <- changeTOAnnually(monthlyData)
         list(quarterly = quarterlyData, annual = annualData) # return
     }) |>
     set_names(seriesTable$name)

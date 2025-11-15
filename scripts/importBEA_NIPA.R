@@ -44,7 +44,7 @@ GDP_A <- beaGet(gdpA_list) |>
     select(LineDescription, year, pctChange) |>
     pivot_wider(names_from = LineDescription, values_from = pctChange) |>
     rename_with(~ gsub(" ", "_", .x)) |>
-    rename_with(~ paste0(.x, "_%"), .cols = -year)
+    rename_with(~ paste0(.x, "_GDP"), -year)
 
 # GDP Quartly
 gdpQ_list <- append(nipaConfig,
@@ -74,7 +74,7 @@ GDP_Q <- beaGet(gdpQ_list) |>
     select(LineDescription, year, quarter, pctChange) |>
     pivot_wider(names_from = LineDescription, values_from = pctChange) |>
     rename_with(~ gsub(" ", "_", .x)) |>
-    rename_with(~ paste0(.x, "_%"), .cols = -c(year, quarter))
+    rename_with(~ paste0(.x, "_GDP"), -c(year, quarter))
 
 
 # Personal Income ---------------------------------------------------------
@@ -96,10 +96,30 @@ PID_A <- beaGet(pidA_list) |>
     ) |>
     mutate(year = str_extract(time, "[0-9]{4}") |> as.numeric()) |>
     select(LineDescription, year, dollars) |>
+    left_join(FRED_data$CPI$annual |>
+                  select(year, avgA),
+              by = "year") |>
     pivot_wider(names_from = LineDescription, values_from = dollars) |>
-    rename_with( ~ gsub(" ", "_", .x)) |>
-    rename_with( ~ paste0(.x, "_M"), .cols = -year) |>
-    mutate(across(-year, ~ (.x - lag(.x))/lag(.x), .names = "{.col}_%"))
+    mutate(
+        across(
+            .cols = -c(year, avgA),
+            .fns = function(x) {
+                real_income <- x/avgA * 100
+                log(real_income) - lag(log(real_income))
+            }
+        )
+    ) |>
+    select(-avgA) |>
+    filter(!if_all(everything(-year), is.na))
+
+
+
+    rename_with(
+        .cols = -year,
+        .fn = ~ .x |>
+            gsub(" ", "_", .x) |>
+            paste0(.x, "_PID")
+    )
 
 
 
@@ -124,4 +144,20 @@ PID_Q <- beaGet(pidQ_list) |>
     select(LineDescription, year, quarter, dollars) |>
     pivot_wider(names_from = LineDescription, values_from = dollars) |>
     rename_with(~ gsub(" ", "_", .x)) |>
-    rename_with(~ paste0(.x, "_M"), .cols = -c(year, quarter))
+    rename_with(~ paste0(.x, "_GDP"), -c(year, quarter))
+
+
+# Un-adjusted Data --------------------------------------------------------
+
+PID_A_unadjusted <- beaGet(pidA_list) |>
+    pivot_longer(
+        cols = !(TableName:UNIT_MULT),
+        names_to = "time",
+        values_to = "dollars"
+    ) |>
+    mutate(year = str_extract(time, "[0-9]{4}") |> as.numeric()) |>
+    select(LineDescription, year, dollars) |>
+    pivot_wider(names_from = LineDescription, values_from = dollars) |>
+    rename_with( ~ gsub(" ", "_", .x)) |>
+    mutate(across(-year, ~ (.x - lag(.x))/lag(.x), .names = "{.col}_pct")) |>
+    rename_with(~ paste0(.x, "_PID"), -year)

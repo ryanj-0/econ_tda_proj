@@ -25,6 +25,6 @@ FDI_A <- beaGet(
         ) |>
     mutate(year = str_extract(time, "[0-9]{4}") |> as.numeric()) |>
     drop_na(expenditures) |>
-    select(year, Column, expenditures) |>
+    select(year, SeriesID, SeriesName, Column, expenditures) |>
     rename(Type = Column) |>
-    rename("expenditures_M" = expenditures)
+    rename("expenditures_FDI" = expenditures)
