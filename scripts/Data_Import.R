@@ -9,7 +9,7 @@
 
 lastPulled <- readRDS(paste(getwd(), "data/lastPulled.rds", sep = "/"))
 
-if(Sys.Date() > lastPulled + 90) {
+if(Sys.Date() > lastPulled + 15) {
 
     # Update last pulled
     lastPulled <- Sys.Date()
