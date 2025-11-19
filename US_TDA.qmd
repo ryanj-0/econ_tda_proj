@@ -38,7 +38,7 @@ source(paste(getwd(), "scripts/Data_Import.R", sep = "/"))
 source(paste(getwd(), "scripts/Final_Data.R", sep = "/"))
 ```
 
-# United States macroeconomic Analyis with BallMapper
+# Mapping the Shape of the U.S. Economy: A Topological Data Analysis Approach with BallMapper
 
 *Ryan Johnson*\textsuperscript{*}
 
@@ -52,16 +52,11 @@ Topological Data Analysis; BallMapper; Data Science;
 Economics; Macroeconomics; Topology;
 
 # ABSTRACT
-This paper set outs to explore the general use of Ball Mapper (BM) in data analysis as well as add to the small body of current research applying Ball Mapper. We carry out this analysis with economic data from three United States sources: the Bureau of Economic Analysis (BEA), the Federal Reserve Bank (FRB), and Bureau of Labor Statistics. We aim to show the reader how Ball Mapper is used for exploratory data analysis, interpretations of BM graphs, and the stability of Ball Mapper Results.
+Topological Data Analysis is (TDA) is a new data analysis method which gained popularity starting in the early 21st century. Currently, a large body of TDA research utilizes the traditional Mapper algorithm. We aim to expand the body of literature on BallMapper, a new, Mapper adjacent algorithm. Applying BallMapper to widely used, U.S. macroeconomic data from the Bureau of Economic Analysis (BEA), the Federal Reserve Bank (FRB), and Bureau of Labor Statistics (BLS), we do this is three parts. Specifically we show BallMapper's utility in exploratory data analysis, compare the topological graphs produced to notable historic economic events, and test the stability topological graphs and their features. Results show...
 
-
-# Reading Key [Removed after Review]
-- [?] - Need reference here or as of writing seems like an appropriate place for reference.
-- [fn?] - Would a footnote be helpful?
-- [any words] - phrasing to keep writing momentum but think it needs changed.
-
-Outline:
-
+# Paper Outline [Removed after Review]
+- Abstract [x]
+- Introduction
 - Methods and Procedures
   - Procedures
     - Literature
@@ -80,9 +75,16 @@ Outline:
 - Conclusion
 - References
 
+
+We aim to expand the body of literature using BallMapper.
+The latter is a sub-field of Algebraic Topology which provides mathematical certainy about what we are seeing from the Mapper algorithm. The former, is a visualization tool and can be used for exploratory data analysis.
+
 \newpage
 # INTRODUCTION
-Topological Data Analysis (TDA) is a newer data analysis methodology that is gaining popularity. Traditionally, TDA has two parts to its analysis: graph creation and persistence of common features across many graphs.\footnote{https://arxiv.org/pdf/2504.09042} The first part, graph creation, is commonly carried out with an algorithm called Mapper which produces a topological map.\footnote{Need to explain what Topological map is?} The second, persistence, creates many graphs and analyzes common features of each topological map to understand the underlying relationships in data. These underlying relationships in data form a central argument for TDA: data contains an underlying structure.
+Topological Data Analysis (TDA) is a new and emerging field of data analysis that is increasing in popularity. Conceptually, the traditional applications of TDA have two parts, a algorithm called Mapper and Persistence Homology. These two parts can be thought
+of graph creation and persistence of common features across many graphs.\footnote{https://arxiv.org/pdf/2504.09042} 
+
+The first part, graph creation, is commonly carried out with an algorithm called Mapper which produces a topological map.\footnote{Need to explain what Topological map is?} The second, persistence, creates many graphs and analyzes common features of each topological map to understand the underlying relationships in data. These underlying relationships in data form a central argument for TDA: data contains an underlying structure.
 
 For this analysis we will be focusing on the graph creation portion of TDA. Specifically, we are examining various macroeconomic indicators of the United States of America (U.S.) using a Mapper-adjacent algorithm called BallMapper (BM).\footnote{https://arxiv.org/pdf/1901.07410} BallMapper is of particular interest to us because it significantly reduces the parameters to create a topological map. It simplifies traditional Mapper by reducing the need for the user to pass data through multiple functions, each with their own parameters.\footnote{add reference, seems appropriate here.}
 
@@ -127,6 +129,58 @@ Looking at the time ranges in @fig-YearSpan, we elected to exclude Employment Co
 [^1]: Hughes-Cromwick, Ellen, and Julia Coronado. 2019. "The Value of US Government Data to US Business Decisions." Journal of Economic Perspectives 33 (1): 131\u201346. DOI: 10.1257/jep.33.1.131
 
 ## *Data*
+The Beareau of Economic Analysis (BEA), Bureau of Labor Statistics, and the Federal Reserve Bank data were because of how widely-used these sources are. To obtain our data we used R to pull from the BEA's and the Federal Reserve Economic Data (FRED) API.\footnote{Code for analysis can be found on GitHub: [myLinkHere]}
+
+```{r}
+#| label: tbl-dataSources
+#| tbl-cap: "Data Sources"
+#| warning: false
+
+all_annual |>
+  map_df(
+    .id = "series", 
+    ~ tibble(
+      year_start = min(.x$year),
+      year_end = max(.x$year),
+      )
+  ) |>
+  mutate(API =  case_when(
+        series == "GDP" ~ "BEA",
+        series == "PID" ~ "BEA",
+        series == "FDI" ~ "BEA",
+        .default = "FRED"
+      )
+  ) |>
+  mutate(data_frequency =  case_when(
+        series == "GDP" ~ "Annual",
+        series == "PID" ~ "Annual",
+        series == "FDI" ~ "Annual",
+        series == "FFR" ~ "Annual",
+        series == "ECI" ~ "Quarterly",
+        .default = "Monthly"
+      )
+  ) |>
+  mutate(series_name =  case_when(
+        series == "GDP" ~ "Gross Domestic Product",
+        series == "PID" ~ "Personal Income & Its Disposition",
+        series == "FDI" ~ "Foreign Direct Investment",
+        series == "FFR" ~ "Federal Funds Rate",
+        series == "ECI" ~ "Employment Cost Index",
+        series == "CPI" ~ "Consumer Price Index",
+        series == "housingStarts" ~ "New Privately-Owned Housing Units Started",
+        series == "PPI_All" ~ "Producer Price Index - All Commodities",
+        series == "unemployment" ~ "Unemployment Rate"
+      )
+  ) |>
+  relocate(series_name, .before = series) |>
+  relocate(API, .after = year_end) |>
+  select(-series) |>
+  gt() |>
+  cols_align(align = "center", 
+             columns = c(year_start, year_end, API, data_frequency)
+             )
+```
+
 PPI_All only include Farm products, processed foods and feeds, Industrials, and other commodities such as rubber, lumber, machinery, and aircraft since 1959.
 Most all services only have data series from 2009 onwards.
 
