@@ -79,7 +79,7 @@ GDP_Q <- beaGet(gdpQ_list) |>
 
 # Personal Income ---------------------------------------------------------
 
-# Persional Income and Outlays Annual
+# Personal Income and Outlays Annual
 pidA_list <- append(nipaConfig,
                     list(
                         'datasetname' = 'NIPA',
@@ -108,22 +108,15 @@ PID_A <- beaGet(pidA_list) |>
         across(
             .cols = -c(year, avgA),
             .fns = function(x) {
-                real_income <- x/avgA * 100
-                log(real_income) - lag(log(real_income))
+                real_income <- (x/avgA) * 100
+                (log(real_income) - lag(log(real_income))) * 100
             }
         )
     ) |>
     select(-avgA) |>
-    filter(!if_all(everything(-year), is.na))
-
-
-
-    rename_with(
-        .cols = -year,
-        .fn = ~ .x |>
-            gsub(" ", "_", .x) |>
-            paste0(.x, "_PID")
-    )
+    filter(!if_all(-year, is.na)) |>
+    rename_with(~ gsub(" ", "_", .x), -year) |>
+    rename_with(~ paste0(.x, "_PID"), -year)
 
 
 
@@ -149,19 +142,3 @@ PID_Q <- beaGet(pidQ_list) |>
     pivot_wider(names_from = LineDescription, values_from = dollars) |>
     rename_with(~ gsub(" ", "_", .x)) |>
     rename_with(~ paste0(.x, "_GDP"), -c(year, quarter))
-
-
-# Un-adjusted Data --------------------------------------------------------
-
-PID_A_unadjusted <- beaGet(pidA_list) |>
-    pivot_longer(
-        cols = !(TableName:UNIT_MULT),
-        names_to = "time",
-        values_to = "dollars"
-    ) |>
-    mutate(year = str_extract(time, "[0-9]{4}") |> as.numeric()) |>
-    select(LineDescription, year, dollars) |>
-    pivot_wider(names_from = LineDescription, values_from = dollars) |>
-    rename_with( ~ gsub(" ", "_", .x)) |>
-    mutate(across(-year, ~ (.x - lag(.x))/lag(.x), .names = "{.col}_pct")) |>
-    rename_with(~ paste0(.x, "_PID"), -year)
