@@ -21,7 +21,6 @@ change_tbl <- c("PPI_All", "CPI", "housingStarts")
 analysisData <- map2(analysisData, names(analysisData),
                      ~ {
                          if(.y %in% change_tbl) {
-
                              seriesID <- unique(.x$series_id)
 
                              .x |>
