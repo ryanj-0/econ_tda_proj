@@ -88,6 +88,10 @@ pidA_list <- append(nipaConfig,
                     ))
 
 
+# Real-income calculation is used by taking each income value and mulitplying
+#   it by our CPI value for that year. Then taking the log difference of the
+#   curretn year to the previous year.
+#   https://econbrowser.com/archives/2014/02/use-of-logarithms-in-economics
 PID_A <- beaGet(pidA_list) |>
     pivot_longer(
         cols = !(TableName:UNIT_MULT),
