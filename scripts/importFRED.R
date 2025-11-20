@@ -27,14 +27,6 @@
 
 # Federal Funds Effective Rate --------------------------------------------
 
-# Monthly Rate
-FFR_M <- fredr(series_id = "FEDFUNDS")
-
-
-# Quarterly Rate (calculated)
-# Q1 = 1:3, Q2 = 4:6, Q3 = 7:9, Q4 = 10:12
-FFR_Q <- changeToQuarterly(FFR_M)
-
 # Yearly Rate
 FFR_A <- fredr(series_id = "RIFSPFFNA") |>
     mutate(year = str_extract(date, "[0-9]{4}") |> as.numeric()) |>
@@ -83,29 +75,6 @@ FRED_data <-
         monthlyData <- fredr(series_id = .x)
         quarterlyData <- changeToQuarterly(monthlyData)
         annualData <- changeTOAnnually(monthlyData)
-        list(quarterly = quarterlyData, annual = annualData) # return
+        list(quarterly = quarterlyData, annual = annualData) # return table
     }) |>
     set_names(seriesTable$name)
-
-
-
-# Recession Dates ---------------------------------------------------------
-
-
-nberRecessions <-
-    fredr(series_id = "USRECQ") |>
-    mutate(
-        year = format(date, "%Y") |> as.numeric(),
-        month = format(date, "%m") |> as.numeric(),
-        quarter = case_when(
-            month %in% c(1:3) ~ 1,
-            month %in% c(4:6) ~ 2,
-            month %in% c(7:9) ~ 3,
-            month %in% c(10:12) ~ 4
-        )
-    ) |>
-    filter(value == 1) |>
-    group_by(year) |>
-    mutate(fullYear = n() / 4) |>
-    ungroup() |>
-    select(series_id, year, quarter, fullYear)
