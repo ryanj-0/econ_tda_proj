@@ -38,22 +38,6 @@ source(paste(getwd(), "scripts/Data_Import.R", sep = "/"))
 source(paste(getwd(), "scripts/Final_Data.R", sep = "/"))
 ```
 
-# Mapping the Shape of the U.S. Economy: A Topological Data Analysis Approach with BallMapper
-
-*Ryan Johnson*\textsuperscript{*}
-
-*[?] Department of Mathematics, University of Alaska Anchorage, Anchorage, AK*
-
-Student: *johnson.ryan1019@gmail.com*\textsuperscript{*} \newline
-Mentor: *scook25@alaska.edu*
-
-# KEYWORDS
-Topological Data Analysis; BallMapper; Data Science;
-Economics; Macroeconomics; Topology;
-
-# ABSTRACT
-Topological Data Analysis is (TDA) is a new data analysis method which gained popularity starting in the early 21st century. Currently, a large body of TDA research utilizes the traditional Mapper algorithm. We aim to expand the body of literature on BallMapper, a new, Mapper adjacent algorithm. Applying BallMapper to widely used, U.S. macroeconomic data from the Bureau of Economic Analysis (BEA), the Federal Reserve Bank (FRB), and Bureau of Labor Statistics (BLS), we do this is three parts. Specifically we show BallMapper's utility in exploratory data analysis, compare the topological graphs produced to notable historic economic events, and test the stability topological graphs and their features. Results show...
-
 # Paper Outline [Removed after Review]
 - Abstract [x]
 - Introduction
@@ -75,9 +59,25 @@ Topological Data Analysis is (TDA) is a new data analysis method which gained po
 - Conclusion
 - References
 
+# Mapping the Shape of the U.S. Economy: A Topological Data Analysis Approach with BallMapper
+
+*Ryan Johnson*\textsuperscript{*}
+
+*[?] Department of Mathematics, University of Alaska Anchorage, Anchorage, AK*
+
+Student: *johnson.ryan1019@gmail.com*\textsuperscript{*} \newline
+Mentor: *scook25@alaska.edu*
+
+# KEYWORDS
+Topological Data Analysis; BallMapper; Data Science;
+Economics; Macroeconomics; Topology;
+
+# ABSTRACT
+Topological Data Analysis is (TDA) is a new data analysis method which gained popularity starting in the early 21st century. Currently, a large body of TDA research utilizes the traditional Mapper algorithm. We aim to expand the body of literature on BallMapper, a new, Mapper adjacent algorithm. Applying BallMapper to widely used, U.S. macroeconomic data from the Bureau of Economic Analysis (BEA), the Federal Reserve Bank (FRB), and Bureau of Labor Statistics (BLS), we do this is three parts. Specifically we show BallMapper's utility in exploratory data analysis, compare the topological graphs produced to notable historic economic events, and test the stability topological graphs and their features. Results show. [...]
+
 
 We aim to expand the body of literature using BallMapper.
-The latter is a sub-field of Algebraic Topology which provides mathematical certainy about what we are seeing from the Mapper algorithm. The former, is a visualization tool and can be used for exploratory data analysis.
+The latter is a sub-field of Algebraic Topology which provides mathematical certainty about what we are seeing from the Mapper algorithm. The former, is a visualization tool and can be used for exploratory data analysis.
 
 \newpage
 # INTRODUCTION
@@ -102,24 +102,36 @@ TDA's increasing popularity since the early 21st century and has led to a wide a
 
 This paper relied on three publicly available data from US government sources. The Bureau of Economic Analysis (BEA), The Federal Reserve Board (FRB), and The Bureau of Labor Statistics (BLS). The data were gathered using R using two application programming interfaces (APIs): one for data from the BEA, and the other from the Federal Reserve Economic Data (FRED) API. FRED aggregates data from national and international sources, as well as public and private sources. We additionally used recession dates based on business cycle contractions and expansions provided by the National Bureau of Economic Research (NBER).
 
-These agencies were selected because of they are authoritative sources for U.S. economic data. Their widespread use in both the private and public sector gives us high confidence in the accuracy and integrity of the data \footnote{Hughes-Cromwick, Ellen, and Julia Coronado. 2019. "The Value of US Government Data to US Business Decisions." Journal of Economic Perspectives 33 (1): 131\u201346. DOI: 10.1257/jep.33.1.131}
+These agencies were selected because of they are authoritative sources for U.S. economic data. Their widespread use in both the private and public sector gives us high confidence in the accuracy and integrity of the data. \footnote{Hughes-Cromwick, Ellen, and Julia Coronado. 2019. "The Value of US Government Data to US Business Decisions." Journal of Economic Perspectives 33 (1): 131\u201346. DOI: 10.1257/jep.33.1.131}
 
-Looking at the time ranges in @tbl-dataSources, we elected to exclude Employment Cost Index (ECI) and Foreign Direct Investment (FDI) due to their limited available years. Looking at the remaining data series, Housing Starts has the smallest range and so , we will limit our years to the years 1959 - 2024. 
+Looking the *Year Start* and *Year End* in @tbl-dataSources, we elected to exclude Employment Cost Index (ECI) and Foreign Direct Investment (FDI) due to their limited available years. Of the remaining data series, New Privately-Owned Housing Units Started (Housing Starts) has the smallest range and will provide the range of years used for our analysis - 1959-2024.
 
 ```{r}
 #| label: tbl-dataSources
-#| tbl-cap: "*New Privately-Owned Housing Units Started (Housing Starts) is considered a flow because it is provided as a Seasonally Adjusted Annual Rate (SAAR)."
+#| tbl-cap: "*Housing Starts is considered a flow because it is provided as a Seasonally Adjusted Annual Rate (SAAR)."
 #| tbl-cap-location: bottom
 #| warning: false
 
 source(paste(getwd(), "scripts/Table1_data_summary.R", sep = "/"))
 data_summary_table
 ```
+@tbl-dataSources also shows that our data came in annual, quarterly, and monthly time frequencies. We are interested in annual data for this analysis so some data considerations are as follows because not all our data provided in Real dollars, were given as a rate (growth rate, proportion rate, or fixed rate), or on a similar scale (i.e., rate, millions of dollars, index).
+Additionally, BallMapper is less effective and inefficent to use when the input data variation there is large variation in the scales of each dimension of the dataset (columns). \footnote{[find reference]} To aide BallMapper, we transformed our data to either a rate or a percentage change from the previous year where appropriate. This ensures all dimensions of our data stay on a 0-100 scale and helps with the time complexity of BallMapper.
 
-@tbl-dataSources also shows that our data came in annual, quarterly, and monthly time frequencies. This analysis is using data by year so some considerations we had to account for was that not all our data provided in Real dollars, were given as a rate (growth rate, proportion rate,  or fixed rate), or on a similar scale.
-BallMapper is less effective and harder to use when the input data variation is large regarding each dimension's sclae [find reference]. To fix this we transformed out data to either a rate or a percentage change from the previous year where appropriate.
-
-only so for our data from FRED that came in monthly frequencies only we did two different calculations based on the type of data we had seen in our *Data Type* column. For data that is of type *Flow* - measuring some quantity over time - and was not already given as a percent growth, we first found the annual average if was given on a monthly or quarterly time frame using non-weighted arithmetic mean. Then with those averages
+## *Pre Analysis Calculations*
+The first data series we needed to to make adjustments for was Personal Income and It's Outlays; specifically, Personal Income and Its Disposition (Personal Income).
+\footnote{Table 2.1 from the BEA's Interactive Data, National Data section.}
+Personal Income is reported in nominal dollars, which does not account for inflation, so our first calculation is to adjust Personal Income for inflation using Consumer Price Index (CPI) data.
+$$
+\text{Real Personal Income} = \frac{\text{Personal Income}}{\text{CPI}} * 100
+$${#eq-cpiRealDollars}
+We then take the output os @eq-cpiRealDollars and take the log difference and multiply it by 100 to get a percentage change for the preceding year.
+$$
+\Delta\text{Real Personal Income} = ln(\text{Real Personal Income}_{t}) - ln(\text{Real Personal Income}_{t-1})
+$${#eq-deltaPersoanlIncome}
+ 
+ that came in monthly frequencies, two different calculations wered done based on the type of data (see @tbl-dataSources). Data labeled type *Flow* 
+\footnote{This data is measuring some quantity over time such as Personal Income} and was not already given as a percent growth, we took a two step calculation: first we found the annual average by calculating the non-weighted arithmetic mean. After finding the 
 
 Some of our data was only available in monthly time frames [insert data names] and were initially interested in quarterly and annual data. So to get representative data on our time periods of interest we took the arithmetic mean of their respective time intervals see in **equation_quarterly** and **equation_annual**.
 
