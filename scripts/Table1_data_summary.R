@@ -12,7 +12,7 @@ data_summary_table <- all_annual |>
     ) |>
     mutate(series_name =  case_when(
         series == "GDP" ~ "Gross Domestic Product",
-        series == "PID" ~ "Personal Income & Its Disposition",
+        series == "PID" ~ "Personal Income & Oulays",
         series == "FDI" ~ "Foreign Direct Investment",
         series == "FFR" ~ "Federal Funds Rate",
         series == "ECI" ~ "Employment Cost Index",
@@ -63,7 +63,8 @@ data_summary_table <- all_annual |>
         data_frequency = "Data Frequency",
         data_type = "Data Type"
     ) |>
-    opt_table_font(font = "EB Garamond") |>
+    opt_table_font(font = "EB Garamond",
+                   size = 10.25) |>
     tab_options(
         page.margin.top = "top = 1in",
         page.margin.left =  "left = 1in",
