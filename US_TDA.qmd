@@ -97,99 +97,41 @@ What follows is a summary of current literature and motivation for this paper. W
 
 # METHODS AND PROCEDURES
 
-## Literature
+## *Data*
 TDA's increasing popularity since the early 21st century and has led to a wide array of applications as well as development in software packages.\footnote{Chazal F and Michel B (2021) An Introduction to Topological Data Analysis: Fundamental and Practical Aspects for Data Scientists. Front. Artif. Intell. 4:667963. doi: 10.3389/frai.2021.667963}
 
+This paper relied on three publicly available data from US government sources. The Bureau of Economic Analysis (BEA), The Federal Reserve Board (FRB), and The Bureau of Labor Statistics (BLS). The data were gathered using R using two application programming interfaces (APIs): one for data from the BEA, and the other from the Federal Reserve Economic Data (FRED) API. FRED aggregates data from national and international sources, as well as public and private sources. We additionally used recession dates based on business cycle contractions and expansions provided by the National Bureau of Economic Research (NBER).
 
+These agencies were selected because of they are authoritative sources for U.S. economic data. Their widespread use in both the private and public sector gives us high confidence in the accuracy and integrity of the data \footnote{Hughes-Cromwick, Ellen, and Julia Coronado. 2019. "The Value of US Government Data to US Business Decisions." Journal of Economic Perspectives 33 (1): 131\u201346. DOI: 10.1257/jep.33.1.131}
 
-and is increasingly being applied to From the small body of literature we have reviewed, TDABM has removed many of the parameters that are required for more traditional methods of TDA. Generally speaking, traditional TDA contains four broad steps, each with multiple user-defined parameters. Conversely, TDABM has reduced this process to an the user selecting their data, a coloring variable and an epsilon value -- details on this follow below. What should be noted, although TDABM reduces the number of steps needed to produce similar outcomes of traditional TDA methods, we lose control of being able fine tune out outputs. We also find that interpreting results becomes more difficult. However, TDABM is still in its infancy, so there is not a large body of research on interpretation. [@dlotko2019ballmapper] One major motivation for this paper is a paper written by @dlotko2019macroeconomy that applied TDABM to a global macroeconomic dataset to compare how countries have evolved over time, their transformation from the Great Depression Era, and various views on wealth and inequality. We could not find other TDA literature found specifically focused on the macroeconomic economy of singular countries. Hence, our topic of choice.
-
-
-## *Sources*
-```{r}
-#| label: fig-YearSpan
-#| fig-cap: "Span of Years by Economic Data Source"
-#| warning: false
-
-source(paste(getwd(), "scripts/Figure1_yearSpan.R", sep = "/"))
-yearSpan_plot
-```
-
-This paper relied on three publicly available data from US government sources. The Bureau of Economic Analysis (BEA), The Federal Reserve Board (FRB), and The Bureau of Labor Statistics (BLS). The data were gathered using R using two application programming interfaces (APIs): one for data from the BEA, and the other from the Federal Reserve Economic Data (FRED) API. FRED aggregates data from national and international sources, as well as public and private sources. Relevant to this paper, we used additional data, recession dates, based on business cycle contractions and expansions provided by the National Bureau of Economic Research.
-
-These agencies were selected because of they are authoritative sources for U.S. economic data. Their widespread use in both the private and public sector gives us high confidence in the accuracy and integrity of the data.[^1]
-
-While both quarterly and annual data were collected, the following analysis is focused on an annual timescale. The choice of an annual time frame was to keep consistency with other literature applying BallMapper to economic data on a yearly basis. 
-
-Looking at the time ranges in @fig-YearSpan, we elected to exclude Employment Cost Index (ECI) and Foreign Direct Investment (FDI) due to their limited available years. Since our Housing Starts data has the smallest range of years, we will limit the rest of our data sources to the years 1959 - 2024.
-
-
-
-
-[^1]: Hughes-Cromwick, Ellen, and Julia Coronado. 2019. "The Value of US Government Data to US Business Decisions." Journal of Economic Perspectives 33 (1): 131\u201346. DOI: 10.1257/jep.33.1.131
-
-## *Data*
-The Beareau of Economic Analysis (BEA), Bureau of Labor Statistics, and the Federal Reserve Bank data were because of how widely-used these sources are. To obtain our data we used R to pull from the BEA's and the Federal Reserve Economic Data (FRED) API.\footnote{Code for analysis can be found on GitHub: [myLinkHere]}
+Looking at the time ranges in @tbl-dataSources, we elected to exclude Employment Cost Index (ECI) and Foreign Direct Investment (FDI) due to their limited available years. Looking at the remaining data series, Housing Starts has the smallest range and so , we will limit our years to the years 1959 - 2024. 
 
 ```{r}
 #| label: tbl-dataSources
-#| tbl-cap: "Data Sources"
+#| tbl-cap: "*New Privately-Owned Housing Units Started (Housing Starts) is considered a flow because it is provided as a Seasonally Adjusted Annual Rate (SAAR)."
+#| tbl-cap-location: bottom
 #| warning: false
 
-all_annual |>
-  map_df(
-    .id = "series", 
-    ~ tibble(
-      year_start = min(.x$year),
-      year_end = max(.x$year),
-      )
-  ) |>
-  mutate(API =  case_when(
-        series == "GDP" ~ "BEA",
-        series == "PID" ~ "BEA",
-        series == "FDI" ~ "BEA",
-        .default = "FRED"
-      )
-  ) |>
-  mutate(data_frequency =  case_when(
-        series == "GDP" ~ "Annual",
-        series == "PID" ~ "Annual",
-        series == "FDI" ~ "Annual",
-        series == "FFR" ~ "Annual",
-        series == "ECI" ~ "Quarterly",
-        .default = "Monthly"
-      )
-  ) |>
-  mutate(series_name =  case_when(
-        series == "GDP" ~ "Gross Domestic Product",
-        series == "PID" ~ "Personal Income & Its Disposition",
-        series == "FDI" ~ "Foreign Direct Investment",
-        series == "FFR" ~ "Federal Funds Rate",
-        series == "ECI" ~ "Employment Cost Index",
-        series == "CPI" ~ "Consumer Price Index",
-        series == "housingStarts" ~ "New Privately-Owned Housing Units Started",
-        series == "PPI_All" ~ "Producer Price Index - All Commodities",
-        series == "unemployment" ~ "Unemployment Rate"
-      )
-  ) |>
-  relocate(series_name, .before = series) |>
-  relocate(API, .after = year_end) |>
-  select(-series) |>
-  gt() |>
-  cols_align(align = "center", 
-             columns = c(year_start, year_end, API, data_frequency)
-             )
+source(paste(getwd(), "scripts/Table1_data_summary.R", sep = "/"))
+data_summary_table
 ```
 
-PPI_All only include Farm products, processed foods and feeds, Industrials, and other commodities such as rubber, lumber, machinery, and aircraft since 1959.
-Most all services only have data series from 2009 onwards.
+@tbl-dataSources also shows that our data came in annual, quarterly, and monthly time frequencies. This analysis is using data by year so some considerations we had to account for was that not all our data provided in Real dollars, were given as a rate (growth rate, proportion rate,  or fixed rate), or on a similar scale.
+BallMapper is less effective and harder to use when the input data variation is large regarding each dimension's sclae [find reference]. To fix this we transformed out data to either a rate or a percentage change from the previous year where appropriate.
 
+only so for our data from FRED that came in monthly frequencies only we did two different calculations based on the type of data we had seen in our *Data Type* column. For data that is of type *Flow* - measuring some quantity over time - and was not already given as a percent growth, we first found the annual average if was given on a monthly or quarterly time frame using non-weighted arithmetic mean. Then with those averages
+
+Some of our data was only available in monthly time frames [insert data names] and were initially interested in quarterly and annual data. So to get representative data on our time periods of interest we took the arithmetic mean of their respective time intervals see in **equation_quarterly** and **equation_annual**.
 
 Data for analysis is on an annual change. Converted data which are not a rate (fed funds rate and unemployment) or changes year over year (gdp), to reflect percent change from year to year.
 For persona income and it's disposition, also need to calculate the real amounts instead of the reported nominal [**insert reference**]. For this we will take the nominal value/cpi X 100 for the real value, and then take the log difference year to year to measure changes by year. \footnote{https://econbrowser.com/archives/2014/02/use-of-logarithms-in-economics}
 
-Some of our data was only available in monthly time frames [insert data names] and were initially interested in quarterly and annual data. So to get representative data on our time periods of interest we took the arithmetic mean of their respective time intervals see in **equation_quarterly** and **equation_annual**.
 
+
+PPI_All only include Farm products, processed foods and feeds, Industrials, and other commodities such as rubber, lumber, machinery, and aircraft since 1959.
+Most all services only have data series from 2009 onwards.
+
+and is increasingly being applied to From the small body of literature we have reviewed, TDABM has removed many of the parameters that are required for more traditional methods of TDA. Generally speaking, traditional TDA contains four broad steps, each with multiple user-defined parameters. Conversely, TDABM has reduced this process to an the user selecting their data, a coloring variable and an epsilon value -- details on this follow below. What should be noted, although TDABM reduces the number of steps needed to produce similar outcomes of traditional TDA methods, we lose control of being able fine tune out outputs. We also find that interpreting results becomes more difficult. However, TDABM is still in its infancy, so there is not a large body of research on interpretation. [@dlotko2019ballmapper] One major motivation for this paper is a paper written by @dlotko2019macroeconomy that applied TDABM to a global macroeconomic dataset to compare how countries have evolved over time, their transformation from the Great Depression Era, and various views on wealth and inequality. We could not find other TDA literature found specifically focused on the macroeconomic economy of singular countries. Hence, our topic of choice.
 
 ### TDA BallMapper
 TDABM, and in general TDA, believes that data contains a "shape" to it. It pulls ideas from the branch of Mathematics, Topology. At a high-level, Topology focuses on the properties of geometric shapes when you deform them without breaking them, e.g. bend, twist, scrunch. The following is a basic overview of TDABM [^examples].

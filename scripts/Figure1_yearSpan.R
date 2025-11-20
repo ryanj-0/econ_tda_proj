@@ -98,3 +98,11 @@ yearSpan_plot <- ggplot(yearRanges, aes(y = data_source)) +
         axis.title.y = element_text(margin = margin(r = 20))
     )
 
+```{r}
+#| label: fig-YearSpan
+#| fig-cap: "Span of Years by Economic Data Source"
+#| warning: false
+
+source(paste(getwd(), "scripts/Figure1_yearSpan.R", sep = "/"))
+yearSpan_plot
+```
