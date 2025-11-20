@@ -9,7 +9,7 @@
 
 lastPulled <- readRDS(paste(getwd(), "data/lastPulled.rds", sep = "/"))
 
-if(Sys.Date() > lastPulled + 15) {
+if(Sys.Date() > lastPulled + 10) {
 
     # Update last pulled
     lastPulled <- Sys.Date()
@@ -42,7 +42,7 @@ if(Sys.Date() > lastPulled + 15) {
 
 } else
     message("Last Date Pulled: ", lastPulled, "\n",
-            "Data within 90 days of last pull, loading local data.")
+            "Data within 10 days of last pull, loading local data.")
 
 
 
