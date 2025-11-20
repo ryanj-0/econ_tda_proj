@@ -4,6 +4,7 @@
 
 # Clear Memory
 rm(list = ls())
+gc()
 
 # Load Packages -----------------------------------------------------------
 if (!require("pacman")) {
@@ -11,16 +12,21 @@ if (!require("pacman")) {
 }
 
 # Will install following packages if not already installed
-pacman::p_load(tidyverse,
-               bea.R,
-               fredr,
-               BallMapper,
-               gt,
-               viridis,
-               knitr,
-               kableExtra,
-               svglite,
-               showtext)
+pacman::p_load(
+    # APIs
+    bea.R,
+    fredr,
+    # Paper formatting and design
+    gt,
+    viridis,
+    kableExtra,
+    svglite,
+    showtext,
+    knitr,
+    # analysis
+    BallMapper,
+    data.table,
+    tidyverse)
 
 
 # Source Functions --------------------------------------------------------
