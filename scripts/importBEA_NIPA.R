@@ -109,7 +109,7 @@ PID_A <- beaGet(pidA_list) |>
             .cols = -c(year, avgA),
             .fns = function(x) {
                 real_income <- (x/avgA) * 100
-                (log(real_income) - lag(log(real_income))) * 100
+                (log(real_income) - log(lag(real_income))) * 100
             }
         )
     ) |>
