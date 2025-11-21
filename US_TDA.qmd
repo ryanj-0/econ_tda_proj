@@ -38,27 +38,6 @@ source(paste(getwd(), "scripts/Data_Import.R", sep = "/"))
 source(paste(getwd(), "scripts/Final_Data.R", sep = "/"))
 ```
 
-# Paper Outline [Removed after Review]
-- Abstract [x]
-- Introduction
-- Methods and Procedures
-  - Procedures
-    - Literature
-    - Data
-    - Mapper/BallMapper
-  - Methods
-    - Descriptive Analysis of BM Graph
-      - Groupings
-      - Statistical correlation and other known interpretations
-      - difference epsilon testing
-    - time travel - coloring by year
-    - robustness check with randomization
-    - other colorings?
-  - Results
-- Discussion
-- Conclusion
-- References
-
 # Mapping the Shape of the U.S. Economy: A Topological Data Analysis Approach with BallMapper
 
 *Ryan Johnson*\textsuperscript{*}
@@ -75,14 +54,10 @@ Economics; Macroeconomics; Topology;
 # ABSTRACT
 Topological Data Analysis is (TDA) is a new data analysis method which gained popularity starting in the early 21st century. Currently, a large body of TDA research utilizes the traditional Mapper algorithm. We aim to expand the body of literature on BallMapper, a new, Mapper adjacent algorithm. Applying BallMapper to widely used, U.S. macroeconomic data from the Bureau of Economic Analysis (BEA), the Federal Reserve Bank (FRB), and Bureau of Labor Statistics (BLS), we do this is three parts. Specifically we show BallMapper's utility in exploratory data analysis, compare the topological graphs produced to notable historic economic events, and test the stability topological graphs and their features. Results show. [...]
 
-
-We aim to expand the body of literature using BallMapper.
-The latter is a sub-field of Algebraic Topology which provides mathematical certainty about what we are seeing from the Mapper algorithm. The former, is a visualization tool and can be used for exploratory data analysis.
-
-\newpage
 # INTRODUCTION
-Topological Data Analysis (TDA) is a new and emerging field of data analysis that is increasing in popularity. Conceptually, the traditional applications of TDA have two parts, a algorithm called Mapper and Persistence Homology. These two parts can be thought
-of graph creation and persistence of common features across many graphs.\footnote{https://arxiv.org/pdf/2504.09042} 
+Topological Data Analysis (TDA) is a new and emerging field of data analysis that is increasing in popularity. At a high level, the traditional applications of TDA use two tools: an algorithm called Mapper that produces a network-like graph and and analysis technique called Persistence Homology. 
+Mapper can be thought of carrying out a statistical analysis with just pictures, it might confirm a hypothesis but is not enough to say something is statistically significant. Persistence Homology on the other hand is more akin to doing an analysis of variance (ANOVA). It provides the statistical, in our case mathematical, backing to what we might see if we just plot the data.\footnote{https://arxiv.org/pdf/2504.09042} 
+\footnote{Chazal F and Michel B (2021) An Introduction to Topological Data Analysis: Fundamental and Practical Aspects for Data Scientists. Front. Artif. Intell. 4:667963. doi: 10.3389/frai.2021.667963}
 
 The first part, graph creation, is commonly carried out with an algorithm called Mapper which produces a topological map.\footnote{Need to explain what Topological map is?} The second, persistence, creates many graphs and analyzes common features of each topological map to understand the underlying relationships in data. These underlying relationships in data form a central argument for TDA: data contains an underlying structure.
 
@@ -96,10 +71,9 @@ What follows is a summary of current literature and motivation for this paper. W
 
 
 # METHODS AND PROCEDURES
+## PROCEDURES
 
-## *Data*
-TDA's increasing popularity since the early 21st century and has led to a wide array of applications as well as development in software packages.\footnote{Chazal F and Michel B (2021) An Introduction to Topological Data Analysis: Fundamental and Practical Aspects for Data Scientists. Front. Artif. Intell. 4:667963. doi: 10.3389/frai.2021.667963}
-
+### *Data*
 This paper relied on three publicly available data from US government sources. The Bureau of Economic Analysis (BEA), The Federal Reserve Board (FRB), and The Bureau of Labor Statistics (BLS). The data were gathered using R using two application programming interfaces (APIs): one for data from the BEA, and the other from the Federal Reserve Economic Data (FRED) API. FRED aggregates data from national and international sources, as well as public and private sources. We additionally used recession dates based on business cycle contractions and expansions provided by the National Bureau of Economic Research (NBER).
 
 These agencies were selected because of they are authoritative sources for U.S. economic data. Their widespread use in both the private and public sector gives us high confidence in the accuracy and integrity of the data. \footnote{Hughes-Cromwick, Ellen, and Julia Coronado. 2019. "The Value of US Government Data to US Business Decisions." Journal of Economic Perspectives 33 (1): 131\u201346. DOI: 10.1257/jep.33.1.131}
@@ -116,34 +90,70 @@ source(paste(getwd(), "scripts/Table1_data_summary.R", sep = "/"))
 data_summary_table
 ```
 @tbl-dataSources also shows that our data came in annual, quarterly, and monthly time frequencies. We are interested in annual data for this analysis so some data considerations are as follows because not all our data provided in Real dollars, were given as a rate (growth rate, proportion rate, or fixed rate), or on a similar scale (i.e., rate, millions of dollars, index).
-Additionally, BallMapper is less effective and inefficent to use when the input data variation there is large variation in the scales of each dimension of the dataset (columns). \footnote{[find reference]} To aide BallMapper, we transformed our data to either a rate or a percentage change from the previous year where appropriate. This ensures all dimensions of our data stay on a 0-100 scale and helps with the time complexity of BallMapper.
+Additionally, BallMapper is less effective and inefficient to use when the input data variation there is large variation in the scales of each dimension of the dataset (columns).\footnote{[find reference]} To aide BallMapper, we transformed our data to either a rate or a percentage change from the previous year where appropriate. This ensures all dimensions of our data stay on a 0-100 scale and helps with the time complexity of BallMapper.
 
-## *Pre Analysis Calculations*
-The first data series we needed to to make adjustments for was Personal Income and It's Outlays; specifically, Personal Income and Its Disposition (Personal Income).
-\footnote{Table 2.1 from the BEA's Interactive Data, National Data section.}
-Personal Income is reported in nominal dollars, which does not account for inflation, so our first calculation is to adjust Personal Income for inflation using Consumer Price Index (CPI) data.
+### *Pre Analysis Calculations*
+The first data series we needed to to make adjustments for was Personal Income and It's Outlays; specifically, Personal Income and Its Disposition (Personal Income).\footnote{Table 2.1 from the BEA's Interactive Data, National Data section.}
+Personal Income is reported in nominal dollars, which does not account for inflation, so our first calculation is to adjust Personal Income for inflation using Consumer Price Index (CPI) data. \footnote{https://www.dallasfed.org/research/basics/nominal}
 $$
-\text{Real Personal Income} = \frac{\text{Personal Income}}{\text{CPI}} * 100
+\text{Real Dollars} = \frac{\text{Nominal Dollars}}{\text{CPI}} * 100
 $${#eq-cpiRealDollars}
-We then take the output os @eq-cpiRealDollars and take the log difference and multiply it by 100 to get a percentage change for the preceding year.
+From @eq-cpiRealDollars, we then take the log difference (@eq-deltaLog) and multiply it by 100 to get a percentage change for the preceding year. This log difference helps to make our data more linear which aides the BallMapper algorithm's use of the standard Euclidean Distance between each row of data.
+\footnote{https://econbrowser.com/archives/2014/02/use-of-logarithms-in-economics}
+\footnote{https://www.numberanalytics.com/blog/log-transform-econ-how-to-guide}
 $$
-\Delta\text{Real Personal Income} = ln(\text{Real Personal Income}_{t}) - ln(\text{Real Personal Income}_{t-1})
-$${#eq-deltaPersoanlIncome}
- 
- that came in monthly frequencies, two different calculations wered done based on the type of data (see @tbl-dataSources). Data labeled type *Flow* 
-\footnote{This data is measuring some quantity over time such as Personal Income} and was not already given as a percent growth, we took a two step calculation: first we found the annual average by calculating the non-weighted arithmetic mean. After finding the 
+\Delta\ln{(\text{Real Level})} = 
+\ln{(\text{Real Level}_{t})} - \ln{(\text{Real Level}_{t-1})}
+$${#eq-deltaLog}
 
-Some of our data was only available in monthly time frames [insert data names] and were initially interested in quarterly and annual data. So to get representative data on our time periods of interest we took the arithmetic mean of their respective time intervals see in **equation_quarterly** and **equation_annual**.
-
-Data for analysis is on an annual change. Converted data which are not a rate (fed funds rate and unemployment) or changes year over year (gdp), to reflect percent change from year to year.
-For persona income and it's disposition, also need to calculate the real amounts instead of the reported nominal [**insert reference**]. For this we will take the nominal value/cpi X 100 for the real value, and then take the log difference year to year to measure changes by year. \footnote{https://econbrowser.com/archives/2014/02/use-of-logarithms-in-economics}
-
+Additionally, we applied @eq-deltaLog to New Privately-Owned Housing Units Started (Housing Starts), Producer Price Index - All Commodities (PPI - All), and CPI and multiplied each of those by 100 to get the percent growth from the preceding year for Housing Starts, Consumer Inflation (Demand-Pull Inflation), and Producer Inflation (Cost-Push Inflation), respectively.
 
 
 PPI_All only include Farm products, processed foods and feeds, Industrials, and other commodities such as rubber, lumber, machinery, and aircraft since 1959.
-Most all services only have data series from 2009 onwards.
+Most all services only have data series from 2009 on wards.
 
 and is increasingly being applied to From the small body of literature we have reviewed, TDABM has removed many of the parameters that are required for more traditional methods of TDA. Generally speaking, traditional TDA contains four broad steps, each with multiple user-defined parameters. Conversely, TDABM has reduced this process to an the user selecting their data, a coloring variable and an epsilon value -- details on this follow below. What should be noted, although TDABM reduces the number of steps needed to produce similar outcomes of traditional TDA methods, we lose control of being able fine tune out outputs. We also find that interpreting results becomes more difficult. However, TDABM is still in its infancy, so there is not a large body of research on interpretation. [@dlotko2019ballmapper] One major motivation for this paper is a paper written by @dlotko2019macroeconomy that applied TDABM to a global macroeconomic dataset to compare how countries have evolved over time, their transformation from the Great Depression Era, and various views on wealth and inequality. We could not find other TDA literature found specifically focused on the macroeconomic economy of singular countries. Hence, our topic of choice.
+
+
+## METHODS
+### *BallMapper*
+- Summary of algorithm
+- correlation considerations
+### *Exploratory Data Analysis (EDA) Application*
+- known interpretations
+
+### *Small Comparative Analysis*
+-"New Deal"
+- 08 financial crisis
+- Covid
+- Flash Crash 87
+- Tech Boom
+- AI Boom
+- Oil Embargo/ high unemployment
+
+### *Robustness and Stabilization*
+- Shuffle Dataset --> Run BallMapper
+  - Look at:
+    - # nodes
+    - coloring consistency
+    - look at financne application and brexit vote
+
+# CONCLUSION
+
+# DISCUSSION
+# REFERENCES
+
+
+
+
+
+# Old Paper
+
+
+## Old Intro
+
+Dłotko demonstrates that, mathematically, TDABM produces a near similar output to that of traditional TDA methods via a fuctor map [@dlotko2019ballmapper].
+TDA BallMapper and closely follows other papers that have applied TDABM. We will begin with a general overview of TDABM: current published literature and useful concepts to know. We then will describe our data and reasoning behind their selection. Our [Methodology](#sec-methodology) and [Results](#sec-results) will touch on more theoretical concepts behind TDABM and then adress a couple of findings, respectively.
 
 ### TDA BallMapper
 TDABM, and in general TDA, believes that data contains a "shape" to it. It pulls ideas from the branch of Mathematics, Topology. At a high-level, Topology focuses on the properties of geometric shapes when you deform them without breaking them, e.g. bend, twist, scrunch. The following is a basic overview of TDABM [^examples].
@@ -188,10 +198,6 @@ In our [Data](#sec-data) section, we noted that some calculations were needed be
 [^software]: There are packages available both in R and Python under the names BallMapper and pyBallMapper, respectively.
 
 
-
-
-The analysis reportes here are guided by @dlotko2019macroeconomy's approach. We will be referencing our TDABM output in @fig-ballmapper for the remainder of this section.
-
 ## Results
 
 ### Interpretation of TDA BallMapper Graphs, An Abridged Version
@@ -218,8 +224,7 @@ Shfiting our focus towards component A, it consists of data most similar to the 
 [^greatinflation]: 1974 - 1984
 [^aftercovid]: *2021:* An outlier, we see higher levels of unemployment and inflation. We see high PCE, Ig, and imports; *2022:* Nodes $\{8, 28\}$ we see that there is higher than normal inflation, export, and imports; *2023:* Nodes $\{6, 24\}$, we see low inflation and low unemployment.
 
-
-# Discussion
+## Discussion
 
 This paper serves as a proof-of-concept of the usefulness of TDABM as a methodology for exploratory data analysis. By no means is this a totally comprehensive method to gain insight into data, but instead TDA BallMapper proves itself to be useful tool wehen employed in addition to other traditional analyses. 
 
@@ -227,25 +232,18 @@ In our [Results](#sec-results) section we briefly went over two ways to interpre
 
 For the future development of TDABM, and TDA in general, there are many possibilities of future research and one glaring downside. The downside to TDA is that it is a high barrier to entry to understand the methodologies inner workings. Those with a technical background will have an easier time, but nonetheless a higher barrier than methods such as linear regressions.  Subject wise, TDA has an advantage in some of the social sciences because it can be somewhat of a bridge between qualitative and quantitative analyses. TDABM has been used to analyze the Brexit Vote data, seeking to understand quantitative and qualitative motivations behind its outcome @Rudkin2023. TDA also has the advantages of dimension reduction which could be useful to the life-sciences. Fields such as genetics, chemistry, and biology have many fields of data, and being able to consolidate it into an understandable form could benefit the body of knowledge greatly.
 
-# Conclusion
-
-
 # Endnotes {.unnumbered}
 
 
 General Percent Change Formula $$\Delta p_n = \frac{p_n - p_{n-k}}{p_{n-k}} \text{ for some } p \in P \text{ and } n > 0$${#eq-generalpctchange}
 where $P$ is a column of our data with $x_1,...,x_n$ observations and $k$ is a lag integer such that $k>0$.
 
-
-# Appendix {.unnumbered}
-
-
-
+## Appendix {.unnumbered}
 
 ![Data is normalized on a \[0,1\] scale due to all varialbe not being normally distributed See Supplement_2.pdf.](annualBM.svg){#fig-ballmapper}
 
 \newpage
-# References {.unnumbered}
+## References {.unnumbered}
 
 ::: {#refs}
 :::
@@ -267,12 +265,3 @@ where $P$ is a column of our data with $x_1,...,x_n$ observations and $k$ is a l
     -   [PPI](https://fred.stlouisfed.org/series/PPIFIS)
     -   [Housing Starts](https://fred.stlouisfed.org/series/HOUST)
     -   [Unemployment Rate](https://fred.stlouisfed.org/series/UNRATE)
-
-
-
-
-
-# Old Intro Material
-
-Dłotko demonstrates that, mathematically, TDABM produces a near similar output to that of traditional TDA methods via a fuctor map [@dlotko2019ballmapper].
-TDA BallMapper and closely follows other papers that have applied TDABM. We will begin with a general overview of TDABM: current published literature and useful concepts to know. We then will describe our data and reasoning behind their selection. Our [Methodology](#sec-methodology) and [Results](#sec-results) will touch on more theoretical concepts behind TDABM and then adress a couple of findings, respectively.
