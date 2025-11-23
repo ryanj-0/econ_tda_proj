@@ -13,7 +13,7 @@
 
 # Update Final Data Check --------------------------------------------------
 
-if(Sys.Date() > lastPulled + 10) {
+if(Sys.Date() > lastPulled + 3) {
 
     # Quarterly Combined
     BEA_quarterly <- inner_join(GDP_Q, PID_Q, by = join_by(year, quarter))
@@ -61,30 +61,29 @@ if(Sys.Date() > lastPulled + 10) {
 
     all_annual <- readRDS(paste(getwd(), "data/all_annual.rds", sep = "/"))
 
-    # Recession Dates ---------------------------------------------------------
-
-
-    nberRecessions <-
-        fredr(series_id = "USRECQ") |>
-        mutate(
-            year = format(date, "%Y") |> as.numeric(),
-            month = format(date, "%m") |> as.numeric(),
-            quarter = case_when(
-                month %in% c(1:3) ~ 1,
-                month %in% c(4:6) ~ 2,
-                month %in% c(7:9) ~ 3,
-                month %in% c(10:12) ~ 4
-            )
-        ) |>
-        filter(value == 1) |>
-        group_by(year) |>
-        mutate(fullYear = n() / 4) |>
-        ungroup() |>
-        select(series_id, year, quarter, fullYear)
-
-    nberRecessions_yearly <- nberRecessions |>
-        select(-quarter) |>
-        unique()
-
 }
 
+# Recession Dates ---------------------------------------------------------
+
+
+nberRecessions <-
+    fredr(series_id = "USRECQ") |>
+    mutate(
+        year = format(date, "%Y") |> as.numeric(),
+        month = format(date, "%m") |> as.numeric(),
+        quarter = case_when(
+            month %in% c(1:3) ~ 1,
+            month %in% c(4:6) ~ 2,
+            month %in% c(7:9) ~ 3,
+            month %in% c(10:12) ~ 4
+        )
+    ) |>
+    filter(value == 1) |>
+    group_by(year) |>
+    mutate(fullYear = n() / 4) |>
+    ungroup() |>
+    select(series_id, year, quarter, fullYear)
+
+nberRecessions_yearly <- nberRecessions |>
+    select(-quarter) |>
+    unique()
