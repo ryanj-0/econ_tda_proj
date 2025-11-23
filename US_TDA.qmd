@@ -18,9 +18,6 @@ format:
     header-includes:
       - "\\pagenumbering{gobble}"
 
-execute:
-  echo: false
-
 editor: source
 ---
 
@@ -35,7 +32,7 @@ source(paste(getwd(), "scripts/systemConfig.R", sep = "/"))
 source(paste(getwd(), "scripts/Data_Import.R", sep = "/"))
 
 # Final Data
-source(paste(getwd(), "scripts/Final_Data.R", sep = "/"))
+source(paste(getwd(), "scripts/Data_Final.R", sep = "/"))
 ```
 
 # Mapping the Shape of the U.S. Economy: A Topological Data Analysis Approach with BallMapper
@@ -52,23 +49,18 @@ Topological Data Analysis; BallMapper; Data Science;
 Economics; Macroeconomics; Topology;
 
 # ABSTRACT
-Topological Data Analysis is (TDA) is a new data analysis method which gained popularity starting in the early 21st century. Currently, a large body of TDA research utilizes the traditional Mapper algorithm. We aim to expand the body of literature on BallMapper, a new, Mapper adjacent algorithm. Applying BallMapper to widely used, U.S. macroeconomic data from the Bureau of Economic Analysis (BEA), the Federal Reserve Bank (FRB), and Bureau of Labor Statistics (BLS), we do this is three parts. Specifically we show BallMapper's utility in exploratory data analysis, compare the topological graphs produced to notable historic economic events, and test the stability topological graphs and their features. Results show. [...]
+Topological Data Analysis is (TDA) is a new data analysis method which gained popularity starting in the early 21st century. Currently, a large body of TDA research utilizes the traditional Mapper algorithm. We aim to expand the body of literature on BallMapper, a new, Mapper adjacent algorithm. Applying BallMapper to widely used, U.S. macroeconomic data from the Bureau of Economic Analysis (BEA), the Federal Reserve Bank (FRB), and Bureau of Labor Statistics (BLS), we do this is three parts. Specifically, we show an example of BallMapper's utility in exploratory data analysis which also provides an example of how to interpret BallMapper's output; analyze our topological graphs to notable historic economic events; and test the stability of BallMapper's output and the topological graph's features. Results show. [...]
 
 # INTRODUCTION
 Topological Data Analysis (TDA) is a new and emerging field of data analysis that is increasing in popularity. At a high level, the traditional applications of TDA use two tools: an algorithm called Mapper that produces a network-like graph and and analysis technique called Persistence Homology. 
-Mapper can be thought of carrying out a statistical analysis with just pictures, it might confirm a hypothesis but is not enough to say something is statistically significant. Persistence Homology on the other hand is more akin to doing an analysis of variance (ANOVA). It provides the statistical, in our case mathematical, backing to what we might see if we just plot the data.\footnote{https://arxiv.org/pdf/2504.09042} 
-\footnote{Chazal F and Michel B (2021) An Introduction to Topological Data Analysis: Fundamental and Practical Aspects for Data Scientists. Front. Artif. Intell. 4:667963. doi: 10.3389/frai.2021.667963}
+Mapper can be thought of carrying out a statistical analysis with just pictures, it might confirm a hypothesis but is not enough to say something is statistically significant. Persistence Homology on the other hand is more akin to doing an analysis of variance (ANOVA). It provides the statistical, in our case mathematical, backing to what we might see if we were to only plot the data. Moreover, the combination of Mapper and Persistence Homology is what forms the central argument for TDA: data contains an underlying shape.\footnote{https://arxiv.org/pdf/2504.09042},\footnote{Chazal F and Michel B (2021) An Introduction to Topological Data Analysis: Fundamental and Practical Aspects for Data Scientists. Front. Artif. Intell. 4:667963. doi: 10.3389/frai.2021.667963}
 
-The first part, graph creation, is commonly carried out with an algorithm called Mapper which produces a topological map.\footnote{Need to explain what Topological map is?} The second, persistence, creates many graphs and analyzes common features of each topological map to understand the underlying relationships in data. These underlying relationships in data form a central argument for TDA: data contains an underlying structure.
+For this analysis we will be focusing on the graph creation portion of TDA. Specifically, we are examining various macroeconomic indicators of the United States of America (U.S.) using a Mapper-adjacent algorithm called BallMapper(BM).\footnote{https://arxiv.org/pdf/1901.07410}
+BallMapper is of particular interest to us because it significantly reduces the parameters to create a topological map. It simplifies traditional Mapper by reducing the need for the user to pass data through multiple functions, each with their own parameters.\footnote{add reference}
+One benefit to this reduction in parameters is that it removes some of the barriers to learning Mapper (or Mapper-like algorithms), and more generally, TDA. Those who have a mathematical background, introductory course in Topology, or conceptual knowledge of data science methods and algorithms will fare much easier. However, if you are not equipped with any of the aforementioned tools, TDA might seem unnecessarily complicated for data analysis.
 
-For this analysis we will be focusing on the graph creation portion of TDA. Specifically, we are examining various macroeconomic indicators of the United States of America (U.S.) using a Mapper-adjacent algorithm called BallMapper (BM).\footnote{https://arxiv.org/pdf/1901.07410} BallMapper is of particular interest to us because it significantly reduces the parameters to create a topological map. It simplifies traditional Mapper by reducing the need for the user to pass data through multiple functions, each with their own parameters.\footnote{add reference, seems appropriate here.}
-
-One benefit to this reduction in parameters is that it removes some of the barriers to entry to learning Mapper (or Mapper-like algorithms), and more generally, Topological Data Analysis (TDA). Those who have a mathematical background, introductory course in Topology, or conceptual knowledge of data science methods and algorithms will fare much easier. However, if you are not equipped with any of the aforementioned knowledge, TDA will seem unnecessarily complicated for data analysis.
-
-One main objective of this paper is serve as an on-ramp for anyone interested in TDA but feels inundated upon early stage researching. We also want to add to the small body of research whose main analysis is with BallMapper. Our last goal is to improve literature on how to discern BallMapper graphs.
-        
-What follows is a summary of current literature and motivation for this paper. We then address our data sources and calculations for analysis. Third we will talk about BallMapper and Mapper theory, giving both technical and non-technical understanding. We then will touch on tools and test for [robustness] of BM. Our results comprise of: exploratory data analysis, changing BallMapper parameters, and the robustness checks. The discussion and conclusion will elaborate on where BallMapper fits into the TDA ecosystem, as well as talk about future work and applications.
-
+Beyond the main objectives of this analysis, we hope that this paper is serve as an on-ramp for anyone interested in TDA but feels inundated with jargon upon early stage researching. Out objectives are to add to the small body of literature whose main focus is applications with BallMapper.\footnote{add Mapper survey paper refrence here}
+We go about this by first showing BallMapper's use in exploratory data analysis (EDA). Using our results from EDA, we then will compare BallMapper's outputs (topological graphs) to notable historic economic events [and maybe less known?]. Lastly we will test the stability and consistency of BallMapper's output. The conclusion will talk broadly about results and other considerations of note, and the discussion will elaborate on future work and questions for research.
 
 # METHODS AND PROCEDURES
 ## PROCEDURES
@@ -76,25 +68,32 @@ What follows is a summary of current literature and motivation for this paper. W
 ### *Data*
 This paper relied on three publicly available data from US government sources. The Bureau of Economic Analysis (BEA), The Federal Reserve Board (FRB), and The Bureau of Labor Statistics (BLS). The data were gathered using R using two application programming interfaces (APIs): one for data from the BEA, and the other from the Federal Reserve Economic Data (FRED) API. FRED aggregates data from national and international sources, as well as public and private sources. We additionally used recession dates based on business cycle contractions and expansions provided by the National Bureau of Economic Research (NBER).
 
-These agencies were selected because of they are authoritative sources for U.S. economic data. Their widespread use in both the private and public sector gives us high confidence in the accuracy and integrity of the data. \footnote{Hughes-Cromwick, Ellen, and Julia Coronado. 2019. "The Value of US Government Data to US Business Decisions." Journal of Economic Perspectives 33 (1): 131\u201346. DOI: 10.1257/jep.33.1.131}
+These agencies were selected because of they are authoritative sources for U.S. economic data. Their widespread use in both the private and public sector gives us high confidence in the accuracy and integrity of the data. 
+\footnote{Hughes-Cromwick, Ellen, and Julia Coronado. 2019. "The Value of US Government Data to US Business Decisions." Journal of Economic Perspectives 33 (1): 131\u201346. DOI: 10.1257/jep.33.1.131}
 
 Looking the *Year Start* and *Year End* in @tbl-dataSources, we elected to exclude Employment Cost Index (ECI) and Foreign Direct Investment (FDI) due to their limited available years. Of the remaining data series, New Privately-Owned Housing Units Started (Housing Starts) has the smallest range and will provide the range of years used for our analysis - 1959-2024.
-
 ```{r}
 #| label: tbl-dataSources
 #| tbl-cap: "*Housing Starts is considered a flow because it is provided as a Seasonally Adjusted Annual Rate (SAAR)."
 #| tbl-cap-location: bottom
+#| tbl-pos: "H"
+#| echo: false
+#| eval: true
 #| warning: false
 
 source(paste(getwd(), "scripts/Table1_data_summary.R", sep = "/"))
 data_summary_table
 ```
 @tbl-dataSources also shows that our data came in annual, quarterly, and monthly time frequencies. We are interested in annual data for this analysis so some data considerations are as follows because not all our data provided in Real dollars, were given as a rate (growth rate, proportion rate, or fixed rate), or on a similar scale (i.e., rate, millions of dollars, index).
-Additionally, BallMapper is less effective and inefficient to use when the input data variation there is large variation in the scales of each dimension of the dataset (columns).\footnote{[find reference]} To aide BallMapper, we transformed our data to either a rate or a percentage change from the previous year where appropriate. This ensures all dimensions of our data stay on a 0-100 scale and helps with the time complexity of BallMapper.
+Additionally, BallMapper is less effective and inefficient to use when the input data variation there is large variation in the scales of each dimension of the dataset (columns).
+\footnote{[find reference]}
+To aide BallMapper, we transformed our data to either a rate or a percentage change from the previous year where appropriate. This ensures all dimensions of our data stay on a 0-100 scale and helps with the time complexity of BallMapper.
 
 ### *Pre Analysis Calculations*
-The first data series we needed to to make adjustments for was Personal Income and It's Outlays; specifically, Personal Income and Its Disposition (Personal Income).\footnote{Table 2.1 from the BEA's Interactive Data, National Data section.}
-Personal Income is reported in nominal dollars, which does not account for inflation, so our first calculation is to adjust Personal Income for inflation using Consumer Price Index (CPI) data. \footnote{https://www.dallasfed.org/research/basics/nominal}
+The first data series we needed to to make adjustments for was Personal Income and It's Outlays; specifically, Personal Income and Its Disposition (Personal Income).
+\footnote{Table 2.1 from the BEA's Interactive Data, National Data section.}
+Personal Income is reported in nominal dollars, which does not account for inflation, so our first calculation is to adjust Personal Income for inflation using Consumer Price Index (CPI) data. 
+\footnote{https://www.dallasfed.org/research/basics/nominal}
 $$
 \text{Real Dollars} = \frac{\text{Nominal Dollars}}{\text{CPI}} * 100
 $${#eq-cpiRealDollars}
@@ -119,11 +118,12 @@ and is increasingly being applied to From the small body of literature we have r
 ### *BallMapper*
 - Summary of algorithm
 - correlation considerations
+
 ### *Exploratory Data Analysis (EDA) Application*
 - known interpretations
 
 ### *Small Comparative Analysis*
--"New Deal"
+- "New Deal"
 - 08 financial crisis
 - Covid
 - Flash Crash 87
