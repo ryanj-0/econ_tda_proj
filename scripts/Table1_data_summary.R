@@ -10,45 +10,49 @@ data_summary_table <- all_annual |>
             year_end = max(.x$year),
         )
     ) |>
-    mutate(series_name =  case_when(
-        series == "GDP" ~ "Gross Domestic Product",
-        series == "PID" ~ "Personal Income & Oulays",
-        series == "FDI" ~ "Foreign Direct Investment",
-        series == "FFR" ~ "Federal Funds Rate",
-        series == "ECI" ~ "Employment Cost Index",
-        series == "CPI" ~ "Consumer Price Index",
-        series == "housingStarts" ~ "New Privately-Owned Housing Units Started",
-        series == "PPI_All" ~ "Producer Price Index - All Commodities",
-        series == "unemployment" ~ "Unemployment Rate"
-    )
+    mutate(
+        series_name =  case_when(
+            series == "GDP" ~ "Gross Domestic Product",
+            series == "PID" ~ "Personal Income & Oulays",
+            series == "FDI" ~ "Foreign Direct Investment",
+            series == "FFR" ~ "Federal Funds Rate",
+            series == "ECI" ~ "Employment Cost Index",
+            series == "CPI" ~ "Consumer Price Index",
+            series == "housingStarts" ~ "New Privately-Owned Housing Units Started",
+            series == "PPI_All" ~ "Producer Price Index - All Commodities",
+            series == "unemployment" ~ "Unemployment Rate"
+        )
     ) |>
-    mutate(data_frequency =  case_when(
-        series == "GDP" ~ "Annual",
-        series == "PID" ~ "Annual",
-        series == "FDI" ~ "Annual",
-        series == "FFR" ~ "Annual",
-        series == "ECI" ~ "Quarterly",
-        .default = "Monthly"
-    )
+    mutate(
+        data_frequency =  case_when(
+            series == "GDP" ~ "Annual",
+            series == "PID" ~ "Annual",
+            series == "FDI" ~ "Annual",
+            series == "FFR" ~ "Annual",
+            series == "ECI" ~ "Quarterly",
+            .default = "Monthly"
+        )
     ) |>
-    mutate(data_type =  case_when(
-        series == "GDP" ~ "Flow",
-        series == "PID" ~ "Flow",
-        series == "FDI" ~ "Flow",
-        series == "FFR" ~ "Rate",
-        series == "ECI" ~ "Index",
-        series == "CPI" ~ "Index",
-        series == "housingStarts" ~ "Flow*",
-        series == "PPI_All" ~ "Index",
-        series == "unemployment" ~ "Rate"
-    )
+    mutate(
+        data_type =  case_when(
+            series == "GDP" ~ "Flow",
+            series == "PID" ~ "Flow",
+            series == "FDI" ~ "Flow",
+            series == "FFR" ~ "Rate",
+            series == "ECI" ~ "Index",
+            series == "CPI" ~ "Index",
+            series == "housingStarts" ~ "Flow*",
+            series == "PPI_All" ~ "Index",
+            series == "unemployment" ~ "Rate"
+        )
     ) |>
-    mutate(API =  case_when(
-        series == "GDP" ~ "BEA",
-        series == "PID" ~ "BEA",
-        series == "FDI" ~ "BEA",
-        .default = "FRED"
-    )
+    mutate(
+        API =  case_when(
+            series == "GDP" ~ "BEA",
+            series == "PID" ~ "BEA",
+            series == "FDI" ~ "BEA",
+            .default = "FRED"
+        )
     ) |>
     relocate(series_name, .before = series) |>
     select(-series) |>
