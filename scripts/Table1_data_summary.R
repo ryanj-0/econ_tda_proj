@@ -2,7 +2,9 @@
 ## Table 1: Summary of data ranges, type, and frequency
 #######################################################
 
-data_summary_table <- all_annual |>
+
+# Data for Summary Table --------------------------------------------------
+data_summary <- all_annual |>
     map_df(
         .id = "series",
         ~ tibble(
@@ -55,15 +57,23 @@ data_summary_table <- all_annual |>
         )
     ) |>
     relocate(c(series_abbreviation, series_name), .before = series) |>
-    select(-series) |>
+    select(-series)
+
+# Even rows for striping
+striping_rows <- seq(2, nrow(data_summary), 2)
+
+
+# Summary Table -----------------------------------------------------------
+data_summary_table <- data_summary |>
     gt() |>
-    cols_align(align = "center",
-               columns = c(
-                   year_start,
-                   year_end,
-                   data_frequency,
-                   API
-               )
+    cols_align(
+        align = "center",
+        columns = c(
+            year_start,
+            year_end,
+            data_frequency,
+            API
+        )
     ) |>
     cols_label(
         series_name = "Data Series",
@@ -73,11 +83,8 @@ data_summary_table <- all_annual |>
         data_frequency = "Data Frequency",
         data_type = "Data Type"
     ) |>
-    opt_table_font(font = "EB Garamond",
-                   size = 10.25) |>
     tab_options(
-        page.margin.top = "top = 1in",
-        page.margin.left =  "left = 1in",
-        page.margin.bottom =  "bottom = 1in",
-        page.margin.right = "right = 0.5in"
-    )
+        table.width = pct(100),
+        table.font.size = "8pt"
+    ) |>
+    opt_table_font(font = "EB Garamond")

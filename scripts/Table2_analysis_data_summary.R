@@ -2,13 +2,17 @@
 ## Table 2: Summary of data used in BallMapper Analysis
 #######################################################
 
-analysis_data_summary_table <- analysisData |>
+
+
+# Analysis Data Summary ---------------------------------------------------
+analysis_data_summary <- analysisData |>
     map_df(
         .id = "series",
         ~ tibble(
             num_cols = ncol(.x) - 1
         )
     ) |>
+    arrange(-num_cols) |>
     mutate(
         series_name =  case_when(
             series == "housingStarts" ~ "Housing Starts",
@@ -47,30 +51,43 @@ analysis_data_summary_table <- analysisData |>
                 "Cost of Capital and Borrowing Conditions",
             series == "housingStarts" ~
                 "Physical Residential Production"
+        ),
+        cyclical_timing = case_when(
+            series %in% c("PPI_All", "housingStarts") ~ "Leading",
+            series %in% c("unemployment", "CPI") ~ "Lagging",
+            series %in% c("GDP", "PID") ~ "Concurrent",
+            series == "FFR" ~ "Policy/Reactive"
+        ),
+        transformation = case_when(
+            series %in% c("PPI_All", "CPI", "housingStarts", "unemployment") ~
+                "12-month Avg. & Log Difference",
+            series == "FFR" ~ "None (Annual Rate) & Simple Difference",
+            series == "PID" ~ "Real Adjustment & Log Difference",
+            series == "GDP" ~ "None (Source in % Change)"
         )
     ) |>
-    relocate(series_name, .before = series) |>
-    relocate(c(economic_label, economic_description), .after = series_name) |>
-    select(-series) |>
+    relocate(num_cols, .after = transformation) |>
+    select(-series)
+
+
+# Analysis Data Summary Table ---------------------------------------------
+analysis_data_summary_table <- analysis_data_summary |>
     gt() |>
     cols_align(align = "center",
-               columns = c(
-                   num_cols
-                   )
+               columns = c(num_cols, cyclical_timing)
     ) |>
-    cols_width(economic_label ~ px(150),
-               economic_description ~ px(100)) |>
+    cols_width(economic_description ~ px(100),
+               transformation ~ px(80)) |>
     cols_label(
         series_name = "Data Series",
         economic_label = "Economic Role",
         economic_description = "Functional Descriptioin",
+        transformation = "Transformation Applied",
+        cyclical_timing = "Business Cycle Timing",
         num_cols = "Feature Count"
     ) |>
-    opt_table_font(font = "EB Garamond",
-                   size = 10.25) |>
     tab_options(
-        page.margin.top = "top = 1in",
-        page.margin.left =  "left = 1in",
-        page.margin.bottom =  "bottom = 1in",
-        page.margin.right = "right = 0.5in"
-    )
+        table.width = pct(100),
+        table.font.size = "8pt"
+    ) |>
+    opt_table_font(font = "EB Garamond")
