@@ -21,9 +21,13 @@ data_summary_table <- all_annual |>
             series == "housingStarts" ~ "New Privately-Owned Housing Units Started",
             series == "PPI_All" ~ "Producer Price Index - All Commodities",
             series == "unemployment" ~ "Unemployment Rate"
-        )
-    ) |>
-    mutate(
+        ),
+        series_abbreviation =  case_when(
+            series == "housingStarts" ~ "Housing Starts",
+            series == "PPI_All" ~ "PPI",
+            series == "unemployment" ~ "UnRate",
+            .default = series
+        ),
         data_frequency =  case_when(
             series == "GDP" ~ "Annual",
             series == "PID" ~ "Annual",
@@ -31,9 +35,7 @@ data_summary_table <- all_annual |>
             series == "FFR" ~ "Annual",
             series == "ECI" ~ "Quarterly",
             .default = "Monthly"
-        )
-    ) |>
-    mutate(
+        ),
         data_type =  case_when(
             series == "GDP" ~ "Flow",
             series == "PID" ~ "Flow",
@@ -44,9 +46,7 @@ data_summary_table <- all_annual |>
             series == "housingStarts" ~ "Flow*",
             series == "PPI_All" ~ "Index",
             series == "unemployment" ~ "Rate"
-        )
-    ) |>
-    mutate(
+        ),
         API =  case_when(
             series == "GDP" ~ "BEA",
             series == "PID" ~ "BEA",
@@ -54,15 +54,21 @@ data_summary_table <- all_annual |>
             .default = "FRED"
         )
     ) |>
-    relocate(series_name, .before = series) |>
+    relocate(c(series_abbreviation, series_name), .before = series) |>
     select(-series) |>
     gt() |>
     cols_align(align = "center",
-               columns = c(year_start, year_end, API, data_frequency)
+               columns = c(
+                   year_start,
+                   year_end,
+                   data_frequency,
+                   API
+               )
     ) |>
     cols_label(
-        series_name = "Series Name",
-        year_start = "Yeart Start",
+        series_name = "Data Series",
+        series_abbreviation = "Series Abbreviation",
+        year_start = "Year Start",
         year_end = "Year End",
         data_frequency = "Data Frequency",
         data_type = "Data Type"
