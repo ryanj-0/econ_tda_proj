@@ -25,7 +25,7 @@ pacman::p_load(
     knitr,
     # analysis
     future,
-    future.apply,
+    furrr,
     microbenchmark,
     BallMapper,
     data.table,
