@@ -24,6 +24,9 @@ pacman::p_load(
     showtext,
     knitr,
     # analysis
+    future,
+    future.apply,
+    microbenchmark,
     BallMapper,
     data.table,
     tidyverse)
