@@ -16,7 +16,8 @@ format:
     number-sections: false
     link-citations: true
     header-includes:
-      - "\\pagenumbering{gobble}"
+      - \pagenumbering{gobble}
+      - \usepackage[table]{xcolor}
 
 editor: source
 ---
@@ -33,6 +34,9 @@ source(paste(getwd(), "scripts/Data_Import.R", sep = "/"))
 
 # Final Data
 source(paste(getwd(), "scripts/Data_Final.R", sep = "/"))
+
+# Analysis Data
+source(paste(getwd(), "scripts/BallMapper_data.R", sep = "/"))
 ```
 
 # Mapping the Shape of the U.S. Economy: A Topological Data Analysis Approach with BallMapper
@@ -62,16 +66,26 @@ One benefit to this reduction in parameters is that it removes some of the barri
 Beyond the main objectives of this analysis, we hope that this paper is serve as an on-ramp for anyone interested in TDA but feels inundated with jargon upon early stage researching. Out objectives are to add to the small body of literature whose main focus is applications with BallMapper.\footnote{add Mapper survey paper refrence here}
 We go about this by first showing BallMapper's use in exploratory data analysis (EDA). Using our results from EDA, we then will compare BallMapper's outputs (topological graphs) to notable historic economic events [and maybe less known?]. Lastly we will test the stability and consistency of BallMapper's output. The conclusion will talk broadly about results and other considerations of note, and the discussion will elaborate on future work and questions for research.
 
+---
+and is increasingly being applied to From the small body of literature we have reviewed, TDABM has removed many of the parameters that are required for more traditional methods of TDA. Generally speaking, traditional TDA contains four broad steps, each with multiple user-defined parameters. Conversely, TDABM has reduced this process to an the user selecting their data, a coloring variable and an epsilon value -- details on this follow below. What should be noted, although TDABM reduces the number of steps needed to produce similar outcomes of traditional TDA methods, we lose control of being able fine tune out outputs. We also find that interpreting results becomes more difficult. However, TDABM is still in its infancy, so there is not a large body of research on interpretation. [@dlotko2019ballmapper] One major motivation for this paper is a paper written by @dlotko2019macroeconomy that applied TDABM to a global macroeconomic dataset to compare how countries have evolved over time, their transformation from the Great Depression Era, and various views on wealth and inequality. We could not find other TDA literature found specifically focused on the macroeconomic economy of singular countries. Hence, our topic of choice.
+
 # METHODS AND PROCEDURES
 ## PROCEDURES
 
-### *Data*
+### *Data Selection*
 This paper relied on three publicly available data from US government sources. The Bureau of Economic Analysis (BEA), The Federal Reserve Board (FRB), and The Bureau of Labor Statistics (BLS). The data were gathered using R using two application programming interfaces (APIs): one for data from the BEA, and the other from the Federal Reserve Economic Data (FRED) API. FRED aggregates data from national and international sources, as well as public and private sources. We additionally used recession dates based on business cycle contractions and expansions provided by the National Bureau of Economic Research (NBER).
 
 These agencies were selected because of they are authoritative sources for U.S. economic data. Their widespread use in both the private and public sector gives us high confidence in the accuracy and integrity of the data. 
 \footnote{Hughes-Cromwick, Ellen, and Julia Coronado. 2019. "The Value of US Government Data to US Business Decisions." Journal of Economic Perspectives 33 (1): 131\u201346. DOI: 10.1257/jep.33.1.131}
 
-Looking the *Year Start* and *Year End* in @tbl-dataSources, we elected to exclude Employment Cost Index (ECI) and Foreign Direct Investment (FDI) due to their limited available years. Of the remaining data series, New Privately-Owned Housing Units Started (Housing Starts) has the smallest range and will provide the range of years used for our analysis - 1959-2024.
+
+These three transformations allow us to interpret Housing Starts as a leading indicator, PPI as a measure of Supplier Inflation (Cost-Push Inflation), and CPI as a measure of Consumer Inflation (Demand-PUll Inflation).
+
+
+### *Data Preparation*
+
+
+When looking at *Year Start* and *Year End* in @tbl-dataSources, we excluded Employment Cost Index (ECI) and Foreign Direct Investment (FDI) due to their limited availability of years. Of the remaining data series, New Privately-Owned Housing Units Started (Housing Starts) has the smallest range and will provide the initial base range of years used for our analysis (1960-2024).
 ```{r}
 #| label: tbl-dataSources
 #| tbl-cap: "*Housing Starts is considered a flow because it is provided as a Seasonally Adjusted Annual Rate (SAAR)."
@@ -84,36 +98,34 @@ Looking the *Year Start* and *Year End* in @tbl-dataSources, we elected to exclu
 source(paste(getwd(), "scripts/Table1_data_summary.R", sep = "/"))
 data_summary_table
 ```
-@tbl-dataSources also shows that our data came in annual, quarterly, and monthly time frequencies. We are interested in annual data for this analysis so some data considerations are as follows because not all our data provided in Real dollars, were given as a rate (growth rate, proportion rate, or fixed rate), or on a similar scale (i.e., rate, millions of dollars, index).
+@tbl-dataSources also shows which data came in annual, quarterly, and monthly time frequencies. This analysis focuses on an annual time frame so some data transformation needed to be carried out.
 Additionally, BallMapper is less effective and inefficient to use when the input data variation there is large variation in the scales of each dimension of the dataset (columns).
 \footnote{[find reference]}
-To aide BallMapper, we transformed our data to either a rate or a percentage change from the previous year where appropriate. This ensures all dimensions of our data stay on a 0-100 scale and helps with the time complexity of BallMapper.
+To aide this fact, we transformed our data to either a rate change or a percentage change from the previous year where appropriate. This ensures all dimensions of our data stay on a 0-100 scale and helps with the time complexity of running BallMapper.\footnote{reference about timing}
 
-### *Pre Analysis Calculations*
-The first data series we needed to to make adjustments for was Personal Income and It's Outlays; specifically, Personal Income and Its Disposition (Personal Income).
+The first data series we made adjustments to was Personal Income and Its Disposition (Personal Income).
 \footnote{Table 2.1 from the BEA's Interactive Data, National Data section.}
-Personal Income is reported in nominal dollars, which does not account for inflation, so our first calculation is to adjust Personal Income for inflation using Consumer Price Index (CPI) data. 
+Personal Income is reported in nominal dollars. Thus, it does not account for inflation, so we first adjusted it using the Consumer Price Index (CPI) to get income data to Real Dollars. 
 \footnote{https://www.dallasfed.org/research/basics/nominal}
 $$
 \text{Real Dollars} = \frac{\text{Nominal Dollars}}{\text{CPI}} * 100
 $${#eq-cpiRealDollars}
-From @eq-cpiRealDollars, we then take the log difference (@eq-deltaLog) and multiply it by 100 to get a percentage change for the preceding year. This log difference helps to make our data more linear which aides the BallMapper algorithm's use of the standard Euclidean Distance between each row of data.
+The output of @eq-cpiRealDollars was then used to take the log difference (@eq-deltaLog) to get a percentage change from the preceding year. This log difference helps to make our data more linear which aides BallMapper's use of the standard Euclidean Distance between each row of data. [If BM did not use the Euclidian distance between points, we might not need to take log differences. However topic is for another paper.]
 \footnote{https://econbrowser.com/archives/2014/02/use-of-logarithms-in-economics}
 \footnote{https://www.numberanalytics.com/blog/log-transform-econ-how-to-guide}
 $$
-\Delta\ln{(\text{Real Level})} = 
-\ln{(\text{Real Level}_{t})} - \ln{(\text{Real Level}_{t-1})}
+\Delta\ln{(\text{Level})} = 
+[\ln{(\text{Level}_{t})} - \ln{(\text{Level}_{t-1})}]*100
 $${#eq-deltaLog}
 
-Additionally, we applied @eq-deltaLog to New Privately-Owned Housing Units Started (Housing Starts), Producer Price Index - All Commodities (PPI - All), and CPI and multiplied each of those by 100 to get the percent growth from the preceding year for Housing Starts, Consumer Inflation (Demand-Pull Inflation), and Producer Inflation (Cost-Push Inflation), respectively.
+We additionally need to do some transformations on Housing Starts, Producer Price Index - All Commodities (PPI), and CPI. All three of these sources were given only on a monthly time frame, so to get an annual value for them we used a simple arithmetic mean.\footnote{PPI tracks only physical goods such as Farm Products and Feed, Industrial Commodidities, and Other Commodidites such as Aircraft, Steel, and Lumber.}
+Once we have these data in annual form, we then find the change from the previous year using @eq-deltaLog for their final data in our analysis.
 
 
-PPI_All only include Farm products, processed foods and feeds, Industrials, and other commodities such as rubber, lumber, machinery, and aircraft since 1959.
-Most all services only have data series from 2009 on wards.
 
-and is increasingly being applied to From the small body of literature we have reviewed, TDABM has removed many of the parameters that are required for more traditional methods of TDA. Generally speaking, traditional TDA contains four broad steps, each with multiple user-defined parameters. Conversely, TDABM has reduced this process to an the user selecting their data, a coloring variable and an epsilon value -- details on this follow below. What should be noted, although TDABM reduces the number of steps needed to produce similar outcomes of traditional TDA methods, we lose control of being able fine tune out outputs. We also find that interpreting results becomes more difficult. However, TDABM is still in its infancy, so there is not a large body of research on interpretation. [@dlotko2019ballmapper] One major motivation for this paper is a paper written by @dlotko2019macroeconomy that applied TDABM to a global macroeconomic dataset to compare how countries have evolved over time, their transformation from the Great Depression Era, and various views on wealth and inequality. We could not find other TDA literature found specifically focused on the macroeconomic economy of singular countries. Hence, our topic of choice.
 
-### *Analysis Data*
+
+
 ```{r}
 #| label: tbl-analysisData
 #| tbl-cap: "All years for analysis are 1960-2024."
@@ -122,9 +134,6 @@ and is increasingly being applied to From the small body of literature we have r
 #| echo: false
 #| eval: true
 #| warning: false
-
-# Analysis Data
-source(paste(getwd(), "scripts/BallMapper_Analysis.R", sep = "/"))
 
 # Summary of Analysis Data
 source(paste(getwd(), "scripts/Table2_analysis_data_summary.R", sep = "/"))
@@ -251,11 +260,6 @@ In our [Results](#sec-results) section we briefly went over two ways to interpre
 
 For the future development of TDABM, and TDA in general, there are many possibilities of future research and one glaring downside. The downside to TDA is that it is a high barrier to entry to understand the methodologies inner workings. Those with a technical background will have an easier time, but nonetheless a higher barrier than methods such as linear regressions.  Subject wise, TDA has an advantage in some of the social sciences because it can be somewhat of a bridge between qualitative and quantitative analyses. TDABM has been used to analyze the Brexit Vote data, seeking to understand quantitative and qualitative motivations behind its outcome @Rudkin2023. TDA also has the advantages of dimension reduction which could be useful to the life-sciences. Fields such as genetics, chemistry, and biology have many fields of data, and being able to consolidate it into an understandable form could benefit the body of knowledge greatly.
 
-# Endnotes {.unnumbered}
-
-
-General Percent Change Formula $$\Delta p_n = \frac{p_n - p_{n-k}}{p_{n-k}} \text{ for some } p \in P \text{ and } n > 0$${#eq-generalpctchange}
-where $P$ is a column of our data with $x_1,...,x_n$ observations and $k$ is a lag integer such that $k>0$.
 
 ## Appendix {.unnumbered}
 
