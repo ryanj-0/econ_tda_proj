@@ -23,10 +23,13 @@ pacman::p_load(
     svglite,
     showtext,
     knitr,
-    # analysis
+    # Analysis
     future,
     furrr,
     microbenchmark,
+    igraph,
+    tidygraph,
+    ggraph,
     BallMapper,
     data.table,
     tidyverse)
