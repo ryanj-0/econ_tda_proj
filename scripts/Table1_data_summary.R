@@ -15,7 +15,7 @@ data_summary <- all_annual |>
     mutate(
         series_name =  case_when(
             series == "GDP" ~ "Gross Domestic Product",
-            series == "PID" ~ "Personal Income & Oulays",
+            series == "PID" ~ "Personal Income & Its Disposition",
             series == "FDI" ~ "Foreign Direct Investment",
             series == "FFR" ~ "Federal Funds Rate",
             series == "ECI" ~ "Employment Cost Index",
@@ -27,7 +27,7 @@ data_summary <- all_annual |>
         series_abbreviation =  case_when(
             series == "housingStarts" ~ "Housing Starts",
             series == "PPI_All" ~ "PPI",
-            series == "unemployment" ~ "UnRate",
+            series == "unemployment" ~ "Unrate",
             .default = series
         ),
         data_frequency =  case_when(
@@ -54,13 +54,11 @@ data_summary <- all_annual |>
             series == "PID" ~ "BEA",
             series == "FDI" ~ "BEA",
             .default = "FRED"
-        )
+        ),
+        row_id = row_number()
     ) |>
-    relocate(c(series_abbreviation, series_name), .before = series) |>
+    relocate(c(series_name, series_abbreviation), .before = series) |>
     select(-series)
-
-# Even rows for striping
-striping_rows <- seq(2, nrow(data_summary), 2)
 
 
 # Summary Table -----------------------------------------------------------
@@ -69,12 +67,15 @@ data_summary_table <- data_summary |>
     cols_align(
         align = "center",
         columns = c(
+            series_abbreviation,
             year_start,
             year_end,
+            data_type,
             data_frequency,
             API
         )
     ) |>
+    cols_width(series_abbreviation ~ px(150)) |>
     cols_label(
         series_name = "Data Series",
         series_abbreviation = "Series Abbreviation",
@@ -83,6 +84,21 @@ data_summary_table <- data_summary |>
         data_frequency = "Data Frequency",
         data_type = "Data Type"
     ) |>
+    tab_style(
+        style = list(
+            cell_fill(color = "#F2F2F2"),
+            cell_borders(
+                sides = c("left", "right"),
+                color = "#F2F2F2",
+                weight = px(12)
+            )
+        ),
+        locations = list(
+            cells_body(rows = row_id %% 2 == 0),
+            cells_stub(rows = row_id %% 2 == 0)
+        )
+    ) |>
+    cols_hide(columns = row_id) |>
     tab_options(
         table.width = pct(100),
         table.font.size = "8pt"

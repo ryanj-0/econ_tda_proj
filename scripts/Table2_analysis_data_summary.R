@@ -59,25 +59,26 @@ analysis_data_summary <- analysisData |>
             series == "FFR" ~ "Policy/Reactive"
         ),
         transformation = case_when(
-            series %in% c("PPI_All", "CPI", "housingStarts", "unemployment") ~
+            series %in% c("PPI_All", "CPI", "housingStarts") ~
                 "12-month Avg. & Log Difference",
-            series == "FFR" ~ "None (Annual Rate) & Simple Difference",
+            series %in% c("FFR", "unemployment") ~
+                "None (Annual Rate) & Simple Difference",
             series == "PID" ~ "Real Adjustment & Log Difference",
             series == "GDP" ~ "None (Source in % Change)"
-        )
+        ),
+        row_id = row_number()
     ) |>
     relocate(num_cols, .after = transformation) |>
     select(-series)
 
-
-# Analysis Data Summary Table ---------------------------------------------
+    # Analysis Data Summary Table -----------------------------------------
 analysis_data_summary_table <- analysis_data_summary |>
     gt() |>
-    cols_align(align = "center",
-               columns = c(num_cols, cyclical_timing)
+    cols_align(
+        align = "center",
+        columns = c(num_cols, cyclical_timing)
     ) |>
-    cols_width(economic_description ~ px(100),
-               transformation ~ px(80)) |>
+    cols_width(economic_description ~ px(130)) |>
     cols_label(
         series_name = "Data Series",
         economic_label = "Economic Role",
@@ -86,6 +87,21 @@ analysis_data_summary_table <- analysis_data_summary |>
         cyclical_timing = "Business Cycle Timing",
         num_cols = "Feature Count"
     ) |>
+    tab_style(
+        style = list(
+            cell_fill(color = "#F2F2F2"),
+            cell_borders(
+                sides = c("left", "right"),
+                color = "#F2F2F2",
+                weight = px(1)
+            )
+        ),
+        locations = list(
+            cells_body(rows = row_id %% 2 == 0),
+            cells_stub(rows = row_id %% 2 == 0)
+        )
+    ) |>
+    cols_hide(columns = row_id) |>
     tab_options(
         table.width = pct(100),
         table.font.size = "8pt"
