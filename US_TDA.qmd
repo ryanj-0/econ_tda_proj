@@ -25,6 +25,8 @@ editor: source
 ```{r}
 #| label: setup
 #| include: false
+#| echo: false
+#| eval: false
 
 # Load Packages and API Keys
 source(paste(getwd(), "scripts/systemConfig.R", sep = "/"))
