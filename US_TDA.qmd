@@ -33,10 +33,10 @@ source(paste(getwd(), "scripts/systemConfig.R", sep = "/"))
 source(paste(getwd(), "scripts/Data_Import.R", sep = "/"))
 
 # Final Data
-source(paste(getwd(), "scripts/Data_Final.R", sep = "/"))
+source(paste(getwd(), "scripts/Data_Aggregate.R", sep = "/"))
 
 # Analysis Data
-source(paste(getwd(), "scripts/BallMapper_data.R", sep = "/"))
+source(paste(getwd(), "scripts/Method_Data.R", sep = "/"))
 ```
 
 # Mapping the Shape of the U.S. Economy: A Topological Data Analysis Approach with BallMapper
@@ -149,6 +149,14 @@ We are including the differnt parts of gdp, c + g+ i + net exports
 
 ### *Exploratory Data Analysis (EDA) Application*
 - known interpretations
+
+#### *Notes*
+11/29/20205
+- ran seq to find interesting maps (bm_loop_00), found that .4-.75 seem to produce the most interesting graphs so we will run another sequence to see if there are any nuances we should be interested in (bm_loop_01)
+- starting at 0.0447, maps have 3 components
+- around 0.468, small components start to have more points included. We see this refelcted in sizing between connected points
+- 
+- 
 
 ### *Small Comparative Analysis*
 - "New Deal"
