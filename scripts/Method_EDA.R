@@ -1,3 +1,10 @@
+######################################################
+## Exploratory Data Analysis for paper Methods section
+######################################################
+
+
+# Global Data -------------------------------------------------------------
+
 reference_data <- finalData |>
     mutate(row_id = row_number())
 
@@ -12,6 +19,7 @@ coloring <- finalData |>
     as.data.frame()
 
 
+# BallMapper Testing ------------------------------------------------------
 
 e = 0.6
 
@@ -21,6 +29,17 @@ ColorIgraphPlot(outputFromBallMapper = econ_bm)
 title(main = e)
 
 
+# Custom Graph ------------------------------------------------------------
+
+skeleton <- graph_from_edgelist(econ_bm$edges, directed = FALSE)
+V(skeleton)$coloring <- econ_bm$coloring_values
+V(skeleton)$node_size <- econ_bm$vertices[, "size"]
+
+ggraph(skeleton, layout = "fr") +
+    geom_edge_link(color = "grey80", width = 0.5) +
+    geom_node_point(aes(color = coloring_values), size = node_size)
+
+# Node Investigation ------------------------------------------------------
 node <- 26
 
 interest <- points_covered_by_landmarks(outputFromBallMapper = econ_bm,
