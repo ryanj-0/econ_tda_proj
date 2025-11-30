@@ -12,27 +12,49 @@ if (!require("pacman")) {
 }
 
 # Will install following packages if not already installed
-pacman::p_load(
+pkgs <- c(
     # APIs
-    bea.R,
-    fredr,
+    "bea.R",
+    "fredr",
     # Paper formatting and design
-    gt,
-    viridis,
-    kableExtra,
-    svglite,
-    showtext,
-    knitr,
+    "gt",
+    "viridis",
+    "kableExtra",
+    "svglite",
+    "showtext",
+    "knitr",
     # Analysis
-    future,
-    furrr,
-    microbenchmark,
-    igraph,
-    tidygraph,
-    ggraph,
-    BallMapper,
-    data.table,
-    tidyverse)
+    "future",
+    "furrr",
+    "microbenchmark",
+    "igraph",
+    "tidygraph",
+    "ggraph",
+    "BallMapper",
+    "data.table",
+    "tidyverse"
+)
+
+# Package Load Function
+pkg_loader <- function(pkg) {
+    # Check if installed
+    if (!requireNamespace(pkg, quietly = TRUE)) {
+        message(paste("Installing missing package:", pkg))
+        install.packages(pkg)
+    }
+
+    # Try to load it. If this fails, the script STOPS here.
+    tryCatch({
+        library(pkg, character.only = TRUE)
+        message(paste("✔ Loaded:", pkg))
+    }, error = function(e) {
+        stop(paste("❌ FAILED to load:", pkg, "\nError message:", e$message))
+    })
+}
+
+lapply(pkgs, pkg_loader)
+
+
 
 
 # Source Functions --------------------------------------------------------
