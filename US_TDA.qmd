@@ -156,9 +156,14 @@ We are including the differnt parts of gdp, c + g+ i + net exports
 11/29/20205
 - ran seq to find interesting maps (bm_loop_00), found that .4-.75 seem to produce the most interesting graphs so we will run another sequence to see if there are any nuances we should be interested in (bm_loop_01)
 - starting at 0.0447, maps have 3 components
-- around 0.468, small components start to have more points included. We see this refelcted in sizing between connected points
-- 
-- 
+- around 0.468, small components start to have more points included. We see this reflected in sizing between connected points
+
+11/30/2025
+- run new maps with new graph function
+- 0.537 & 0.538 have a three node component?
+- 0.546 & 0.547 have 4 components?
+- 0.61-0.625 2 components but the shape changes b/c of points moving around
+- 0.677-0.75 2 components and various combine of nodes
 
 ### *Small Comparative Analysis*
 - "New Deal"
