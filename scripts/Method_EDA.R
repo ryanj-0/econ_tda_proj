@@ -28,80 +28,73 @@ ColorIgraphPlot(outputFromBallMapper = econ_bm)
 title(main = e)
 
 
+econ_igraph <- bm_to_igraph(econ_bm)
+
+investigate <- 17
+reference_data[V(econ_igraph)$members[[investigate]], ]
+
 # Custom Graph ------------------------------------------------------------
 
-# Prep Data for Graph Transormation
-nodes_df <- econ_bm$vertices |> as.data.frame()
-edges_df <- econ_bm$edges |> as.data.frame()
+new_bm_graph <- function(bm_igraph_output, epsilon) {
 
-# Create Basic Graph
-skeleton <- graph_from_data_frame(
-    d = edges_df,
-    vertices = vertices_df,
-    directed = FALSE
-)
+    ggraph(bm_igraph_output, layout = "kk") +
+        geom_edge_link(
+            aes(width = weight,
+                color = weight > 3
+            )
+        ) +
+        scale_edge_color_manual(
+            values = c("TRUE" = "#000000",
+                       "FALSE" = "#BEBEBE"),
+            guide = "none"
+        ) +
+        scale_edge_width(
+            range = c(0.2, 1),
+            guide = "none"
+        ) +
+        geom_node_point(
+            aes(
+                color = coloring,
+                size = size
+            )
+        ) +
+        geom_node_text(
+            aes(label = name)
+        ) +
+        scale_size_area(
+            max_size = 25,
+            guide = "none"
+        ) +
+        scale_color_gradientn(
+            name = coloring |> names() |> str_to_title(),
+            colors = c("#67A9CF", "#D1E5F0", "#F7F7F7", "#FDDBC7", "#EF8A62")
+        ) +
+        theme_void() +
+        labs(
+            title = "BallMapper Output",
+            subtitle = paste0("Epsilon: ", epsilon),
+            caption = paste0("N: ", nrow(pointcloud))
+        ) +
+        theme(
+            text = element_text(family = "EB Garamond"),
+            legend.position = "bottom",
+            legend.key.width = unit(0.1, "npc")
 
-# Adding Additional Outputs from BM
-V(skeleton)$coloring_values <- econ_bm$coloring
-V(skeleton)$rows_covered <- econ_bm$points_covered_by_landmarks
-
-# Plot New Graph
-ggraph(skeleton, layout = "fr") +
-    geom_edge_link(
-        color = "#BEBEBE",
-        width = 0.5
-    ) +
-    geom_node_point(
-        aes(
-            color = coloring_values,
-            size = size
         )
-    ) +
-    geom_node_text(
-        aes(label = name)
-    ) +
-    scale_size_area(
-        max_size = 25,
-        guide = "none"
-    ) +
-    scale_color_gradientn(
-        name = coloring |> names() |> str_to_title(),
-        colors = c("#67A9CF", "#D1E5F0", "#F7F7F7", "#FDDBC7", "#EF8A62")
-    ) +
-    theme_void() +
-    labs(
-        title = "BallMapper Output",
-        subtitle = paste0("Epsilon: ", e),
-        caption = paste0("N: ", nrow(pointcloud))
-    ) +
-    theme(
-        text = element_text(family = "EB Garamond"),
-        legend.position = "bottom",
-        legend.key.width = unit(0.1, "npc")
-
-    )
-
-# Node Investigation ------------------------------------------------------
-node <- 26
-
-interest <- points_covered_by_landmarks(outputFromBallMapper = econ_bm,
-                                        numbers_of_landmarks = node)
-investigate <- reference_data[interest, ]
-investigate |> glimpse()
-investigate |> view()
-
-
+}
 
 # Parallel Epsilon Search -------------------------------------------------
 library(future)
 library(furrr)
 
-epsilon_seq <- seq(0.3, 1.4, 0.01)
+epsilon_seq <- seq(0.4, 0.75, 0.001)
 
 ballmapper_list <- function(ep) {
 
     gc()
-    BallMapper(points = pointcloud, values = coloring, epsilon = ep)
+    bm <- BallMapper(points = pointcloud, values = coloring, epsilon = ep)
+    bm_final <- bm_to_igraph(bm)
+    return(bm_final)
 
 }
 
@@ -119,13 +112,13 @@ test <- future_map(
 plan(sequential)
 
 # plot all bm graphs
-pdf("bm_loop.pdf")
+pdf(paste0("bm_loop_02_", format(Sys.Date(), "%Y%m%d"), ".pdf"))
 walk2(
     .x = test,
     .y = epsilon_seq,
-    .f = function(.x, .y) {
-        ColorIgraphPlot(outputFromBallMapper = .x)
-        title(main = .y)
+    .f = ~ {
+        p <- new_bm_graph(.x, .y)
+        print(p)
     }
 )
 
