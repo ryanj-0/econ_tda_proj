@@ -7,11 +7,7 @@ rm(list = ls())
 gc()
 
 # Load Packages -----------------------------------------------------------
-if (!require("pacman")) {
-    install.packages("pacman")
-}
 
-# Will install following packages if not already installed
 pkgs <- c(
     # APIs
     "bea.R",
@@ -26,12 +22,14 @@ pkgs <- c(
     "furrr",
     "microbenchmark",
     "ggraph",
+    "igraph",
     "BallMapper",
     "data.table",
     "tidyverse"
 )
 
 # Package Load Function
+# Will install following packages if not already installed
 pkg_loader <- function(pkg) {
     # Check if installed
     if (!requireNamespace(pkg, quietly = TRUE)) {
@@ -49,9 +47,6 @@ pkg_loader <- function(pkg) {
 }
 
 lapply(pkgs, pkg_loader)
-
-
-
 
 # Source Functions --------------------------------------------------------
 
