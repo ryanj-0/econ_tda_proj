@@ -18,8 +18,6 @@ pkgs <- c(
     "fredr",
     # Paper formatting and design
     "gt",
-    "viridis",
-    "kableExtra",
     "svglite",
     "showtext",
     "knitr",
@@ -27,8 +25,6 @@ pkgs <- c(
     "future",
     "furrr",
     "microbenchmark",
-    "igraph",
-    "tidygraph",
     "ggraph",
     "BallMapper",
     "data.table",
