@@ -166,6 +166,21 @@ We are including the differnt parts of gdp, c + g+ i + net exports
 - 0.677-0.75 2 components and various combine of nodes
 - Most Interesting Epsilon Values:
   - 
+
+12/1/2025
+- Choosing handful of maps to see which to use for analysis
+  - c(0.468, 0.473, 0.478, 0.487, 0.511, 0.600, 0.605, 0.614, 0.642, 0.716)
+- 0.475-0.482 stable graph, no change
+- 0.495 start to see 2-simplex form, persists throughout
+  - 3-7-11 --> 3-6-10 --> 
+- Noticing developing three big groups of nodes, three "phases" of economy?
+- talk about differnt shapes: 2-simplex, mickey mouse, spurs, lolipop holders,
+- make edge strenth acording edge length? #discussion
+- later year v past year 2-simplex pattern?
+
+12/2/2025
+- Narrowing down more which graph for analysis
+  - 
   
 ### *Small Comparative Analysis*
 - "New Deal"
