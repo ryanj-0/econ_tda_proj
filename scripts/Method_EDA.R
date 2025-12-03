@@ -5,11 +5,14 @@
 # Global Data -------------------------------------------------------------
 
 reference_data <- finalData |>
-    mutate(row_id = row_number())
+    mutate(row_id = row_number()) |>
+    left_join(nberRecessions_yearly |> select(year, fullYear)) |>
+    mutate(recession = if_else(is.na(fullYear), 0, 1)) |>
+    relocate(recession, .after = year)
 
 
 pointcloud <- reference_data |>
-    select(-c(year, row_id)) |>
+    select(-c(year, row_id, fullYear, recession)) |>
     as.data.frame() |>
     normalize_to_min_0_max_1()
 
@@ -20,7 +23,7 @@ coloring <- finalData |>
 
 # BallMapper Testing ------------------------------------------------------
 
-e = 0.537
+e = 0.511
 
 econ_bm <- BallMapper(points = pointcloud,
                       values = coloring,
@@ -34,18 +37,20 @@ title(main = e)
 # New Graph
 bm_ggraph(econ_igraph, e)
 
-investigate <- 1
-reference_data[V(econ_igraph)$members[[investigate]], ]
+components(econ_igraph)
+
+investigate <- 26
+see <- reference_data[V(econ_igraph)$members[[investigate]], ]
+see
 
 # Parallel Epsilon Search -------------------------------------------------
 library(future)
 library(furrr)
 
-epsilon_seq <- seq(0.4, 0.75, 0.001)
+epsilon_seq <- c(0.478, 0.511, 0.600, 0.605)
 
 ballmapper_list <- function(ep) {
 
-    gc()
     bm <- BallMapper(points = pointcloud, values = coloring, epsilon = ep)
     bm_final <- bm_to_igraph(bm)
     return(bm_final)
@@ -55,7 +60,7 @@ ballmapper_list <- function(ep) {
 
 # computing
 plan(strategy = multisession,
-     workers = parallel::detectCores() - 1)
+     workers = parallel::detectCores() - 2)
 
 test <- future_map(
     .x = epsilon_seq,
@@ -65,17 +70,18 @@ test <- future_map(
 # parallel off
 plan(sequential)
 
+gc()
+
 # plot all bm graphs
-pdf(paste0("bm_loop_02_", format(Sys.Date(), "%Y%m%d"), ".pdf"))
+pdf(paste0("bm_loop_04_", format(Sys.Date(), "%Y%m%d"), ".pdf"))
 walk2(
     .x = test,
     .y = epsilon_seq,
     .f = ~ {
-        p <- new_bm_graph(.x, .y)
+        p <- bm_ggraph(.x, .y)
         print(p)
     }
 )
-
 
 dev.off()
 
