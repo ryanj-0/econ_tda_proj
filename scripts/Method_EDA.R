@@ -16,56 +16,64 @@ pointcloud <- reference_data |>
     as.data.frame() |>
     normalize_to_min_0_max_1()
 
-coloring <- finalData |>
+coloring <- reference_data |>
     select(year) |>
     as.data.frame()
 
+# Investigation
+bm <- BallMapper(points = pointcloud, values = coloring, epsilon = 0.511)
+bm_final <- bm_to_igraph(bm)
 
-# BallMapper Testing ------------------------------------------------------
+# Testing calculation for igraph
+V(bm_final)$degree <- degree(bm_final)
+
+# test graph
+test_ggraph(bm_final, coloring = coloring |> names(), epsilon = 0.511)
+
+# investigate nodes
+node <- 4
+reference_data[V(bm_final)$members[[node]], ] |> summary() |> view()
+
+# Further Analysis With Chosen Epsilon ------------------------------------
+
+coloring_vec <- reference_data |>
+    select(-c(row_id)) |>
+    names()
 
 e = 0.511
 
-econ_bm <- BallMapper(points = pointcloud,
-                      values = coloring,
-                      epsilon = e)
-econ_igraph <- bm_to_igraph(econ_bm)
-
-# Old Graph
-ColorIgraphPlot(outputFromBallMapper = econ_bm)
-title(main = e)
-
-# New Graph
-bm_ggraph(econ_igraph, e)
-
-components(econ_igraph)
-
-investigate <- 26
-see <- reference_data[V(econ_igraph)$members[[investigate]], ]
-see
-
-# Parallel Epsilon Search -------------------------------------------------
+# Computing All Colorings
 library(future)
 library(furrr)
 
-epsilon_seq <- c(0.478, 0.511, 0.600, 0.605)
+econ_all_coloring <- function(coloring) {
 
-ballmapper_list <- function(ep) {
+    # Set coloring
+    coloring <- reference_data |>
+        select(all_of(coloring)) |>
+        as.data.frame()
 
-    bm <- BallMapper(points = pointcloud, values = coloring, epsilon = ep)
+    # Run BallMapper
+    bm <- BallMapper(points = pointcloud, values = coloring, epsilon = e)
     bm_final <- bm_to_igraph(bm)
     return(bm_final)
 
 }
 
-
 # computing
-plan(strategy = multisession,
-     workers = parallel::detectCores() - 2)
+if(Sys.info()[["nodename"]] == "zenbook") {
+    plan(strategy = multisession,
+         workers = parallel::detectCores() - 1)
+} else {
+    plan(strategy = multisession,
+         workers = parallel::detectCores() - 2)
+}
 
-test <- future_map(
-    .x = epsilon_seq,
-    .f = ballmapper_list,
-    .options = furrr_options(seed = TRUE))
+
+econ_all_bm <- future_map(
+    .x = coloring_vec,
+    .f = econ_all_coloring,
+    .options = furrr_options(seed = 321))
 
 # parallel off
 plan(sequential)
@@ -73,10 +81,10 @@ plan(sequential)
 gc()
 
 # plot all bm graphs
-pdf(paste0("bm_loop_04_", format(Sys.Date(), "%Y%m%d"), ".pdf"))
+pdf(paste0("bm_all_coloring_00_", format(Sys.Date(), "%Y%m%d"), ".pdf"))
 walk2(
     .x = test,
-    .y = epsilon_seq,
+    .y = coloring_vec,
     .f = ~ {
         p <- bm_ggraph(.x, .y)
         print(p)
@@ -84,4 +92,3 @@ walk2(
 )
 
 dev.off()
-
