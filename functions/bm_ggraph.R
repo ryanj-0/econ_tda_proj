@@ -4,7 +4,7 @@
 # easier readability.
 ############################################
 
-bm_ggraph <- function(bm_igraph_output, epsilon) {
+bm_ggraph <- function(bm_igraph_output, coloring) {
 
     ggraph(bm_igraph_output, layout = "kk") +
         geom_edge_link(
@@ -39,12 +39,11 @@ bm_ggraph <- function(bm_igraph_output, epsilon) {
             guide = "none"
         ) +
         scale_fill_gradientn(
-            name = coloring |> names() |> str_to_title(),
             colors = c("#0072B2", "#00B0E1", "#009B77", "#F0E442", "#E69F00")
         ) +
         labs(
-            title = "BallMapper Output",
-            subtitle = paste0("Epsilon: ", epsilon," | N: ", nrow(pointcloud))
+            title = paste("BallMapper Output | ", str_to_title(coloring)),
+            subtitle = paste0("Epsilon: 0.511 | N: ", nrow(pointcloud))
         ) +
         theme_void() +
         theme(
