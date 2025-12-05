@@ -66,7 +66,7 @@ if(Sys.Date() > lastPulled + 3) {
 # Recession Dates ---------------------------------------------------------
 
 
-nberRecessions <-
+nber_business_cycles <-
     fredr(series_id = "USRECQ") |>
     mutate(
         year = format(date, "%Y") |> as.numeric(),
@@ -77,13 +77,18 @@ nberRecessions <-
             month %in% c(7:9) ~ 3,
             month %in% c(10:12) ~ 4
         )
-    ) |>
+    )
+
+nberRecessions <- nber_business_cycles |>
     filter(value == 1) |>
     group_by(year) |>
-    mutate(fullYear = n() / 4) |>
-    ungroup() |>
-    select(series_id, year, quarter, fullYear)
+    mutate(recession_span = n()/4) |>
+    select(series_id, year, recession_span) |>
+    unique()
 
-nberRecessions_yearly <- nberRecessions |>
-    select(-quarter) |>
+nberExpansion <- nber_business_cycles |>
+    filter(value == 0) |>
+    group_by(year) |>
+    mutate(expansion_span = n()/4) |>
+    select(series_id, year, expansion_span) |>
     unique()
