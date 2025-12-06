@@ -91,3 +91,10 @@ analysisData <- map(analysisData, ~ filter(.x, year %in% analysisYears))
 # Reduce and combine tables
 finalData <- reduce(analysisData, full_join, by = "year")
 
+
+# Final Data to Reference -------------------------------------------------
+
+reference_data <- finalData |>
+    mutate(row_id = row_number()) |>
+    left_join(nberRecessions |> select(year, recession_span)) |>
+    left_join(nberExpansion |> select(year, expansion_span))

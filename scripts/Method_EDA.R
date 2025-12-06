@@ -4,12 +4,6 @@
 
 # Global Data -------------------------------------------------------------
 
-reference_data <- finalData |>
-    mutate(row_id = row_number()) |>
-    left_join(nberRecessions |> select(year, recession_span)) |>
-    left_join(nberExpansion |> select(year, expansion_span))
-
-
 pointcloud <- reference_data |>
     select(-c(year, row_id, recession_span, expansion_span)) |>
     as.data.frame() |>
@@ -25,6 +19,7 @@ bm_final <- bm_to_igraph(bm)
 
 # Testing calculation for igraph
 V(bm_final)$degree <- degree(bm_final)
+
 
 # test graph
 source(paste(getwd(), "functions/test_ggraph.R", sep = "/"))
@@ -73,7 +68,7 @@ if(Sys.info()[["nodename"]] == "zenbook") {
 econ_all_bm <- future_map(
     .x = coloring_vec,
     .f = econ_all_coloring,
-    .options = furrr_options(seed = 321))
+    .options = furrr_options(seed = 2025))
 
 # parallel off
 plan(sequential)
