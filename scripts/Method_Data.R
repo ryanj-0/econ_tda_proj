@@ -103,3 +103,10 @@ pointcloud <- final_data |>
     select(-c(year, row_id, recession_span, expansion_span)) |>
     as.data.frame() |>
     normalize_to_min_0_max_1()
+
+# clean up variable enviornment
+rm(all_quarterly,
+   analysisData,
+   nber_business_cycles,
+   nberExpansion,
+   nberRecessions)
