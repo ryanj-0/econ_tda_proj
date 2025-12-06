@@ -5,7 +5,7 @@
 # Global Data -------------------------------------------------------------
 
 coloring <- final_data |>
-    select(expansion_span) |>
+    select(year) |>
     as.data.frame()
 
 # Investigation
@@ -82,3 +82,8 @@ walk2(
 )
 
 dev.off()
+
+
+# Correlation Table -------------------------------------------------------
+
+
