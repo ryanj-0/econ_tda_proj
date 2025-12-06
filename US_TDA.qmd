@@ -123,11 +123,6 @@ $${#eq-deltaLog}
 We additionally need to do some transformations on Housing Starts, Producer Price Index - All Commodities (PPI), and CPI. All three of these sources were given only on a monthly time frame, so to get an annual value for them we used a simple arithmetic mean.\footnote{PPI tracks only physical goods such as Farm Products and Feed, Industrial Commodidities, and Other Commodidites such as Aircraft, Steel, and Lumber.}
 Once we have these data in annual form, we then find the change from the previous year using @eq-deltaLog for their final data in our analysis.
 
-
-
-
-
-
 ```{r}
 #| label: tbl-analysisData
 #| tbl-cap: "All years for analysis are 1960-2024."
@@ -149,11 +144,19 @@ We are including the differnt parts of gdp, c + g+ i + net exports
 - Summary of algorithm
 - correlation considerations
 
+Since BM is a developing method, we have not found any standardized way to finding a epsilon(s) that describes our data well. So to ensure that we do not miss any potential interesting outputs, our strategy is carried out # stages.
+We first started by taking out standardized pointcloud and found the upper and lower bounds of our graphs, 0.3-1.4 respectively.
+To find the lower bound we test various epsilons such that every record (row) of data is its own node in our graph. To find the upper bound we do the opposite and find an epsilon so large that we reduce our graph to just a few nodes, usually connected.
+After finding these initial bounds we aim to compute around 100 graphs at even intervals from our lower to upper bound. From this range of graphs we observe a sub-range of epsilon values where our graphs are not too noisy nor hide too much information. For this step we found that epsilon values 0.4-0.75 gave us an interesting range of graphs. We look for components (connected nodes) appearing or disappearing, significant changes in coloration in the graph, [...].
+
 ### *Exploratory Data Analysis (EDA) Application*
 - known interpretations
 
+ 
+
 #### *Notes*
 11/29/20205
+- inital range 0.3 - 1.4
 - ran seq to find interesting maps (bm_loop_00), found that .4-.75 seem to produce the most interesting graphs so we will run another sequence to see if there are any nuances we should be interested in (bm_loop_01)
 - starting at 0.0447, maps have 3 components
 - around 0.468, small components start to have more points included. We see this reflected in sizing between connected points
