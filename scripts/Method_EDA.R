@@ -4,12 +4,7 @@
 
 # Global Data -------------------------------------------------------------
 
-pointcloud <- reference_data |>
-    select(-c(year, row_id, recession_span, expansion_span)) |>
-    as.data.frame() |>
-    normalize_to_min_0_max_1()
-
-coloring <- reference_data |>
+coloring <- final_data |>
     select(expansion_span) |>
     as.data.frame()
 
@@ -27,11 +22,11 @@ test_ggraph(bm_final, coloring = coloring |> names(), epsilon = 0.511)
 
 # investigate nodes
 node <- 4
-reference_data[V(bm_final)$members[[node]], ] |> summary() |> view()
+final_data[V(bm_final)$members[[node]], ] |> summary() |> view()
 
 # Further Analysis With Chosen Epsilon ------------------------------------
 
-coloring_vec <- reference_data |>
+coloring_vec <- final_data |>
     select(-c(row_id)) |>
     names()
 
@@ -44,7 +39,7 @@ library(furrr)
 econ_all_coloring <- function(coloring) {
 
     # Set coloring
-    coloring <- reference_data |>
+    coloring <- final_data |>
         select(all_of(coloring)) |>
         as.data.frame()
 

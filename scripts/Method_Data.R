@@ -89,12 +89,17 @@ analysisYears <- c(1960:2024)
 analysisData <- map(analysisData, ~ filter(.x, year %in% analysisYears))
 
 # Reduce and combine tables
-finalData <- reduce(analysisData, full_join, by = "year")
+final_data <- reduce(analysisData, full_join, by = "year")
 
 
 # Final Data to Reference -------------------------------------------------
 
-reference_data <- finalData |>
+final_data <- final_data |>
     mutate(row_id = row_number()) |>
     left_join(nberRecessions |> select(year, recession_span)) |>
     left_join(nberExpansion |> select(year, expansion_span))
+
+pointcloud <- final_data |>
+    select(-c(year, row_id, recession_span, expansion_span)) |>
+    as.data.frame() |>
+    normalize_to_min_0_max_1()
