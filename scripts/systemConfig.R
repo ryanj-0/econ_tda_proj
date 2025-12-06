@@ -18,6 +18,7 @@ pkgs <- c(
     "showtext",
     "knitr",
     # Analysis
+    "corrr",
     "future",
     "furrr",
     "microbenchmark",
