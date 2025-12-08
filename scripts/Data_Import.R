@@ -7,13 +7,13 @@
 
 # Check Data Pull Date ----------------------------------------------------
 
-lastPulled <- readRDS(paste(getwd(), "data/lastPulled.rds", sep = "/"))
+lastPulled <- readRDS(paste(getwd(), "data/Last_Pulled.rds", sep = "/"))
 
 if(Sys.Date() > lastPulled + 3) {
 
     # Update last pulled
-    lastPulled <- Sys.Date()
-    saveRDS(lastPulled, paste(getwd(), "data/lastPulled.rds", sep = "/"))
+    last_pulled <- Sys.Date()
+    saveRDS(last_pulled, paste(getwd(), "data/Last_Pulled.rds", sep = "/"))
 
     # Pull data again ---------------------------------------------------------
     # Import FRED Data
@@ -41,8 +41,8 @@ if(Sys.Date() > lastPulled + 3) {
        FFR_M, seriesTable)
 
 } else
-    message("Last Date Pulled: ", lastPulled, "\n",
-            "Data within 10 days of last pull, loading local data.")
+    message("Last Date Pulled: ", last_pulled, "\n",
+            "Data within 3 days of last pull, loading local data.")
 
 
 

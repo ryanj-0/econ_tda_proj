@@ -50,16 +50,16 @@ if(Sys.Date() > lastPulled + 3) {
     )
 
     # Save Updated Data
-    saveRDS(all_quarterly, paste(getwd(), "data/all_quarterly.rds", sep = "/"))
-    saveRDS(all_annual, paste(getwd(), "data/all_annual.rds", sep = "/"))
+    saveRDS(all_quarterly, paste(getwd(), "data/All_Quarterly.rds", sep = "/"))
+    saveRDS(all_annual, paste(getwd(), "data/All_Annual.rds", sep = "/"))
 
 } else {
 
     all_quarterly <- readRDS(
-        paste(getwd(), "data/all_quarterly.rds", sep = "/")
+        paste(getwd(), "data/All_Quarterly.rds", sep = "/")
         )
 
-    all_annual <- readRDS(paste(getwd(), "data/all_annual.rds", sep = "/"))
+    all_annual <- readRDS(paste(getwd(), "data/All_Annual.rds", sep = "/"))
 
 }
 
