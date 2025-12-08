@@ -24,15 +24,15 @@ if(Sys.Date() > lastPulled + 3) {
     # - PPI: Final Demand
     # - Unemployment
     # - Recession Dates
-    source(paste(getwd(), "scripts/importFRED.R", sep = "/"))
+    source(paste(getwd(), "scripts/Data_import_FRED.R", sep = "/"))
 
     # Import BEA NIPA Data: data includes Annual and Quarterly
     # - GDP
     # - Personal Income and Its Disposition
-    source(paste(getwd(), "scripts/importBEA_NIPA.R", sep = "/"))
+    source(paste(getwd(), "scripts/Data_import_BEA_NIPA.R", sep = "/"))
 
     # Import BEA Foreign Direct Investment
-    source(paste(getwd(), "scripts/importBEA_FDI.R", sep = "/"))
+    source(paste(getwd(), "scripts/Data_import_BEA_FDI.R", sep = "/"))
 
     # Clean up
     rm(nipaConfig,
