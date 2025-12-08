@@ -13,7 +13,7 @@
 
 # Update Final Data Check --------------------------------------------------
 
-if(Sys.Date() > lastPulled + 3) {
+if(Sys.Date() > last_pulled + 3) {
 
     # Quarterly Combined
     BEA_quarterly <- inner_join(GDP_Q, PID_Q, by = join_by(year, quarter))
