@@ -97,10 +97,30 @@ final_data <- reduce(analysisData, full_join, by = "year")
 final_data <- final_data |>
     mutate(row_id = row_number()) |>
     left_join(nberRecessions |> select(year, recession_span)) |>
-    left_join(nberExpansion |> select(year, expansion_span))
+    left_join(nberExpansion |> select(year, expansion_span)) |>
+    rename(Year = year,
+           PPI_Change = pctChange_PPIACO,
+           Personal_Income = Personal_income_PID,
+           Compensation = Compensation_of_employees_PID,
+           Entrepreneurship =
+               `Proprietors'_income_with_inventory_valuation_and_capital_consumption_adjustments_PID`,
+           Transfers = Personal_current_transfer_receipts_PID,
+           Consumption = Personal_consumption_expenditures_GDP,
+           Domestic_Investment = Gross_private_domestic_investment_GDP,
+           Government_Spending =
+               Government_consumption_expenditures_and_gross_investment_GDP,
+           Exports = Exports_GDP,
+           Imports = Imports_GDP,
+           Inflation = pctChange_CPIAUCSL,
+           Unemployment = unrate,
+           Unemployment_Change = pctChange_UNRATE,
+           Fed_Rate = rate_FFR,
+           Fed_Rate_Change = pctChange_FFR,
+           Housing_Change = pctChange_HOUST
+    )
 
 pointcloud <- final_data |>
-    select(-c(year, row_id, recession_span, expansion_span)) |>
+    select(-c(Year, row_id, recession_span, expansion_span)) |>
     as.data.frame() |>
     normalize_to_min_0_max_1()
 

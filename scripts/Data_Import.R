@@ -7,9 +7,9 @@
 
 # Check Data Pull Date ----------------------------------------------------
 
-lastPulled <- readRDS(paste(getwd(), "data/Last_Pulled.rds", sep = "/"))
+last_pulled <- readRDS(paste(getwd(), "data/Last_Pulled.rds", sep = "/"))
 
-if(Sys.Date() > lastPulled + 3) {
+if(Sys.Date() > last_pulled + 3) {
 
     # Update last pulled
     last_pulled <- Sys.Date()

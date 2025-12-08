@@ -86,4 +86,8 @@ dev.off()
 
 # Correlation Table -------------------------------------------------------
 
-
+pointcloud |>
+    correlate() |>
+    shave() |>
+    rplot(shape = 15, print_cor = TRUE) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
