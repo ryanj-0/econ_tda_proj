@@ -2,6 +2,10 @@
 
 test_ggraph <- function(bm_igraph_output, coloring, epsilon) {
 
+    # Set graph details
+    coloring_name <- coloring |> names() |> str_to_title()
+    num_nodes <- V(bm_igraph_output)$members |> length()
+
     ggraph(bm_igraph_output, layout = "kk") +
         geom_edge_link(
             aes(width = weight,
@@ -35,7 +39,7 @@ test_ggraph <- function(bm_igraph_output, coloring, epsilon) {
             guide = "none"
         ) +
         scale_fill_gradientn(
-            name = coloring |> str_to_title(),
+            name = coloring |> names() |> str_to_title(),
             colors = c("#0072B2", "#00B0E1", "#009B77", "#F0E442", "#E69F00"),
             guide = guide_colorbar(
                 title.position = "bottom",
@@ -45,14 +49,20 @@ test_ggraph <- function(bm_igraph_output, coloring, epsilon) {
             )
         ) +
         labs(
-            title = paste("BallMapper Output | ", str_to_title(coloring)),
-            subtitle = paste0("Epsilon: ", epsilon, " | N: ", nrow(pointcloud))
+            title = paste("Colored by ", coloring_name),
+            subtitle = paste0("Epsilon: ", epsilon,
+                              " | Nodes: ", num_nodes)
         ) +
         theme_void() +
         theme(
             text = element_text(family = "EB Garamond"),
             legend.position = "bottom",
-            legend.key.width = unit(0.1, "npc")
-
+            legend.key.width = unit(0.1, "npc"),
+            plot.background = element_rect(
+                color = "#BFBFBF",
+                linewidth = 1,
+                fill = NA
+            ),
+            plot.margin = margin(15, 15, 15, 15)
         )
 }
