@@ -17,6 +17,7 @@ pkgs <- c(
     "svglite",
     "showtext",
     "knitr",
+    "patchwork",
     # Analysis
     "corrr",
     "future",
