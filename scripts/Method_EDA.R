@@ -5,8 +5,9 @@
 # Global Data -------------------------------------------------------------
 
 coloring <- final_data |>
-    select(year) |>
+    select(Year) |>
     as.data.frame()
+
 
 # Investigation
 bm <- BallMapper(points = pointcloud, values = coloring, epsilon = 0.511)
@@ -15,14 +16,37 @@ bm_final <- bm_to_igraph(bm)
 # Testing calculation for igraph
 V(bm_final)$degree <- degree(bm_final)
 
-
 # test graph
 source(paste(getwd(), "functions/test_ggraph.R", sep = "/"))
-test_ggraph(bm_final, coloring = coloring |> names(), epsilon = 0.511)
+test_ggraph(bm_final, coloring = coloring, epsilon = 0.511)
 
 # investigate nodes
-node <- 4
-final_data[V(bm_final)$members[[node]], ] |> summary() |> view()
+node <- c(22, 23, 15, 18, 19)
+final_data[V(bm_final)$members[node] |> unlist(), ]
+
+# test dual graph
+comparision_map <- c("Year", "Unemployment")
+test <- map(.x = comparision_map,
+            .f = ~ {
+
+                # Coloring
+                coloring_test <- final_data |>
+                    select(all_of(.x)) |>
+                    as.data.frame()
+
+                # Run BallMapper
+                bm_test <- BallMapper(points = pointcloud,
+                                      values = coloring_test,
+                                      epsilon = 0.511)
+                bm_igraph <- bm_to_igraph(bm_test)
+
+                # ggGraph
+                test_ggraph(bm_igraph,
+                            coloring = coloring_test,
+                            epsilon = 0.511)
+            })
+
+wrap_plots(test, ncol = 2)
 
 # Further Analysis With Chosen Epsilon ------------------------------------
 
@@ -89,5 +113,8 @@ dev.off()
 pointcloud |>
     correlate() |>
     shave() |>
-    rplot(shape = 15, print_cor = TRUE) +
+    rplot(
+        print_cor = TRUE,
+        colors = c("#0072B2", "#FFFFFF", "#E69F00")
+    ) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
