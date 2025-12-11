@@ -6,7 +6,11 @@
 rm(list = ls())
 gc()
 
+
 # Load Packages -----------------------------------------------------------
+if (!require("pacman")) {
+    install.packages("pacman")
+}
 
 pkgs <- c(
     # APIs
@@ -19,36 +23,17 @@ pkgs <- c(
     "knitr",
     "patchwork",
     # Analysis
-    "corrr",
     "future",
     "furrr",
+    "corrr",
     "microbenchmark",
     "ggraph",
     "igraph",
     "BallMapper",
-    "data.table",
     "tidyverse"
 )
 
-# Package Load Function
-# Will install following packages if not already installed
-pkg_loader <- function(pkg) {
-    # Check if installed
-    if (!requireNamespace(pkg, quietly = TRUE)) {
-        message(paste("Installing missing package:", pkg))
-        install.packages(pkg)
-    }
-
-    # Try to load it. If this fails, the script STOPS here.
-    tryCatch({
-        library(pkg, character.only = TRUE)
-        message(paste("✔ Loaded:", pkg))
-    }, error = function(e) {
-        stop(paste("❌ FAILED to load:", pkg, "\nError message:", e$message))
-    })
-}
-
-lapply(pkgs, pkg_loader)
+p_load(char = pkgs)
 
 # Source Functions --------------------------------------------------------
 
