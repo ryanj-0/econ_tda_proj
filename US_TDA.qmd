@@ -29,7 +29,7 @@ editor: source
 #| eval: false
 
 # Load Packages and API Keys
-source(paste(getwd(), "scripts/systemConfig.R", sep = "/"))
+source(paste(getwd(), "scripts/System_Config.R", sep = "/"))
 
 # Import Raw Data
 source(paste(getwd(), "scripts/Data_Import.R", sep = "/"))
@@ -97,7 +97,7 @@ When looking at *Year Start* and *Year End* in @tbl-dataSources, we excluded Emp
 #| eval: true
 #| warning: false
 
-source(paste(getwd(), "scripts/Table1_data_summary.R", sep = "/"))
+source(paste(getwd(), "scripts/Table1_Data_Summary.R", sep = "/"))
 data_summary_table
 ```
 @tbl-dataSources also shows which data came in annual, quarterly, and monthly time frequencies. This analysis focuses on an annual time frame so some data transformation needed to be carried out.
@@ -133,26 +133,52 @@ Once we have these data in annual form, we then find the change from the previou
 #| warning: false
 
 # Summary of Analysis Data
-source(paste(getwd(), "scripts/Table2_analysis_data_summary.R", sep = "/"))
+source(paste(getwd(), "scripts/Table2_Analysis_Data_Summary.R", sep = "/"))
 analysis_data_summary_table
 ```
 We are including the differnt parts of gdp, c + g+ i + net exports
 
 
 ## METHODS
+
 ### *BallMapper*
+
+#### *The Algorithm*
+
+##### *Technical Audience*
+Suppose we have a dataset $$X$$ of $$N$$ with $$K$$ dimensions such that $$K > 2$$.
+
+
+##### *General Audience*
+Before going over the algorithm there are a few
+For the following algorithm some useful definitions are as follows:
+- We will use the word pointcloud instead of dataset.
+- Conventionally the Euclidean distance metric is used; let $d = dist() is used as our distance metric, denote $
+The core steps of the TDABM algorithm are as follows:
+
+1. From your dataset (pointcloud) select a random point, $\alpha_n$, and draw circle with radius epsilon, $\epsilon$.
+2. For some distance metric where $d$ is the distance from, any points inside the circle will be associated with point $\alpha_n$.
+4. Repeat steps 1 - 3 until there are no more points to select and you have a set ${\alpha_1 \text{,...,} \alpha_n}$.
+5. Draw an edge between $\alpha_i$ and $\alpha_j$ if they share a point(s) for our set ${\alpha_1 \text{,...,} \alpha_n}$.
+
+Although the above list five steps, it should be noted that this is just the algorithm and is all done with one function call.[^software] From the steps above, the only thing the user of TDABM is responsible for is creation of a pointcloud and choosing an appropriate $\epsilon$.
 - Summary of algorithm
 - correlation considerations
 
 Since BM is a developing method, we have not found any standardized way to finding a epsilon(s) that describes our data well. So to ensure that we do not miss any potential interesting outputs, our strategy is carried out # stages.
 We first started by taking out standardized pointcloud and found the upper and lower bounds of our graphs, 0.3-1.4 respectively.
 To find the lower bound we test various epsilons such that every record (row) of data is its own node in our graph. To find the upper bound we do the opposite and find an epsilon so large that we reduce our graph to just a few nodes, usually connected.
-After finding these initial bounds we aim to compute around 100 graphs at even intervals from our lower to upper bound. From this range of graphs we observe a sub-range of epsilon values where our graphs are not too noisy nor hide too much information. For this step we found that epsilon values 0.4-0.75 gave us an interesting range of graphs. We look for components (connected nodes) appearing or disappearing, significant changes in coloration in the graph, [...].
+After finding these initial bounds we aim to compute around 100 graphs at even intervals from our lower to upper bound. From this range of graphs we observe a sub-range of epsilon values where our graphs are not too noisy nor hide too much information. For this step we found that epsilon values 0.4-0.75 gave us an interesting range of graphs. We look for components (connected nodes) appearing or disappearing, significant changes in coloration in the graph, [...]. Finally, after looking at our  reduced range we decided on an epsilon of $$0.511$$.
 
 ### *Exploratory Data Analysis (EDA) Application*
-- known interpretations
+For our exploratory data analysis exploration we colored our graph by the $$Year$$. The coloration of each node representing the average of all the years within in a node. The size of our node is commensurate with the number of years it houses. Instead of using the graph output provided by BallMapper, we created graph output using other R packages to bring clarity to our analysis. We have not changed the core structure of the BallMapper output, but rather the presentation. The largest changes of note to the graphs are: spread out nodes to avoid overlapping; display the edge weights between nodes, representing the number number of shared values between two nodes; custom color scale for accessibility.
 
+Looking at our graph, we first observe the overall structure of our graph. There is one large connected component, one small component, and the rest singleton nodes. For the largest connected component, we immediately are interested in the three large nodes (24, 4, and 26) with more overlap than the rest of the component. Additionally, we also notice that each of the large nodes have some single node flares. This structure tells us that for this component, there are three distinct groups and each flare representing similar data to the group but perhaps an outlier in specific ways.
+
+The small component that we see is of interest because it tells us us that these related groups distinctly different from all other groups but similar enough to each other to be connected. Seeing these small components like this sometimes can indicate outliers in data. In our case this could be economic years which were recessions or of extraordinary growth. We also could interpret our singleton nodes in the same manner. Each on representing an outlier year for a singular variable or combination of variables for our data.
  
+
+
 
 #### *Notes*
 11/29/20205
@@ -218,23 +244,6 @@ After finding these initial bounds we aim to compute around 100 graphs at even i
 Dłotko demonstrates that, mathematically, TDABM produces a near similar output to that of traditional TDA methods via a fuctor map [@dlotko2019ballmapper].
 TDA BallMapper and closely follows other papers that have applied TDABM. We will begin with a general overview of TDABM: current published literature and useful concepts to know. We then will describe our data and reasoning behind their selection. Our [Methodology](#sec-methodology) and [Results](#sec-results) will touch on more theoretical concepts behind TDABM and then adress a couple of findings, respectively.
 
-### TDA BallMapper
-TDABM, and in general TDA, believes that data contains a "shape" to it. It pulls ideas from the branch of Mathematics, Topology. At a high-level, Topology focuses on the properties of geometric shapes when you deform them without breaking them, e.g. bend, twist, scrunch. The following is a basic overview of TDABM [^examples].
-
-
-## BallMapper Algorithm
-Before going over the algorithm there are a few
-For the following algorithm some useful definitions are as follows:
-- We will use the word pointcloud instead of dataset.
-- Conventionally the Euclidean distance metric is used; let $d = dist() is used as our distance metric, denote $
-The core steps of the TDABM algorithm are as follows:
-
-1. From your dataset (pointcloud) select a random point, $\alpha_n$, and draw circle with radius epsilon, $\epsilon$.
-2. For some distance metric where $d$ is the distance from, any points inside the circle will be associated with point $\alpha_n$.
-4. Repeat steps 1 - 3 until there are no more points to select and you have a set ${\alpha_1 \text{,...,} \alpha_n}$.
-5. Draw an edge between $\alpha_i$ and $\alpha_j$ if they share a point(s) for our set ${\alpha_1 \text{,...,} \alpha_n}$.
-
-Although the above list five steps, it should be noted that this is just the algorithm and is all done with one function call.[^software] From the steps above, the only thing the user of TDABM is responsible for is creation of a pointcloud and choosing an appropriate $\epsilon$.
 
 
 ## Procedures
