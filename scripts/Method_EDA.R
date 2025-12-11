@@ -48,64 +48,37 @@ test <- map(.x = comparision_map,
 
 wrap_plots(test, ncol = 2)
 
-# Further Analysis With Chosen Epsilon ------------------------------------
 
-coloring_vec <- final_data |>
-    select(-c(row_id)) |>
-    names()
+# GDP Maps ----------------------------------------------------------------
 
-e = 0.511
+gdp_vars <- c("Consumption", "Domestic_Investment", "Government_Spending",
+              "Exports", "Imports")
+gdp_maps <- map(.x = gdp_vars,
+            .f = ~ {
 
-# Computing All Colorings
-library(future)
-library(furrr)
+                # Coloring
+                gdp_coloring <- final_data |>
+                    select(all_of(.x)) |>
+                    as.data.frame()
 
-econ_all_coloring <- function(coloring) {
+                # Run BallMapper
+                gdp_bm <- BallMapper(points = pointcloud,
+                                      values = gdp_coloring,
+                                      epsilon = 0.511)
+                gdp_igraph <- bm_to_igraph(gdp_bm)
 
-    # Set coloring
-    coloring <- final_data |>
-        select(all_of(coloring)) |>
-        as.data.frame()
+                # ggGraph
+                test_ggraph(gdp_igraph,
+                            coloring = gdp_coloring,
+                            epsilon = 0.511)
+            })
 
-    # Run BallMapper
-    bm <- BallMapper(points = pointcloud, values = coloring, epsilon = e)
-    bm_final <- bm_to_igraph(bm)
-    return(bm_final)
+custom_layout <- "
+    AABBCC
+    #DDEE#
+"
 
-}
-
-# computing
-if(Sys.info()[["nodename"]] == "zenbook") {
-    plan(strategy = multisession,
-         workers = parallel::detectCores() - 1)
-} else {
-    plan(strategy = multisession,
-         workers = parallel::detectCores() - 2)
-}
-
-
-econ_all_bm <- future_map(
-    .x = coloring_vec,
-    .f = econ_all_coloring,
-    .options = furrr_options(seed = 2025))
-
-# parallel off
-plan(sequential)
-
-gc()
-
-# plot all bm graphs
-pdf(paste0("bm_all_coloring_00_", format(Sys.Date(), "%Y%m%d"), ".pdf"))
-walk2(
-    .x = test,
-    .y = coloring_vec,
-    .f = ~ {
-        p <- bm_ggraph(.x, .y)
-        print(p)
-    }
-)
-
-dev.off()
+wrap_plots(gdp_maps, design = custom_layout)
 
 
 # Correlation Table -------------------------------------------------------
@@ -118,3 +91,4 @@ pointcloud |>
         colors = c("#0072B2", "#FFFFFF", "#E69F00")
     ) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
