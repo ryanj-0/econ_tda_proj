@@ -4,7 +4,7 @@ test_ggraph <- function(bm_igraph_output, coloring, epsilon) {
 
     # Set graph details
     coloring_name <- coloring |> names() |> str_to_title()
-    num_nodes <- V(bm_igraph_output)$members |> length()
+    num_nodes <- vcount(bm_igraph_output)
 
     ggraph(bm_igraph_output, layout = "kk") +
         geom_edge_link(
