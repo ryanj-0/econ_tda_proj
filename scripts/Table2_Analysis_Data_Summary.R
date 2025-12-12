@@ -2,8 +2,6 @@
 ## Table 2: Summary of data used in BallMapper Analysis
 #######################################################
 
-
-
 # Analysis Data Summary ---------------------------------------------------
 analysis_data_summary <- analysisData |>
     map_df(
