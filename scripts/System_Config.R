@@ -33,7 +33,8 @@ pkgs <- c(
     "tidyverse"
 )
 
-p_load(char = pkgs)
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+pacman::p_load(char = pkgs)
 
 # Source Functions --------------------------------------------------------
 
