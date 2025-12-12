@@ -68,7 +68,7 @@ One benefit to this reduction in parameters is that it removes some of the barri
 Beyond the main objectives of this analysis, we hope that this paper is serve as an on-ramp for anyone interested in TDA but feels inundated with jargon upon early stage researching. Out objectives are to add to the small body of literature whose main focus is applications with BallMapper.\footnote{add Mapper survey paper refrence here}
 We go about this by first showing BallMapper's use in exploratory data analysis (EDA). Using our results from EDA, we then will compare BallMapper's outputs (topological graphs) to notable historic economic events [and maybe less known?]. Lastly we will test the stability and consistency of BallMapper's output. The conclusion will talk broadly about results and other considerations of note, and the discussion will elaborate on future work and questions for research.
 
----
+
 and is increasingly being applied to From the small body of literature we have reviewed, TDABM has removed many of the parameters that are required for more traditional methods of TDA. Generally speaking, traditional TDA contains four broad steps, each with multiple user-defined parameters. Conversely, TDABM has reduced this process to an the user selecting their data, a coloring variable and an epsilon value -- details on this follow below. What should be noted, although TDABM reduces the number of steps needed to produce similar outcomes of traditional TDA methods, we lose control of being able fine tune out outputs. We also find that interpreting results becomes more difficult. However, TDABM is still in its infancy, so there is not a large body of research on interpretation. [@dlotko2019ballmapper] One major motivation for this paper is a paper written by @dlotko2019macroeconomy that applied TDABM to a global macroeconomic dataset to compare how countries have evolved over time, their transformation from the Great Depression Era, and various views on wealth and inequality. We could not find other TDA literature found specifically focused on the macroeconomic economy of singular countries. Hence, our topic of choice.
 
 # METHODS AND PROCEDURES
@@ -83,9 +83,7 @@ These agencies were selected because of they are authoritative sources for U.S. 
 
 These three transformations allow us to interpret Housing Starts as a leading indicator, PPI as a measure of Supplier Inflation (Cost-Push Inflation), and CPI as a measure of Consumer Inflation (Demand-PUll Inflation).
 
-
 ### *Data Preparation*
-
 
 When looking at *Year Start* and *Year End* in @tbl-dataSources, we excluded Employment Cost Index (ECI) and Foreign Direct Investment (FDI) due to their limited availability of years. Of the remaining data series, New Privately-Owned Housing Units Started (Housing Starts) has the smallest range and will provide the initial base range of years used for our analysis (1960-2024).
 ```{r}
@@ -143,25 +141,19 @@ We are including the differnt parts of gdp, c + g+ i + net exports
 
 ### *BallMapper*
 
-#### *The Algorithm*
-
-##### *Technical Audience*
-Suppose we have a dataset $$X$$ of $$N$$ with $$K$$ dimensions such that $$K > 2$$.
-
-
 ##### *General Audience*
 Before going over the algorithm there are a few
 For the following algorithm some useful definitions are as follows:
 - We will use the word pointcloud instead of dataset.
-- Conventionally the Euclidean distance metric is used; let $d = dist() is used as our distance metric, denote $
+- Conventionally the Euclidean distance metric is used; let $$d = dist() is used as our distance metric, denote $$
 The core steps of the TDABM algorithm are as follows:
 
-1. From your dataset (pointcloud) select a random point, $\alpha_n$, and draw circle with radius epsilon, $\epsilon$.
-2. For some distance metric where $d$ is the distance from, any points inside the circle will be associated with point $\alpha_n$.
-4. Repeat steps 1 - 3 until there are no more points to select and you have a set ${\alpha_1 \text{,...,} \alpha_n}$.
-5. Draw an edge between $\alpha_i$ and $\alpha_j$ if they share a point(s) for our set ${\alpha_1 \text{,...,} \alpha_n}$.
+1. From your dataset (pointcloud) select a random point, $\alpha_n$, and draw circle with radius epsilon, $$\epsilon$$.
+2. For some distance metric where $$d$$ is the distance from, any points inside the circle will be associated with point $$\alpha_n$$.
+4. Repeat steps 1 - 3 until there are no more points to select and you have a set $${\alpha_1 \text{,...,} \alpha_n}$$.
+5. Draw an edge between $$\alpha_i$$ and $$\alpha_j$$ if they share a point(s) for our set $${\alpha_1 \text{,...,} \alpha_n}$$.
 
-Although the above list five steps, it should be noted that this is just the algorithm and is all done with one function call.[^software] From the steps above, the only thing the user of TDABM is responsible for is creation of a pointcloud and choosing an appropriate $\epsilon$.
+Although the above list five steps, it should be noted that this is just the algorithm and is all done with one function call.[^software] From the steps above, the only thing the user of TDABM is responsible for is creation of a pointcloud and choosing an appropriate $$\epsilon$$.
 - Summary of algorithm
 - correlation considerations
 
@@ -232,37 +224,24 @@ The small component that we see is of interest because it tells us us that these
 # DISCUSSION
 # REFERENCES
 
-
-
-
-
 # Old Paper
-
 
 ## Old Intro
 
 Dłotko demonstrates that, mathematically, TDABM produces a near similar output to that of traditional TDA methods via a fuctor map [@dlotko2019ballmapper].
 TDA BallMapper and closely follows other papers that have applied TDABM. We will begin with a general overview of TDABM: current published literature and useful concepts to know. We then will describe our data and reasoning behind their selection. Our [Methodology](#sec-methodology) and [Results](#sec-results) will touch on more theoretical concepts behind TDABM and then adress a couple of findings, respectively.
 
-
-
 ## Procedures
 
-
-
 ### Pointcloud Construction
-A primary challenge we encountered when selecting variables for analysis was the variability of time period coverage. Some data spanned from Depression Era 1929 all the way up to 2024. Looking at our final nine variables (see @fig-corr]) and the range of years available by by source (@fig-yearspan), we limited our years to 1960 - 2024 due to Housing Starts data having the smallest range of years.
+A primary challenge we encountered when selecting variables for analysis was the variability of time period coverage. Some data spanned from Depression Era 1929 all the way up to 2024. Looking at our final nine variables (see ) and the range of years available by by source (), we limited our years to 1960 - 2024 due to Housing Starts data having the smallest range of years.
 
-Some of the data was only available by month. In these cases we calculated annual changes by finding the difference between January of the current year and January of the previous year. Note, this reduced the number of years in our data set by one. We also standardized the data by converting non-rate based data to percent changes from the previous year to ensure consistency across all variables (@eq-generalpctchange). One feature of TDABM is that it can be sensitive to data with large scale differences. This not only reduces how precise you can be when selecting a parameter, but can also significantly increase computation time.
+Some of the data was only available by month. In these cases we calculated annual changes by finding the difference between January of the current year and January of the previous year. Note, this reduced the number of years in our data set by one. We also standardized the data by converting non-rate based data to percent changes from the previous year to ensure consistency across all variables (). One feature of TDABM is that it can be sensitive to data with large scale differences. This not only reduces how precise you can be when selecting a parameter, but can also significantly increase computation time.
 
-Looking at our correlation table (@fig-corr), we observe moderate to strong correlations between the pairwise combinations of GDP, PCE, Ig, and Imports. We also see a strong correlation between CPI and Interest Rates. Since these correlations are moderate to high, it's worth noting that the shape of our output may be reflected by these correlations. They also could express themselves with similar coloring of TDABM graphs [@dlotko2019macroeconomy].
-
-
+Looking at our correlation table (), we observe moderate to strong correlations between the pairwise combinations of GDP, PCE, Ig, and Imports. We also see a strong correlation between CPI and Interest Rates. Since these correlations are moderate to high, it's worth noting that the shape of our output may be reflected by these correlations. They also could express themselves with similar coloring of TDABM graphs [@dlotko2019macroeconomy].
 
 ### Cloud Building
 In our [Data](#sec-data) section, we noted that some calculations were needed before our analysis. Additionally, for the Federal Funds Rate, the Unemployment Rate, and CPI we had to take extra steps and considerations while constructing out pointcloud. Since the Federal Funds Rate and the Unemployment Rate are already a rate-based measurements, instead of taking a percent change from the previous year, we instead took the standard non-weight average rate by each year. For CPI, this data was given on a monthly-basis, we calculated it using our [General Percent Change Formula](#eq-generalpctchange) with $k=12$.
-
-
 
 [^examples]: Some very good examples and explanations can be found in [@dlotko2022tdabmfinance] and [@dlotko2019financialratiosstockreturns] which touch on the finer details of TDABM algorithm. A very good illustrative example can be seen in the pre-print [@Dlotko2021].
 [^pointcloud]: Poincloud can be thought as: a high-dimensional dataset that contains n-rows and m-cols such that m > 1.
@@ -273,21 +252,21 @@ In our [Data](#sec-data) section, we noted that some calculations were needed be
 ## Results
 
 ### Interpretation of TDA BallMapper Graphs, An Abridged Version
-In @fig-ballmapper we are presented with what looks like a graph, in the mathematical sense; a display of points (nodes) and edges --some connected while others are not connected at all (satellites). If we do not change the poincloud or $\epsilon$ of our TDABM graph, we will get the same "shape" of the graph regardless of the coloration we choose.
+In we are presented with what looks like a graph, in the mathematical sense; a display of points (nodes) and edges --some connected while others are not connected at all (satellites). If we do not change the poincloud or $\epsilon$ of our TDABM graph, we will get the same "shape" of the graph regardless of the coloration we choose.
 
-Nodes are colored depending on the users interest. In @fit-ballmapper, we are focusing color by year. Coloration calculated by taking the average of the data that is "inside" each node, in our case the average value of the years. Further, if there is only one data point in a node (i.e. a satellite points), the node will appear small and the coloration will reflect as seen on the legend. Conversely, if the node is large, this indicates more data is "inside" the node, and the average value could be reflecting the mean values of a large or small variance.
+Nodes are colored depending on the users interest. In , we are focusing color by year. Coloration calculated by taking the average of the data that is "inside" each node, in our case the average value of the years. Further, if there is only one data point in a node (i.e. a satellite points), the node will appear small and the coloration will reflect as seen on the legend. Conversely, if the node is large, this indicates more data is "inside" the node, and the average value could be reflecting the mean values of a large or small variance.
 
 
-### General @fig-ballmapper Remarks
+### General Remarks
 We initially notice a large connected component[^connectedcomponent] (component A) on the right side of our graph, as well as a smaller connected component (component B) on the lower left side. Noting the coloration, there are three main sections: the right, bottom, and upper-left. On the bottom and sweeping upward to the left we see there are multiple satellite points. These can be of interest because they may indicate outliers in our data.[^outliers]  Focusing back towards component A, we notice that the two largest nodes, $28$ and $22$,  which seem to represent the late 2010s and the dot-Com boom, respectively. We also note that there is a arm coming off the upper-right portion of component A, as well as smaller, lollipop, features emerging at the bottom and top of component A.[^interpretation]
 
 
 ### Time Travel
-Looking at @fig-ballmapper, we see that our graph is colored by year.[^supplement] In this section we will only highlight a few observations in detail due to the nature of this paper. Additional areas for investigation can be found in the [Conclusion](#sec-conclusion). 
+Looking at , we see that our graph is colored by year.[^supplement] In this section we will only highlight a few observations in detail due to the nature of this paper. Additional areas for investigation can be found in the [Conclusion]. 
 
-Mentioned above, we observed the satellite points in the lower half of the graph. If we look at the upper-right quadrant, we see that it consists of nodes $\{1, 16, 25, 27\}$. Looking at @tbl-covidplus we see that it covers the 2020 Pandemic and the Financial Crisis and its aftermath. Seeing a general coloration from the recent 10 - 15 years we would expect to see some of the recent outlier economic events here. Indeed, node $25$ consists of two of the most recent economic downturns, 2009 and 2020. However, what is interesting is that node $27$ consists of three years closely following the 2008-2009 Financial crisis. However, the years following the 2020 COVID Pandemic can be found scattered across nodes $\{6, 8, 24, 28, 29\}$. Looking at node $27$ we find that the common thread is high unemployment. In contrast, the years following the Pandemic are not the same year to year.[^aftercovid]
+Mentioned above, we observed the satellite points in the lower half of the graph. If we look at the upper-right quadrant, we see that it consists of nodes $\{1, 16, 25, 27\}$. Looking at we see that it covers the 2020 Pandemic and the Financial Crisis and its aftermath. Seeing a general coloration from the recent 10 - 15 years we would expect to see some of the recent outlier economic events here. Indeed, node $25$ consists of two of the most recent economic downturns, 2009 and 2020. However, what is interesting is that node $27$ consists of three years closely following the 2008-2009 Financial crisis. However, the years following the 2020 COVID Pandemic can be found scattered across nodes $\{6, 8, 24, 28, 29\}$. Looking at node $27$ we find that the common thread is high unemployment. In contrast, the years following the Pandemic are not the same year to year.[^aftercovid]
 
-Shfiting our focus towards component A, it consists of data most similar to the economic years between the 1990s - 2010s. Meanwhile, looking at component B and the general lower area of our graph, we see that it represents the Great Inflation period of the 1970s - early 1980s [ivestopedia article]. Looking at nodes $12 - 20$, we get exactly ten years of data[^greatinflation] where there was know high inflation, high unemployment, and in general know to be bad time economically for the US (@tbl-greatinflation). Something of interest to note is that nodes $14$ and $15$ consist of 1976 - 1978. This three year period based on data seems to show more normal economic conditions. On the other hand, we see that all the other years in this grouping (nodes $12 - 20$) show signs of a struggling economy in some way.
+Shfiting our focus towards component A, it consists of data most similar to the economic years between the 1990s - 2010s. Meanwhile, looking at component B and the general lower area of our graph, we see that it represents the Great Inflation period of the 1970s - early 1980s [ivestopedia article]. Looking at nodes $12 - 20$, we get exactly ten years of data[^greatinflation] where there was know high inflation, high unemployment, and in general know to be bad time economically for the US (). Something of interest to note is that nodes $14$ and $15$ consist of 1976 - 1978. This three year period based on data seems to show more normal economic conditions. On the other hand, we see that all the other years in this grouping (nodes $12 - 20$) show signs of a struggling economy in some way.
 
 [^connectedcomponent]: In graph theory, a connected component is one in which there exists a path from a node to every other node for a set of nodes and edges.
 [^outliers]: We have not found any literature yet on whether this observation is empirically true.
@@ -300,22 +279,15 @@ Shfiting our focus towards component A, it consists of data most similar to the 
 
 This paper serves as a proof-of-concept of the usefulness of TDABM as a methodology for exploratory data analysis. By no means is this a totally comprehensive method to gain insight into data, but instead TDA BallMapper proves itself to be useful tool wehen employed in addition to other traditional analyses. 
 
-In our [Results](#sec-results) section we briefly went over two ways to interpret TDABM graphs. As seen in many other, longer papers written by Dlotko and colleagues, there is a lot of room to expound our TDABM graph here,though that is beyond the scope of this paper. In general, though, we can see that TDBM can give insight into our data that we might not see otherwise. Seeing that there is data that is not like the others gives an indication that there is something to investigate. Consider our comparison of the 08' - 09' financial crisis and the 2020 COVID Pandemic: We see learned that the years following the financial crisis were similar economically. Another way to view this is, clustering revels that the financial crisis was a singular problem that spurred the collapse of the financial system. Conversely, the COVID pandemic was a singular issue but exposed many different weaknesses in our current world.
+In our section we briefly went over two ways to interpret TDABM graphs. As seen in many other, longer papers written by Dlotko and colleagues, there is a lot of room to expound our TDABM graph here,though that is beyond the scope of this paper. In general, though, we can see that TDBM can give insight into our data that we might not see otherwise. Seeing that there is data that is not like the others gives an indication that there is something to investigate. Consider our comparison of the 08' - 09' financial crisis and the 2020 COVID Pandemic: We see learned that the years following the financial crisis were similar economically. Another way to view this is, clustering revels that the financial crisis was a singular problem that spurred the collapse of the financial system. Conversely, the COVID pandemic was a singular issue but exposed many different weaknesses in our current world.
 
 For the future development of TDABM, and TDA in general, there are many possibilities of future research and one glaring downside. The downside to TDA is that it is a high barrier to entry to understand the methodologies inner workings. Those with a technical background will have an easier time, but nonetheless a higher barrier than methods such as linear regressions.  Subject wise, TDA has an advantage in some of the social sciences because it can be somewhat of a bridge between qualitative and quantitative analyses. TDABM has been used to analyze the Brexit Vote data, seeking to understand quantitative and qualitative motivations behind its outcome @Rudkin2023. TDA also has the advantages of dimension reduction which could be useful to the life-sciences. Fields such as genetics, chemistry, and biology have many fields of data, and being able to consolidate it into an understandable form could benefit the body of knowledge greatly.
 
-
-## Appendix {.unnumbered}
-
-![Data is normalized on a \[0,1\] scale due to all varialbe not being normally distributed See Supplement_2.pdf.](annualBM.svg){#fig-ballmapper}
-
 \newpage
-## References {.unnumbered}
+## References
 
-::: {#refs}
-:::
 
-## Data Sources {.unnumbered}
+## Data Source
 
 - Bureau of Economic Analysis
     -   [Real Exports and Imports](https://apps.bea.gov/iTable/?reqid=19&step=2&isuri=1&categories=survey#eyJhcHBpZCI6MTksInN0ZXBzIjpbMSwyLDNdLCJkYXRhIjpbWyJjYXRlZ29yaWVzIiwiU3VydmV5Il0sWyJOSVBBX1RhYmxlX0xpc3QiLCIxMjkiXV19)
