@@ -126,7 +126,6 @@ pointcloud <- final_data |>
 
 # clean up variable enviornment
 rm(all_quarterly,
-   analysisData,
    nber_business_cycles,
    nberExpansion,
    nberRecessions)
