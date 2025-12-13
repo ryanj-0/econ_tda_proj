@@ -6,25 +6,38 @@
 library(future)
 library(furrr)
 
-epsilon_seq <- c(0.478, 0.511, 0.600, 0.605)
+exploratory_bm <- function(ep) {
 
-ballmapper_list <- function(ep) {
+    explore_coloring <- final_data |>
+        select(Year) |>
+        as.data.frame()
 
-    bm <- BallMapper(points = pointcloud, values = coloring, epsilon = ep)
-    bm_final <- bm_to_igraph(bm)
-    return(bm_final)
+    explore_bm <- BallMapper(points = pointcloud,
+                     values = explore_coloring,
+                     epsilon = ep)
+    explore_final <- bm_to_igraph(explore_bm)
+    return(explore_final)
 
 }
 
-
 # computing
-plan(strategy = multisession,
-     workers = parallel::detectCores() - 2)
+epsilon_seq <- seq(0.5, 0.8, 0.01)
 
-test <- future_map(
+# set workers
+if(Sys.info()[["nodename"]] == "zenbook") {
+    plan(strategy = multisession,
+         workers = parallel::detectCores() - 1)
+} else {
+    plan(strategy = multisession,
+         workers = parallel::detectCores() - 2)
+}
+
+# run parallel
+explore_list <- future_map(
     .x = epsilon_seq,
-    .f = ballmapper_list,
-    .options = furrr_options(seed = TRUE))
+    .f = exploratory_bm,
+    .options = furrr_options(seed = TRUE)
+)
 
 # parallel off
 plan(sequential)
@@ -32,9 +45,9 @@ plan(sequential)
 gc()
 
 # plot all bm graphs
-pdf(paste0("bm_loop_00_", format(Sys.Date(), "%Y%m%d"), ".pdf"))
+pdf(paste0(format(Sys.Date(), "%Y%m%d"), "_explore_loop.pdf"))
 walk2(
-    .x = test,
+    .x = explore_list,
     .y = epsilon_seq,
     .f = ~ {
         p <- bm_ggraph(.x, .y)
