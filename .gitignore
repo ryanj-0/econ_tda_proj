@@ -3,3 +3,5 @@ my_apiKeys.R
 *.Rproj
 bm_loop_*.pdf
 .Rproj.user
+*.pdf
+
