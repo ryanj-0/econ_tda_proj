@@ -62,6 +62,7 @@ analysisData[["PID"]] <- analysisData[["PID"]] |>
 analysisData[["GDP"]] <- analysisData[["GDP"]] |>
     select(
         year,
+        Gross_domestic_product_GDP,
         Personal_consumption_expenditures_GDP,
         Gross_private_domestic_investment_GDP,
         Government_consumption_expenditures_and_gross_investment_GDP,
@@ -95,7 +96,6 @@ final_data <- reduce(analysisData, full_join, by = "year")
 # Final Data to Reference -------------------------------------------------
 
 final_data <- final_data |>
-    mutate(row_id = row_number()) |>
     left_join(nberRecessions |> select(year, recession_span)) |>
     left_join(nberExpansion |> select(year, expansion_span)) |>
     rename(Year = year,
@@ -105,6 +105,7 @@ final_data <- final_data |>
            Entrepreneurship =
                `Proprietors'_income_with_inventory_valuation_and_capital_consumption_adjustments_PID`,
            Transfers = Personal_current_transfer_receipts_PID,
+           GDP = Gross_domestic_product_GDP,
            Consumption = Personal_consumption_expenditures_GDP,
            Domestic_Investment = Gross_private_domestic_investment_GDP,
            Government_Spending =
@@ -117,10 +118,25 @@ final_data <- final_data |>
            Fed_Rate = rate_FFR,
            Fed_Rate_Change = pctChange_FFR,
            Housing_Change = pctChange_HOUST
-    )
+    ) |>
+    mutate(
+        row_id = row_number(),
+        # Macro Analysis Variables
+        Fisher_Equation = Fed_Rate - Inflation,
+        PPI_CPI_Spread = PPI_Change - Inflation,
+        Non_Income_Labor_Gap = Personal_Income - Compensation)
 
 pointcloud <- final_data |>
-    select(-c(Year, row_id, recession_span, expansion_span)) |>
+    select(-c(
+        Year,
+        row_id,
+        GDP,
+        recession_span,
+        expansion_span,
+        Fisher_Equation,
+        PPI_CPI_Spread,
+        Non_Income_Labor_Gap
+    )) |>
     as.data.frame() |>
     normalize_to_min_0_max_1()
 
