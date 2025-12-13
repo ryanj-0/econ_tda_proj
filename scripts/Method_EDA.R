@@ -5,12 +5,13 @@
 # Global Data -------------------------------------------------------------
 
 coloring <- final_data |>
-    select(Year) |>
+    select(Fisher_Equation) |>
     as.data.frame()
+e <- 0.8
 
 
 # Investigation
-bm <- BallMapper(points = pointcloud, values = coloring, epsilon = 0.511)
+bm <- BallMapper(points = pointcloud, values = coloring, epsilon = e)
 bm_final <- bm_to_igraph(bm)
 
 # Testing calculation for igraph
@@ -18,10 +19,10 @@ V(bm_final)$degree <- degree(bm_final)
 
 # test graph
 source(paste(getwd(), "functions/test_ggraph.R", sep = "/"))
-test_ggraph(bm_final, coloring = coloring, epsilon = 0.511)
+test_ggraph(bm_final, coloring = coloring, epsilon = e)
 
 # investigate nodes
-node <- c(22, 23, 15, 18, 19)
+node <- c(19:23)
 final_data[V(bm_final)$members[node] |> unlist(), ]
 
 # test dual graph
