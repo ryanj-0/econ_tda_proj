@@ -4,7 +4,9 @@
 # easier readability.
 ############################################
 
-bm_ggraph <- function(bm_igraph_output, coloring) {
+bm_ggraph <- function(bm_igraph_output, epsilon) {
+
+    num_nodes <- vcount(bm_igraph_output)
 
     ggraph(bm_igraph_output, layout = "kk") +
         geom_edge_link(
@@ -42,8 +44,8 @@ bm_ggraph <- function(bm_igraph_output, coloring) {
             colors = c("#0072B2", "#00B0E1", "#009B77", "#F0E442", "#E69F00")
         ) +
         labs(
-            title = paste("BallMapper Output | ", str_to_title(coloring)),
-            subtitle = paste0("Epsilon: 0.511 | N: ", nrow(pointcloud))
+            title = paste("BallMapper Output | Epsilon:", epsilon),
+            subtitle = paste0("N: ", num_nodes)
         ) +
         theme_void() +
         theme(
