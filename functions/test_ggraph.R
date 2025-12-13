@@ -3,7 +3,9 @@
 test_ggraph <- function(bm_igraph_output, coloring, epsilon) {
 
     # Set graph details
-    coloring_name <- coloring |> names() |> str_to_title()
+    coloring_name <- coloring |>
+        names() |>
+        str_replace_all("_", " ")
     num_nodes <- vcount(bm_igraph_output)
 
     ggraph(bm_igraph_output, layout = "kk") +
@@ -39,7 +41,7 @@ test_ggraph <- function(bm_igraph_output, coloring, epsilon) {
             guide = "none"
         ) +
         scale_fill_gradientn(
-            name = coloring |> names() |> str_to_title(),
+            name = coloring_name,
             colors = c("#0072B2", "#00B0E1", "#009B77", "#F0E442", "#E69F00"),
             guide = guide_colorbar(
                 title.position = "bottom",
