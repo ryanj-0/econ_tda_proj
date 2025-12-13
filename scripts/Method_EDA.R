@@ -7,7 +7,7 @@
 coloring <- final_data |>
     select(Fisher_Equation) |>
     as.data.frame()
-e <- 0.8
+e <- 0.511
 
 
 # Investigation
