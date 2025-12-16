@@ -2,7 +2,6 @@
 ## Data for Ball Mapper Analysis
 #####################################
 
-
 # General Selection of Analysis Data --------------------------------------
 # From our Sources section, we select:
 dataSources <- c("PPI_All",
@@ -124,7 +123,8 @@ final_data <- final_data |>
         # Macro Analysis Variables
         Fisher_Equation = Fed_Rate - Inflation,
         PPI_CPI_Spread = PPI_Change - Inflation,
-        Non_Income_Labor_Gap = Personal_Income - Compensation)
+        Non_Income_Labor_Gap = Personal_Income - Compensation,
+        Ex_Transfers = Personal_Income - Transfers)
 
 pointcloud <- final_data |>
     select(-c(
@@ -135,7 +135,8 @@ pointcloud <- final_data |>
         expansion_span,
         Fisher_Equation,
         PPI_CPI_Spread,
-        Non_Income_Labor_Gap
+        Non_Income_Labor_Gap,
+        Ex_Transfers
     )) |>
     as.data.frame() |>
     normalize_to_min_0_max_1()
