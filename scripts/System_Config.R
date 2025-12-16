@@ -12,6 +12,8 @@ if (!require("pacman")) {
     install.packages("pacman")
 }
 
+library(pacman)
+
 pkgs <- c(
     # APIs
     "bea.R",
