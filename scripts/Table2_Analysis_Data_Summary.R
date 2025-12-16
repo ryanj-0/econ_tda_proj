@@ -65,25 +65,22 @@ analysis_data_summary <- analysisData |>
             series == "GDP" ~ "None (Source in % Change)"
         ),
         row_id = row_number()
-    ) |>
-    relocate(num_cols, .after = transformation) |>
-    select(-series)
+    ) |> relocate(cyclical_timing, .after = economic_label) |>
+    select(-c(series, num_cols))
 
     # Analysis Data Summary Table -----------------------------------------
 analysis_data_summary_table <- analysis_data_summary |>
     gt() |>
-    cols_align(
-        align = "center",
-        columns = c(num_cols, cyclical_timing)
+    cols_width(
+        economic_description ~ px(150),
+        transformation ~ px(150)
     ) |>
-    cols_width(economic_description ~ px(130)) |>
     cols_label(
-        series_name = "Data Series",
+        series_name = "Series Abbreviation",
         economic_label = "Economic Role",
         economic_description = "Functional Descriptioin",
         transformation = "Transformation Applied",
-        cyclical_timing = "Business Cycle Timing",
-        num_cols = "Feature Count"
+        cyclical_timing = "Business Cycle Timing"
     ) |>
     tab_style(
         style = list(
