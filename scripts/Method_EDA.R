@@ -5,7 +5,7 @@
 # Global Data -------------------------------------------------------------
 
 coloring <- final_data |>
-    select(Fisher_Equation) |>
+    select(recession_span) |>
     as.data.frame()
 e <- 0.511
 
@@ -22,8 +22,15 @@ source(paste(getwd(), "functions/test_ggraph.R", sep = "/"))
 test_ggraph(bm_final, coloring = coloring, epsilon = e)
 
 # investigate nodes
-node <- c(19:23)
-final_data[V(bm_final)$members[node] |> unlist(), ]
+node_members <- map(.x = V(bm_final),
+                    .f = ~ {
+                        final_data[V(bm_final)$members[.x] |> unlist(), ]
+                    })
+
+node <- c(26)
+final_data[V(bm_final)$members[node] |> unlist(), ] |>
+    unique() |>
+    view()
 
 # test dual graph
 comparision_map <- c("Year", "Unemployment")
