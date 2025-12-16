@@ -19,6 +19,8 @@ format:
       - \pagenumbering{gobble}
       - \usepackage[table]{xcolor}
 
+
+
 editor: source
 ---
 
@@ -26,7 +28,7 @@ editor: source
 #| label: setup
 #| include: false
 #| echo: false
-#| eval: false
+#| eval: true
 
 # Load Packages and API Keys
 source(paste(getwd(), "scripts/System_Config.R", sep = "/"))
@@ -55,11 +57,13 @@ Topological Data Analysis; BallMapper; Data Science;
 Economics; Macroeconomics; Topology;
 
 # ABSTRACT
-Topological Data Analysis is (TDA) is a new data analysis method which gained popularity starting in the early 21st century. Currently, a large body of TDA research utilizes the traditional Mapper algorithm. We aim to expand the body of literature on BallMapper, a new, Mapper adjacent algorithm. Applying BallMapper to widely used, U.S. macroeconomic data from the Bureau of Economic Analysis (BEA), the Federal Reserve Bank (FRB), and Bureau of Labor Statistics (BLS), we do this is three parts. Specifically, we show an example of BallMapper's utility in exploratory data analysis which also provides an example of how to interpret BallMapper's output; analyze our topological graphs to notable historic economic events; and test the stability of BallMapper's output and the topological graph's features. Results show. [...]
+Topological Data Analysis is (TDA) is a new data analysis method which gained popularity starting in the early 21st century. Currently, a large body of TDA research utilizes the traditional Mapper algorithm. We aim to fill an entry level gap into TDA as well as expand the body of literature on BallMapper, a new, Mapper adjacent algorithm. Using widely used U.S. macroeconomic data from the Bureau of Economic Analysis (BEA), the Federal Reserve Bank (FRB), and Bureau of Labor Statistics (BLS), we do this is three parts. 
+We show an example of BallMapper's utility in exploratory data analysis which also provides an example of how to interpret BallMapper's output; analyze our topological graphs to notable historic economic events; and test the stability of BallMapper's output and the topological graph's features. Results show. [...]
 
 # INTRODUCTION
-Topological Data Analysis (TDA) is a new and emerging field of data analysis that is increasing in popularity. At a high level, the traditional applications of TDA use two tools: an algorithm called Mapper that produces a network-like graph and and analysis technique called Persistence Homology. 
-Mapper can be thought of carrying out a statistical analysis with just pictures, it might confirm a hypothesis but is not enough to say something is statistically significant. Persistence Homology on the other hand is more akin to doing an analysis of variance (ANOVA). It provides the statistical, in our case mathematical, backing to what we might see if we were to only plot the data. Moreover, the combination of Mapper and Persistence Homology is what forms the central argument for TDA: data contains an underlying shape.\footnote{https://arxiv.org/pdf/2504.09042},\footnote{Chazal F and Michel B (2021) An Introduction to Topological Data Analysis: Fundamental and Practical Aspects for Data Scientists. Front. Artif. Intell. 4:667963. doi: 10.3389/frai.2021.667963}
+Topological Data Analysis (TDA) is a new and emerging field of data analysis that is increasing in popularity. Broadly, traditional TDA applications use two tools: an algorithm called Mapper that produces a network-like graph and and analysis technique called Persistence Homology. 
+Mapper can be thought of the exploratory data analysis (EDA) and visual display of statistical analysis. That is, we may see patterns in our data or need a visual tool to help explain the results of an analysis.
+Persistence Homology on the other hand is more akin to statistical models like the Generalized Linear Model or Bayesian Statistics. They provide a mathematical framework and used as a tool to give a researcher confidence in where to look further or what they might be seeing in their data. Moreover, the combination of Mapper and Persistence Homology is what forms the central argument for TDA: data contains an underlying shape.\footnote{https://arxiv.org/pdf/2504.09042},\footnote{Chazal F and Michel B (2021) An Introduction to Topological Data Analysis: Fundamental and Practical Aspects for Data Scientists. Front. Artif. Intell. 4:667963. doi: 10.3389/frai.2021.667963}
 
 For this analysis we will be focusing on the graph creation portion of TDA. Specifically, we are examining various macroeconomic indicators of the United States of America (U.S.) using a Mapper-adjacent algorithm called BallMapper(BM).\footnote{https://arxiv.org/pdf/1901.07410}
 BallMapper is of particular interest to us because it significantly reduces the parameters to create a topological map. It simplifies traditional Mapper by reducing the need for the user to pass data through multiple functions, each with their own parameters.\footnote{add reference}
@@ -72,22 +76,11 @@ We go about this by first showing BallMapper's use in exploratory data analysis 
 and is increasingly being applied to From the small body of literature we have reviewed, TDABM has removed many of the parameters that are required for more traditional methods of TDA. Generally speaking, traditional TDA contains four broad steps, each with multiple user-defined parameters. Conversely, TDABM has reduced this process to an the user selecting their data, a coloring variable and an epsilon value -- details on this follow below. What should be noted, although TDABM reduces the number of steps needed to produce similar outcomes of traditional TDA methods, we lose control of being able fine tune out outputs. We also find that interpreting results becomes more difficult. However, TDABM is still in its infancy, so there is not a large body of research on interpretation. [@dlotko2019ballmapper] One major motivation for this paper is a paper written by @dlotko2019macroeconomy that applied TDABM to a global macroeconomic dataset to compare how countries have evolved over time, their transformation from the Great Depression Era, and various views on wealth and inequality. We could not find other TDA literature found specifically focused on the macroeconomic economy of singular countries. Hence, our topic of choice.
 
 # METHODS AND PROCEDURES
-## PROCEDURES
 
-### *Data Selection*
-This paper relied on three publicly available data from US government sources. The Bureau of Economic Analysis (BEA), The Federal Reserve Board (FRB), and The Bureau of Labor Statistics (BLS). The data were gathered using R using two application programming interfaces (APIs): one for data from the BEA, and the other from the Federal Reserve Economic Data (FRED) API. FRED aggregates data from national and international sources, as well as public and private sources. We additionally used recession dates based on business cycle contractions and expansions provided by the National Bureau of Economic Research (NBER).
-
-These agencies were selected because of they are authoritative sources for U.S. economic data. Their widespread use in both the private and public sector gives us high confidence in the accuracy and integrity of the data. 
-\footnote{Hughes-Cromwick, Ellen, and Julia Coronado. 2019. "The Value of US Government Data to US Business Decisions." Journal of Economic Perspectives 33 (1): 131\u201346. DOI: 10.1257/jep.33.1.131}
-
-
-These three transformations allow us to interpret Housing Starts as a leading indicator, PPI as a measure of Supplier Inflation (Cost-Push Inflation), and CPI as a measure of Consumer Inflation (Demand-PUll Inflation).
-
-### *Data Preparation*
-
-When looking at *Year Start* and *Year End* in @tbl-dataSources, we excluded Employment Cost Index (ECI) and Foreign Direct Investment (FDI) due to their limited availability of years. Of the remaining data series, New Privately-Owned Housing Units Started (Housing Starts) has the smallest range and will provide the initial base range of years used for our analysis (1960-2024).
+## *Data Selection & Preparation*
+This paper relied on three publicly available data from US government sources. The Bureau of Economic Analysis (BEA), The Federal Reserve Board (FRB), and The Bureau of Labor Statistics (BLS). The data were gathered using R using two application programming interfaces (APIs): one for data from the BEA, and the other from the Federal Reserve Economic Data (FRED) API. FRED aggregates data from national and international sources, as well as public and private sources. We additionally used recession dates based on business cycle contractions and expansions provided by the National Bureau of Economic Research (NBER). These agencies were selected because of they are authoritative sources for U.S. economic data. Their widespread use in both the private and public sector gives us high confidence in the accuracy and integrity of the data.\footnote{Hughes-Cromwick, Ellen, and Julia Coronado. 2019. "The Value of US Government Data to US Business Decisions." Journal of Economic Perspectives 33 (1): 131\u201346. DOI: 10.1257/jep.33.1.131}
 ```{r}
-#| label: tbl-dataSources
+#| label: tbl-Data_Sources
 #| tbl-cap: "*Housing Starts is considered a flow because it is provided as a Seasonally Adjusted Annual Rate (SAAR)."
 #| tbl-cap-location: bottom
 #| tbl-pos: "H"
@@ -98,31 +91,9 @@ When looking at *Year Start* and *Year End* in @tbl-dataSources, we excluded Emp
 source(paste(getwd(), "scripts/Table1_Data_Summary.R", sep = "/"))
 data_summary_table
 ```
-@tbl-dataSources also shows which data came in annual, quarterly, and monthly time frequencies. This analysis focuses on an annual time frame so some data transformation needed to be carried out.
-Additionally, BallMapper is less effective and inefficient to use when the input data variation there is large variation in the scales of each dimension of the dataset (columns).
-\footnote{[find reference]}
-To aide this fact, we transformed our data to either a rate change or a percentage change from the previous year where appropriate. This ensures all dimensions of our data stay on a 0-100 scale and helps with the time complexity of running BallMapper.\footnote{reference about timing}
-
-The first data series we made adjustments to was Personal Income and Its Disposition (Personal Income).
-\footnote{Table 2.1 from the BEA's Interactive Data, National Data section.}
-Personal Income is reported in nominal dollars. Thus, it does not account for inflation, so we first adjusted it using the Consumer Price Index (CPI) to get income data to Real Dollars. 
-\footnote{https://www.dallasfed.org/research/basics/nominal}
-$$
-\text{Real Dollars} = \frac{\text{Nominal Dollars}}{\text{CPI}} * 100
-$${#eq-cpiRealDollars}
-The output of @eq-cpiRealDollars was then used to take the log difference (@eq-deltaLog) to get a percentage change from the preceding year. This log difference helps to make our data more linear which aides BallMapper's use of the standard Euclidean Distance between each row of data. [If BM did not use the Euclidian distance between points, we might not need to take log differences. However topic is for another paper.]
-\footnote{https://econbrowser.com/archives/2014/02/use-of-logarithms-in-economics}
-\footnote{https://www.numberanalytics.com/blog/log-transform-econ-how-to-guide}
-$$
-\Delta\ln{(\text{Level})} = 
-[\ln{(\text{Level}_{t})} - \ln{(\text{Level}_{t-1})}]*100
-$${#eq-deltaLog}
-
-We additionally need to do some transformations on Housing Starts, Producer Price Index - All Commodities (PPI), and CPI. All three of these sources were given only on a monthly time frame, so to get an annual value for them we used a simple arithmetic mean.\footnote{PPI tracks only physical goods such as Farm Products and Feed, Industrial Commodidities, and Other Commodidites such as Aircraft, Steel, and Lumber.}
-Once we have these data in annual form, we then find the change from the previous year using @eq-deltaLog for their final data in our analysis.
-
+@tbl-Data_Sources shows all the data series we considered for this analysis. We excluded Employment Cost Index (ECI) and Foreign Direct Investment (FDI) due to their limited availability of years. Of the remaining data series, New Privately-Owned Housing Units Started (Housing Starts) has the smallest range and will provide the lower end for the years used in our analysis (1960-2024). @tbl-Analysis_Data shows the final data series we will be using. These specific series were chosen because they represent different aspects of the macroeconomy, and are described in *Functional Description*. Additionally, we are focusing on an annual time frame for this analysis so some data transformation was needed. The final data series transformations follow.
 ```{r}
-#| label: tbl-analysisData
+#| label: tbl-Analysis_Data
 #| tbl-cap: "All years for analysis are 1960-2024."
 #| tbl-cap-location: bottom
 #| tbl-pos: "H"
@@ -134,14 +105,31 @@ Once we have these data in annual form, we then find the change from the previou
 source(paste(getwd(), "scripts/Table2_Analysis_Data_Summary.R", sep = "/"))
 analysis_data_summary_table
 ```
-We are including the differnt parts of gdp, c + g+ i + net exports
 
+The first transformation was Personal Income and Its Disposition (Personal Income).\footnote{Table 2.1 from the BEA's Interactive Data, National Data section.}
+Personal Income is reported in nominal dollars, so it does not account for inflation. Thus, we first adjusted it using the Consumer Price Index (CPI) to get Personal Income into Real Dollars.\footnote{https://www.dallasfed.org/research/basics/nominal}
+$$
+\text{Real Dollars} = \frac{\text{Nominal Dollars}}{\text{CPI}} * 100
+$${#eq-CPI_Real}
+We then took the the log difference (@eq-deltaLog) from the output from @eq-CPI_Real to get a percentage change from the preceding year. This log difference helps to make our data more linear which aides BallMapper's use of the standard Euclidean Distance between each row of data. [If BM did not use the Euclidian distance between points, we might not need to take log differences. However topic is for another paper.]
+\footnote{https://econbrowser.com/archives/2014/02/use-of-logarithms-in-economics}
+\footnote{https://www.numberanalytics.com/blog/log-transform-econ-how-to-guide}
+$$
+\Delta\ln{(\text{Level})} = 
+[\ln{(\text{Level}_{t})} - \ln{(\text{Level}_{t-1})}]*100
+$${#eq-deltaLog}
+
+Our next transformation was on Housing Starts, Producer Price Index - All Commodities (PPI)\footnote{PPI tracks only physical goods such as Farm Products and Feed, Industrial Commodidities, and Other Commodidites such as Aircraft, Steel, and Lumber.}, and CPI. All three of these sources were only provided on a monthly time frame, so to get an annual value we used a simple arithmetic mean.
+Once these data are in annual form, we then found the percent change from the previous year using @eq-deltaLog for their final data in our analysis.
+
+[Need to add parts more about the data itself?]
 
 ## METHODS
 
 ### *BallMapper*
 
-##### *General Audience*
+#### *The Theory*
+[Explanation of the mathematical theory of BallMapper and the algorithim are described in]
 Before going over the algorithm there are a few
 For the following algorithm some useful definitions are as follows:
 - We will use the word pointcloud instead of dataset.
@@ -157,52 +145,47 @@ Although the above list five steps, it should be noted that this is just the alg
 - Summary of algorithm
 - correlation considerations
 
+
+
+## *Analysis*
+As we saw above we need three parts for BallMapper: a Point Cloud, a variable to color by, and an epsilon. For this analysis, our point cloud was made up of 16 variables (dimensions) which can be see in @tbl-Analysis_Dimensions. It is important to note two dimensions in our analysis were created: *Unemployment Change* and *Fed Rate Change*. All other variables where transformed but no new data created from them. Albeit, Unemployment is a lagging indicator and the Federal Funds Rate is a policy or reactive choice, we thought these two measures were important. Since Unemployment is a flow, is it useful to see if the hose of unemployed is expanding or shrinking. Similarly, it is informative to see changes in the Federal Funds Rate to see the policy choices made are working or not.
+```{r}
+#| label: tbl-Analysis_Dimensions
+#| tbl-cap: "Variables inculde in BallMapper Point Cloud"
+#| tbl-cap-location: bottom
+#| tbl-pos: "H"
+#| echo: false
+#| eval: true
+#| warning: false
+
+# Summary of Analysis Data
+source(paste(getwd(), "scripts/Table3_Analysis_Dimensions.R", sep = "/"))
+analysis_dimensions_table
+```
+To our knowledge there is no research about finding epsilon values for BallMapper. So to find a BM graph which represents our data well we go about finding an epsilon in an iterative manner. We first start by finding the upper and lower bounds of our map, trying small and large epsilon values, respectively. What we look for in our lower bound is a map
+
+
 Since BM is a developing method, we have not found any standardized way to finding a epsilon(s) that describes our data well. So to ensure that we do not miss any potential interesting outputs, our strategy is carried out # stages.
 We first started by taking out standardized pointcloud and found the upper and lower bounds of our graphs, 0.3-1.4 respectively.
 To find the lower bound we test various epsilons such that every record (row) of data is its own node in our graph. To find the upper bound we do the opposite and find an epsilon so large that we reduce our graph to just a few nodes, usually connected.
 After finding these initial bounds we aim to compute around 100 graphs at even intervals from our lower to upper bound. From this range of graphs we observe a sub-range of epsilon values where our graphs are not too noisy nor hide too much information. For this step we found that epsilon values 0.4-0.75 gave us an interesting range of graphs. We look for components (connected nodes) appearing or disappearing, significant changes in coloration in the graph, [...]. Finally, after looking at our  reduced range we decided on an epsilon of $$0.511$$.
 
-### *Exploratory Data Analysis (EDA) Application*
+# CONCLUSION
+## *Exploratory Data Analysis (EDA) Application*
 For our exploratory data analysis exploration we colored our graph by the $$Year$$. The coloration of each node representing the average of all the years within in a node. The size of our node is commensurate with the number of years it houses. Instead of using the graph output provided by BallMapper, we created graph output using other R packages to bring clarity to our analysis. We have not changed the core structure of the BallMapper output, but rather the presentation. The largest changes of note to the graphs are: spread out nodes to avoid overlapping; display the edge weights between nodes, representing the number number of shared values between two nodes; custom color scale for accessibility.
 
 Looking at our graph, we first observe the overall structure of our graph. There is one large connected component, one small component, and the rest singleton nodes. For the largest connected component, we immediately are interested in the three large nodes (24, 4, and 26) with more overlap than the rest of the component. Additionally, we also notice that each of the large nodes have some single node flares. This structure tells us that for this component, there are three distinct groups and each flare representing similar data to the group but perhaps an outlier in specific ways.
 
 The small component that we see is of interest because it tells us us that these related groups distinctly different from all other groups but similar enough to each other to be connected. Seeing these small components like this sometimes can indicate outliers in data. In our case this could be economic years which were recessions or of extraordinary growth. We also could interpret our singleton nodes in the same manner. Each on representing an outlier year for a singular variable or combination of variables for our data.
- 
 
+Node 26 in the large component seem to represent recovery years after big economic shocks. Some years were "Non-Labor Recovery" years but generally things were working as they were suppose to.
 
+Node 31 seems to be a varation of recovery because rates where so low already the gov was a bit "cornered" with monetary policy tools.
 
-#### *Notes*
-11/29/20205
-- inital range 0.3 - 1.4
-- ran seq to find interesting maps (bm_loop_00), found that .4-.75 seem to produce the most interesting graphs so we will run another sequence to see if there are any nuances we should be interested in (bm_loop_01)
-- starting at 0.0447, maps have 3 components
-- around 0.468, small components start to have more points included. We see this reflected in sizing between connected points
+Node 10 seems to be another variaove on reconvery because there was a lot of economic stimulus and help. Losts of wanting to recover provided by the government.
 
-11/30/2025
-- run new maps with new graph function
-- 0.537 & 0.538 have a three node component?
-- 0.546 & 0.547 have 4 components?
-- 0.61-0.625 2 components but the shape changes b/c of points moving around
-- 0.677-0.75 2 components and various combine of nodes
-- Most Interesting Epsilon Values:
-  - 
+Node 24 was "pressure cooker" economy. Everything firing on all cyliders.
 
-12/1/2025
-- Choosing handful of maps to see which to use for analysis
-  - c(0.468, 0.473, 0.478, 0.487, 0.511, 0.600, 0.605, 0.614, 0.642, 0.716)
-- 0.475-0.482 stable graph, no change
-- 0.495 start to see 2-simplex form, persists throughout
-  - 3-7-11 --> 3-6-10 --> 
-- Noticing developing three big groups of nodes, three "phases" of economy?
-- talk about differnt shapes: 2-simplex, mickey mouse, spurs, lolipop holders,
-- make edge strenth acording edge length? #discussion
-- later year v past year 2-simplex pattern?
-
-12/2/2025
-- Narrowing down more which graph for analysis
-  - 
-  
 ### *Small Comparative Analysis*
 - "New Deal"
 - 08 financial crisis
@@ -219,24 +202,13 @@ The small component that we see is of interest because it tells us us that these
     - coloring consistency
     - look at financne application and brexit vote
 
-# CONCLUSION
 
 # DISCUSSION
 # REFERENCES
 
 # Old Paper
 
-## Old Intro
-
-Dłotko demonstrates that, mathematically, TDABM produces a near similar output to that of traditional TDA methods via a fuctor map [@dlotko2019ballmapper].
-TDA BallMapper and closely follows other papers that have applied TDABM. We will begin with a general overview of TDABM: current published literature and useful concepts to know. We then will describe our data and reasoning behind their selection. Our [Methodology](#sec-methodology) and [Results](#sec-results) will touch on more theoretical concepts behind TDABM and then adress a couple of findings, respectively.
-
-## Procedures
-
 ### Pointcloud Construction
-A primary challenge we encountered when selecting variables for analysis was the variability of time period coverage. Some data spanned from Depression Era 1929 all the way up to 2024. Looking at our final nine variables (see ) and the range of years available by by source (), we limited our years to 1960 - 2024 due to Housing Starts data having the smallest range of years.
-
-Some of the data was only available by month. In these cases we calculated annual changes by finding the difference between January of the current year and January of the previous year. Note, this reduced the number of years in our data set by one. We also standardized the data by converting non-rate based data to percent changes from the previous year to ensure consistency across all variables (). One feature of TDABM is that it can be sensitive to data with large scale differences. This not only reduces how precise you can be when selecting a parameter, but can also significantly increase computation time.
 
 Looking at our correlation table (), we observe moderate to strong correlations between the pairwise combinations of GDP, PCE, Ig, and Imports. We also see a strong correlation between CPI and Interest Rates. Since these correlations are moderate to high, it's worth noting that the shape of our output may be reflected by these correlations. They also could express themselves with similar coloring of TDABM graphs [@dlotko2019macroeconomy].
 
