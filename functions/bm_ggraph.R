@@ -4,8 +4,12 @@
 # easier readability.
 ############################################
 
-bm_ggraph <- function(bm_igraph_output, epsilon) {
+bm_ggraph <- function(bm_igraph_output, coloring, epsilon) {
 
+    # Set graph details
+    coloring_name <- coloring |>
+        names() |>
+        str_replace_all("_", " ")
     num_nodes <- vcount(bm_igraph_output)
 
     ggraph(bm_igraph_output, layout = "kk") +
@@ -41,17 +45,19 @@ bm_ggraph <- function(bm_igraph_output, epsilon) {
             guide = "none"
         ) +
         scale_fill_gradientn(
-            colors = c("#0072B2", "#00B0E1", "#009B77", "#F0E442", "#E69F00")
-        ) +
-        labs(
-            title = paste("BallMapper Output | Epsilon:", epsilon),
-            subtitle = paste0("N: ", num_nodes)
+            name = coloring_name,
+            colors = c("#0072B2", "#66C2A5", "#AA3377", "#F0E442", "#FF9F1C"),
+            guide = guide_colorbar(
+                title.position = "bottom",
+                title.hjust = 0.5,
+                title.vjust = 1,
+                label.position = "top"
+            )
         ) +
         theme_void() +
         theme(
             text = element_text(family = "EB Garamond"),
             legend.position = "bottom",
             legend.key.width = unit(0.1, "npc")
-
         )
 }

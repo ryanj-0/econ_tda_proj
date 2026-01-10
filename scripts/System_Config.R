@@ -31,6 +31,7 @@ pkgs <- c(
     "microbenchmark",
     "ggraph",
     "igraph",
+    "tidygraph",
     "BallMapper",
     "tidyverse"
 )

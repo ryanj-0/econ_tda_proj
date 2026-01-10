@@ -5,21 +5,22 @@
 # Global Data -------------------------------------------------------------
 
 coloring <- final_data |>
-    select(recession_span) |>
+    select(Year) |>
     as.data.frame()
 e <- 0.511
 
 
 # Investigation
 bm <- BallMapper(points = pointcloud, values = coloring, epsilon = e)
-bm_final <- bm_to_igraph(bm)
+bm_final <- bm_to_igraph(bm) |>
+    as_tbl_graph()
 
 # Testing calculation for igraph
 V(bm_final)$degree <- degree(bm_final)
 
 # test graph
-source(paste(getwd(), "functions/test_ggraph.R", sep = "/"))
-test_ggraph(bm_final, coloring = coloring, epsilon = e)
+source(paste(getwd(), "functions/bm_ggraph.R", sep = "/"))
+bm_ggraph(bm_final, coloring = coloring, epsilon = e)
 
 # investigate nodes
 node_members <- map(.x = V(bm_final),
