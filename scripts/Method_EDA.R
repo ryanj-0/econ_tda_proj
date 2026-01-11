@@ -7,13 +7,13 @@
 coloring <- final_data |>
     select(Year) |>
     as.data.frame()
-e <- 0.511
+
+e <- 1.4
 
 
 # Investigation
 bm <- BallMapper(points = pointcloud, values = coloring, epsilon = e)
-bm_final <- bm_to_igraph(bm) |>
-    as_tbl_graph()
+bm_final <- bm_to_igraph(bm)
 
 # Testing calculation for igraph
 V(bm_final)$degree <- degree(bm_final)

@@ -70,7 +70,8 @@ BallMapper is of particular interest to us because it significantly reduces the 
 One benefit to this reduction in parameters is that it removes some of the barriers to learning Mapper (or Mapper-like algorithms), and more generally, TDA. Those who have a mathematical background, introductory course in Topology, or conceptual knowledge of data science methods and algorithms will fare much easier. However, if you are not equipped with any of the aforementioned tools, TDA might seem unnecessarily complicated for data analysis.
 
 Beyond the main objectives of this analysis, we hope that this paper is serve as an on-ramp for anyone interested in TDA but feels inundated with jargon upon early stage researching. Out objectives are to add to the small body of literature whose main focus is applications with BallMapper.\footnote{add Mapper survey paper refrence here}
-We go about this by first showing BallMapper's use in exploratory data analysis (EDA). Using our results from EDA, we then will compare BallMapper's outputs (topological graphs) to notable historic economic events [and maybe less known?]. Lastly we will test the stability and consistency of BallMapper's output. The conclusion will talk broadly about results and other considerations of note, and the discussion will elaborate on future work and questions for research.
+We go about this by first showing BallMapper's use in exploratory data analysis (EDA). Using our results from EDA, we then will compare BallMapper's outputs (topological graphs) to notable historic economic events. Lastly we will test the stability and consistency of BallMapper's output. The conclusion will talk broadly about results and other considerations of note, and the discussion will elaborate on future work and questions for research.
+
 
 and is increasingly being applied to From the small body of literature we have reviewed, TDABM has removed many of the parameters that are required for more traditional methods of TDA. Generally speaking, traditional TDA contains four broad steps, each with multiple user-defined parameters. Conversely, TDABM has reduced this process to an the user selecting their data, a coloring variable and an epsilon value -- details on this follow below. What should be noted, although TDABM reduces the number of steps needed to produce similar outcomes of traditional TDA methods, we lose control of being able fine tune out outputs. We also find that interpreting results becomes more difficult. However, TDABM is still in its infancy, so there is not a large body of research on interpretation. [@dlotko2019ballmapper] One major motivation for this paper is a paper written by @dlotko2019macroeconomy that applied TDABM to a global macroeconomic dataset to compare how countries have evolved over time, their transformation from the Great Depression Era, and various views on wealth and inequality. We could not find other TDA literature found specifically focused on the macroeconomic economy of singular countries. Hence, our topic of choice.
 
@@ -132,7 +133,7 @@ Mathematically, the concept of Ball Mapper supposes we are given a dataset $X$ i
 Then for some point $x \in X$ and given $\epsilon > 0$, we create a ball, $b(x, \epsilon)$, centered around $x$ with radius $\epsilon$.
 Our aim to create set of balls, $B$, such that $B = \bigcup_{i = 0}^{n} b(x, \epsilon)$ for all $x \in B$.
 
-In practice, though, we call our dataset $X$ a Point Cloud with $N$ rows. Our dimensions, $K$, are each column of our data and usually our point cloud has dimensions $K > 2$. When we are selecting a point, $x_i \in X$, to draw a ball, we are randomly selecting a row of our point cloud and then taking he Euclidean Distance in $K$ dimensions such that $i \neq j$ and $x_i, x_j \in X$ to every other $x_j$ in our point cloud. Then with our given epsilon, $\epsilon > 0$, we assign any points where the distance is less to epsilon to a ball with center $x_i$ (@eq-euclideanDistance).
+We call our dataset $X$ a Point Cloud where each of the $N$ rows represents a point in our cloud. Our dimension, $K$, are each column of our data and commonly our point cloud has dimensions $K > 2$. When we are selecting a point, $x_i \in X$, to draw a ball, we are randomly selecting a row of our point cloud and then taking he Euclidean Distance in $K$ dimensions such that $i \neq j$ and $x_i, x_j \in X$ to every other $x_j$ in our point cloud. Then with our given epsilon, $\epsilon > 0$, we assign any points where the distance is less to epsilon to a ball with center $x_i$ (@eq-euclideanDistance).
 $$
 d(x_i, x_j) = 
 \sqrt{(x_{i_1} - x_{j_1})^2 + (x_{i_2} - x_{j_2})^2 + \ldots + (x_{i_k} - x_{j_k})^2} < \epsilon
@@ -147,7 +148,7 @@ Algorithmically, Ball Mapper is as follows:
 5. Draw an edge between $b_i, b_j \in B$ if they contain the same $x$, weighting the edge based on number distinct $x$ values $b_i$ and $b_j$ both contain.
 
 ### *Analysis*
-As we saw above we need three parts for BallMapper: a Point Cloud, a variable to color by, and an epsilon. For this analysis, our point cloud was made up of 16 variables (dimensions) which can be see in @tbl-Analysis_Dimensions. It is important to note two dimensions in our analysis were created: *Unemployment Change* and *Fed Rate Change*. All other variables where transformed but no new data created from them. Albeit, Unemployment is a lagging indicator and the Federal Funds Rate is a policy or reactive choice, we thought these two measures were important. Since Unemployment is a flow, is it useful to see if the hose of unemployed is expanding or shrinking. Similarly, it is informative to see changes in the Federal Funds Rate to see the policy choices made are working or not.
+As we saw above we need three parts for BallMapper: a Point Cloud, a variable to color by, and an epsilon. For this analysis, our point cloud was made up of 16 variables (dimensions) which can be see in @tbl-Analysis_Dimensions. It is important to note two dimensions in our analysis were created: *Unemployment Change* and *Fed Rate Change*. [Add reasoning] All other variables where transformed but no new data created from them. Albeit, Unemployment is a lagging indicator and the Federal Funds Rate is a policy or reactive choice, we thought these two measures were important. Since Unemployment is a flow, is it useful to see if the hose of unemployed is expanding or shrinking. Similarly, it is informative to see changes in the Federal Funds Rate to see the policy choices made are working or not.
 ```{r}
 #| label: tbl-Analysis_Dimensions
 #| tbl-cap: "Variables inculde in BallMapper Point Cloud"
@@ -161,12 +162,54 @@ As we saw above we need three parts for BallMapper: a Point Cloud, a variable to
 source(paste(getwd(), "scripts/Table3_Analysis_Dimensions.R", sep = "/"))
 analysis_dimensions_table
 ```
-To our knowledge there is no research about finding epsilon values for BallMapper. So to find a BM graph which represents our data well we go about finding an epsilon in an iterative manner. We first start by finding the upper and lower bounds of our map, trying small and large epsilon values, respectively. What we look for in our lower bound is a map such that the epsilon is small enough to make most all, or all depending on the dataset size, data points singletons, giving an image of many disconnected points. Conversely, our upper bound is an epsilon so large that it includes most every point and produces a map of two or less nodes. With this idea of finding a lower and upper bound, in an iterative manner aim to create around 100 maps at even intervals, review the maps, continue to narrow our interval to a map that shows our data "in focus", and presents what we might think is a good or interesting representation of our data.
+To our knowledge there is no generally accepted way of choosing epsilon in the literature. Since BallMapper constructs maps by selecting a point and taking a radius distance of epsilon, this is should in theory, if given an epsilon small enough, produce a graph such that every point is its own ball. Conversely, this should lead to all of our points being included in one node. For our analysis here, this is indeed the case. So to find an appropriate epsilon we first start by finding these lower and upper bounds.
+What we look for in our lower bound is a graph is an epsilon small enough make every point in our point cloud a singleton node, not connected to any other.
+For our upper bound we do the converse and look for an epsilon so large where it creates a singular node that houses all of our points.
+Additionally, to reduce some of the computational time, we look for a lower bound where a connected component started to form, and an upper bound where we had only two connected nodes.
 
-For our data we started off by using an interval of $[0.3-1.4]$ and then narrowed our interval to $[0.4-0.75]$. When reviewing our maps, we look for connected components (connected nodes) appearing or disappearing, significant changes in coloration in the graph, or the any patterns in size or color of the nodes. We finally decided on the value $0.511$ because it presented a little of all the aforementioned features we look for: coloration and size patterning and connected components.
+For our data we first found a lower and upper bound which created an interval of $[0.3-1.4]$. We then applied a function to generated around 100 graphs and reviewed them, narrowing our interval to $[0.4-0.75]$. During this narrowing process we look for interesting features such as connected components forming or dissolving, flares coming off of any components, or notable sizing or coloration patterns.
+We finally decided on the value $0.511$ because it presented a little of all the aforementioned features we look for: coloration and size patterning and connected components.
+
+The standard BallMapper package in R produces a sufficient graph for exploratory data analysis. It's graphing function uses R base plot function and default coloring scheme. We however, felt that this graph output could be improved upon and recognized that we could use alternative, and more comprehensive packages to create our graph. That is, the output of the BallMapper algorithm could use an alternative package specifically for a network-like graph such as ours. Thus, translating the direct output from the BallMapper algorithm, we created the same graph but changed the visual representation and added a few more help bits of information that we were given but not used previously. Looking at @fig-newGraph, we have the standard Ball Mapper graph output on the left (@fig-newGraph-1) and our new graph output on the right (@fig-newGraph-2). The most prominent changes is the spread of the network and coloration. 
+
+```{r}
+#| label: fig-newGraph
+#| fig-cap: "Ball Mapper Graph colored by Year with Epsilon set to 0.511."
+#| fig-subcap:
+#|     - "Ball Mapper output using standard function (ColorIgraphPlot)"
+#|     - "Ball Maper output using new graph output (ggraph)"
+#| fig-cap-location: bottom
+#| layout-ncol: 2
+#| fig-width: 12
+#| fig-height: 8
+#| out-width: "80%"
+#| fig-pos: "H"
+#| echo: false
+#| eval: true
+#| warning: false
+
+# Set Year Coloring
+coloring <- final_data |>
+    select(Year) |>
+    as.data.frame()
+
+# Set Epsilon
+e <- 0.511
+
+# Create BM Output
+BM_Compare <- BallMapper(points = pointcloud, values = coloring, epsilon = e)
+BM_Compare2 <- bm_to_igraph(BM_Compare)
+
+# Output Maps
+source(paste(getwd(), "functions/bm_ggraph.R", sep = "/"))
+
+ColorIgraphPlot(BM_Compare, seed_for_plotting = 28716)
+bm_ggraph(BM_Compare2, coloring = coloring, epsilon = e)
+```
 
 For our initial map we used *Year* as our coloring variable. This is because Year is a metric that is not dependent on any economic variables and is a good marker for large macroeconomic events such as the dot com bubble of the 2000s. *Year* is not included in the construction of our Point Cloud. This is an important point because we show later that being able to create metrics to color by adds a depth the Ball Mapper's usefulness, even if the metrics themselves are not included in our Point Cloud.
 
+[While the standard implenmentation of BallMapper provides and output...be clear about ballmapper output being the same as ggraph output]
 Instead of using the graph output provided by BallMapper, we created graph output using other R packages to bring clarity to our analysis. We have not changed the core structure of the BallMapper output, but rather the presentation. The largest changes of note to the graphs are: spread out nodes to avoid overlapping; display the edge weights between nodes, representing the number number of shared values between two nodes; custom color scale for accessibility.
 
 # CONCLUSION
@@ -209,17 +252,17 @@ For Nodes 24 and 26 we see two different sides of large economic shocks. Node 24
 For the flares and smaller points that are connect each of our large nodes in C1, we find that some years are in both the smaller node and larger one, which creates our edge. However they also contain additional years which are related nodes 4, 24, or 26 but instead describe transition years to these large nodes.
 
 **Fisher Effect**
-Using the Fisher Equation we can color our topological graph with the approximated real interested rate (@fisherEquation).\footnote{https://inomics.com/terms/fisher-effect-1545486}. Although we know that the Fisher Equation is an approximation and does not hold well when nominal interest rates (Fed Rate) are relatily high and time spans are short, @fig-Fisher shows us a stark picture of our economic history and important time periods.\footnote{https://link.springer.com/chapter/10.1007/978-3-031-76140-9_9}
+Using the Fisher Equation we can color our topological graph with the approximated real interested rate (@fisherEquation).\footnote{https://inomics.com/terms/fisher-effect-1545486}. Although we know that the Fisher Equation is an approximation and does not hold well when nominal interest rates (Fed Rate) are relatively high and time spans are short, @fig-Fisher shows us a stark picture of our economic history and important time periods.\footnote{https://link.springer.com/chapter/10.1007/978-3-031-76140-9\_9}
 
 $$
 \text{Real Interest Rate} \approx \text{Fed Rate} - \text{Inflation}
-$$#eq-fisherEquation
+$${#eq-fisherEquation}
 
 Looking at nodes 19-22, we notice that these years consists of the years 1981-1984, the years during and following the "Volker Shock".\footnote{https://www.federalreservehistory.org/essays/great-inflation} What is interesting about why these nodes are colored is that these nodes see to show the impact of Volker's decision to raise interest and the lag that took place when raising rates.\footnote{https://www.stlouisfed.org/on-the-economy/2023/oct/what-are-long-variable-lags-monetary-policy}
 
 On the lower end the of Fisher Effect, we notice nodes 14, 28, 31, 33, 34 (1975, 2008, 2011-2012, 2021, 2022 respectively) show a negative value for @eq-fisherEquation. In these year rates were already extremely low, or the economy just came off a huge economic shock. In 1975 the fed aggressively lowered rates due to climbing inflation and high unemployment rates from the 1973-'74 oil embargo.\footnote{https://www.federalreservehistory.org/essays/oil-shock-of-1973-74} In 2021-'22 the COVID-19 Pandemic stimulus checks were going to cause inflation but the fed did not want to raise rates too aggressively.
 
-
+We also observe that for our C1 component, node 24 does show an approximate value from our Fisher Equation to be above the stated target rate of 2%. This indicates that indeed the economy for these nodes are showing signs of a "hot" economy.
 
 ```{r}
 #| label: fig-Fisher
@@ -251,6 +294,35 @@ ggraph_Fisher <- bm_ggraph(BM_Fisher, coloring = coloring, epsilon = e)
 ggraph_Fisher
 ```
 
+```{r}
+#| label: fig-PPI_CPI_Spread
+#| fig-cap: "Ball Mapper Graph colored by the difference between PPI and CPI with Epsilon set to 0.511."
+#| fig-cap-location: bottom
+#| fig-width: 12
+#| fig-height: 8
+#| out-width: "80%"
+#| fig-pos: "H"
+#| echo: false
+#| eval: true
+#| warning: false
+
+# Set Year Coloring
+coloring <- final_data |>
+    select(PPI_CPI_Spread) |>
+    as.data.frame()
+
+# Set Epsilon
+e <- 0.511
+
+# Create BM Output
+BM_Spread <- BallMapper(points = pointcloud, values = coloring, epsilon = e)
+BM_Spread <- bm_to_igraph(BM_Spread)
+
+# Output Map
+source(paste(getwd(), "functions/bm_ggraph.R", sep = "/"))
+ggraph_Spread <- bm_ggraph(BM_Spread, coloring = coloring, epsilon = e)
+ggraph_Spread
+```
 
 ### *Robustness and Stabilization*
 - Shuffle Dataset --> Run BallMapper
@@ -265,9 +337,6 @@ ggraph_Fisher
 
 
 # SUPPLEMENTARY
-```{r}
-
-```
 
 ```{r}
 node_4 <- final_data[V(BM_Year)$members[4] |> unlist(), ]
