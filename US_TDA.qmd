@@ -55,35 +55,32 @@ Student: *johnson.ryan-0@pm.me*\textsuperscript{*} \newline
 Mentor: *scook25@alaska.edu*
 
 # KEYWORDS
-Topological Data Analysis; BallMapper; Data Science;
-Economics; Macroeconomics; Topology;
+Topological Data Analysis; Topology; TDA; BallMapper; Mapper; 
+Data Science; Economics; Macroeconomics;
 
 # ABSTRACT
-Topological Data Analysis is (TDA) is a new data analysis method which gained popularity starting in the early 21st century. Currently, a large body of TDA research utilizes the traditional Mapper algorithm. We aim to fill an entry level gap into TDA as well as expand the body of literature on BallMapper, a new, Mapper adjacent algorithm. Using widely used U.S. macroeconomic data from the Bureau of Economic Analysis (BEA), the Federal Reserve Bank (FRB), and Bureau of Labor Statistics (BLS), we do this is three parts. 
-We show an example of BallMapper's utility in exploratory data analysis which also provides an example of how to interpret BallMapper's output; analyze our topological graphs to notable historic economic events; and test the stability of BallMapper's output and the topological graph's features. Results show. [...]
+Topological Data Analysis is (TDA) is a new data analysis method which gained popularity starting in the early 21st century. Currently, a large body of TDA research utilizes the traditional Mapper algorithm. We aim to fill an entry level gap into TDA as well as expand the body of literature using Ball Mapper--a Mapper adjacent algorithm. Using widely used U.S. macroeconomic data from the Bureau of Economic Analysis (BEA), the Federal Reserve Bank (FRB), and the Bureau of Labor Statistics (BLS), we achieve our goal by first showcasing Ball Mapper's use in Exploratory Data Analysis. We then combined Ball Mapper with the Fisher Equation, PPI-CPI Gap, and [ADD FINAL MEASURE] to show it's use beyond Exploratory Data Analysis. Our findings suggest that Ball Mapper is a useful data analysis tool to look at large multidimensional datasets and extract meaningful relationships in insights about our data quickly [...]
 
 # INTRODUCTION
-Topological Data Analysis (TDA) is a new and emerging field of data analysis that is increasing in popularity. Broadly, traditional TDA applications use two tools: an algorithm called Mapper that produces a network-like graph and and analysis technique called Persistence Homology. 
-Mapper can be thought of the exploratory data analysis (EDA) and visual display of statistical analysis. That is, we may see patterns in our data or need a visual tool to help explain the results of an analysis.
-Persistence Homology on the other hand is more akin to statistical models like the Generalized Linear Model or Bayesian Statistics. They provide a mathematical framework and used as a tool to give a researcher confidence in where to look further or what they might be seeing in their data. Moreover, the combination of Mapper and Persistence Homology is what forms the central argument for TDA: data contains an underlying shape.[@madukpe2025mapper; @chazal2021introduction]
+Topological Data Analysis (TDA) is a new and emerging field of data analysis that is increasing in popularity. Broadly, traditional TDA applications use two tools: an algorithm called Mapper that is represented by a mathematical graph and and analysis technique called Persistence Homology.[@madukpe2025mapper]\footnote{A mathematical graph, from Graph Theory, is most closely associated with a Network Graph that consits of nodes and edges.}
+To provide a bridge from traditional statistical analysis, Mapper can be thought of the visual side and Persistent Homology as a the underlying theory and mathematics of our methodology.
 
-For this analysis we will be focusing on the graph creation portion of TDA. Specifically, we are examining various macroeconomic indicators of the United States of America (U.S.) using a Mapper-adjacent algorithm called BallMapper(BM).[@dlotko2019ball]
-BallMapper is of particular interest to us because it significantly reduces the parameters to create a topological map. It simplifies traditional Mapper by reducing the need for the user to pass data through multiple functions, each with their own parameters.\footnote{add reference}
-One benefit to this reduction in parameters is that it removes some of the barriers to learning Mapper (or Mapper-like algorithms), and more generally, TDA. Those who have a mathematical background, introductory course in Topology, or conceptual knowledge of data science methods and algorithms will fare much easier. However, if you are not equipped with any of the aforementioned tools, TDA might seem unnecessarily complicated for data analysis.
+In traditional statistical analysis, one might do some exploratory data analysis (EDA) looking at each variables distribution, variance, and  other summary statistics. That is, obtain information about the data to further make appropriate choices of which models to use for analysis.
+Persistence Homology (PH) on the other hand is more akin to statistical models like the Linear Regression. To clarify this analogy, PH comes from mathematical fields of Algebraic Topology, and Linear Regression models have assumptions which use Probability Theory.[@kemme2025persistent; @trotta2023linear; @gfg_probability] Moreover, the combination of Mapper and Persistence Homology is what forms the central argument for TDA: data contains an underlying shape, and this shape can provide us with qualitative, and sometimes quantitative, insights about large multidimensional datasets.[@chazal2021introduction]
 
-Beyond the main objectives of this analysis, we hope that this paper is serve as an on-ramp for anyone interested in TDA but feels inundated with jargon upon early stage researching. Out objectives are to add to the small body of literature whose main focus is applications with BallMapper.[@madukpe2025mapper]
-We go about this by first showing BallMapper's use in exploratory data analysis (EDA). Using our results from EDA, we then will compare BallMapper's outputs (topological graphs) to notable historic economic events. Lastly we will test the stability and consistency of BallMapper's output. The conclusion will talk broadly about results and other considerations of note, and the discussion will elaborate on future work and questions for research.
+For this analysis we will be focusing on the graph creation portion of TDA. Specifically, we are examining various macroeconomic indicators of the United States of America (U.S.) using a Mapper-adjacent algorithm called BallMapper(BM).
+Ball Mapper is of particular interest to us because it reduces the parameters needed for analysis. This is helpful because removes some of the barriers to start learning TDA by reducing the needed background and coding knowledge.
+In traditional Mapper, one must pass the data through three stages, all with their own parameters, in order to generate a graph. Ball Mapper however only needs one parameter before producing a graph.[@dlotko2019ball] An important trade off between Ball Mapper and traditional Mapper is the following: BM reduces the number of steps needed to produce similar outcomes of traditional Mapper, but we lose control of being able fine tune out these outputs.
+Those who have a mathematical background, introductory course in Topology, or conceptual knowledge of data science methods and algorithms will fare much easier to learning TDA. However, if you are not equipped with any of the aforementioned tools or knowledge, TDA might seem unnecessarily complicated for data analysis, or impossible to learn.
 
+One major motivation for this paper is a paper written by  that applied TDABM to a global macroeconomic dataset to  We could not find other TDA literature found specifically focused on the macroeconomic economy of singular countries. Hence, our topic of choice.
 
-Generally speaking, traditional TDA contains four broad steps, each with multiple user-defined parameters. 
+One major motivation for this paper came from a paper by D\l{}otko, et al. [@dlotko2019mapping] This paper was a two pronged macroeconomic analysis using Ball Mapper. The first was a dataset of five macroeconomic variables from  16 countries from the 1870s-2017. It was interested in comparing how countries have evolved over time, their transformation from the Great Depression Era, and various views on wealth and inequality.
+The second prong was to look at relationship between private credit growth and GDP of various countries. This paper was the only literature that we could find which combines both macroeconomics and Ball Mapper. Hence our choice of topic.
 
-Conversely, TDABM has reduced this process to an the user selecting their data, a coloring variable and an epsilon value -- details on this follow below. What should be noted, although TDABM reduces the number of steps needed to produce similar outcomes of traditional TDA methods, we lose control of being able fine tune out outputs. 
+We hope that this paper will serve as an on-ramp for anyone interested in TDA but feels inundated with jargon upon early stage researching. If successful this analysis will also expand the small body of literature whose main focus is applications with Ball Mapper.[@madukpe2025mapper]
 
-We also find that interpreting results becomes more difficult. 
-
-However, TDABM is still in its infancy, so there is not a large body of research on interpretation. [@dlotko2019ballmapper] 
-
-One major motivation for this paper is a paper written by @dlotko2019macroeconomy that applied TDABM to a global macroeconomic dataset to compare how countries have evolved over time, their transformation from the Great Depression Era, and various views on wealth and inequality. We could not find other TDA literature found specifically focused on the macroeconomic economy of singular countries. Hence, our topic of choice.
+Using widely used U.S. macroeconomic data from the Bureau of Economic Analysis (BEA), the Federal Reserve Bank (FRB), and the Bureau of Labor Statistics (BLS), we plan to achieve these objectives by first showing Ball Mapper's use in exploratory data analysis (EDA). This includes general structural observations about our graphs as well as some more nuanced ways to interpret the Ball Mapper output. We follow this by extending Ball Mappers use in EDA to looking at its graphs through various economic lens: The Fisher Equation, [@mcclung2024fisher; @michaelides2024fisher] PPI\footnote{Producer Price Index - Finished Goods}-CPI Gap, [@bls_ppi_cpi_comparison] and [ADD LAST MEASURE].
 
 # METHODS AND PROCEDURES
 
@@ -127,16 +124,14 @@ $$
 [\ln{(\text{Level}_{t})} - \ln{(\text{Level}_{t-1})}]*100
 $$ {#eq-deltaLog}
 
-Our next transformation was on Housing Starts, Producer Price Index - All Commodities (PPI) and CPI. We should note that PPI tracks only physical goods such as: Farm Products and Feed; Industrial Commodities; and Other Commodities such as Aircraft, Steel, and Lumber.[@bls_ppi_concepts]
+Our next transformation was on Housing Starts, Producer Price Index - Finished Goods (PPI) and CPI. We should note that PPI tracks only physical goods that businesses purchase either for their operations or to sell to consumers. Some examples are: fleet vehicles, appliances, groceries, gas, and clothing.[@bls_ppi_concepts]
 All three of these sources were only provided on a monthly time frame, so to get an annual value we used a simple arithmetic mean.
 Once these data are in annual form, we then found the percent change from the previous year using @eq-deltaLog for their final data in our analysis.
 
-[Need to add parts more about the data itself?]
-
 ## METHODS
 
-### *BallMapper*
-In depth descriptions of Ball Mapper's theory have been covered in various papers. As the aim of our paper is to provided a introductory foray into BallMapper and TDA in general, we will omit some of the more technical details below but provide reference to more in-depth explanations.
+*BallMapper*
+In depth descriptions of Ball Mapper's theory have been covered in various papers. [@dlotko2019ball; @rudkin2025ballmapper;@qiu2020refining] As the aim of our paper is to provided a introductory foray into BallMapper and TDA in general, we will omit some of the more technical details below but provide reference to more in-depth explanations.
 
 Mathematically, the concept of Ball Mapper supposes we are given a dataset $X$ in $K$ dimensions with $N$ observations.
 Then for some point $x \in X$ and given $\epsilon > 0$, we create a ball, $b(x, \epsilon)$, centered around $x$ with radius $\epsilon$.
@@ -156,8 +151,9 @@ As an algorithm, Ball Mapper is as follows:
 4. Repeat steps 1-3 until all $x \in X$ belong to some $b(x, \epsilon)$.
 5. Draw an edge between $b_i, b_j \in B$ if they contain the same $x$, weighting the edge based on number distinct $x$ values $b_i$ and $b_j$ both contain.
 
-### *Analysis*
-As we saw above we need three parts for BallMapper: a Point Cloud, a variable to color by, and an epsilon. For this analysis, our point cloud was made up of 16 variables (dimensions) which can be see in @tbl-Analysis_Dimensions. It is important to note two dimensions in our analysis were created: *Unemployment Change* and *Fed Rate Change*. [Add reasoning] All other variables where transformed but no new data created from them. Albeit, Unemployment is a lagging indicator and the Federal Funds Rate is a policy or reactive choice, we thought these two measures were important. Since Unemployment is a flow, is it useful to see if the hose of unemployed is expanding or shrinking. Similarly, it is informative to see changes in the Federal Funds Rate to see the policy choices made are working or not.
+*Analysis*
+
+As we saw above we need three parts for BallMapper: a Point Cloud, a variable to color by, and an epsilon. For this analysis, our point cloud was made up of 16 variables (dimensions) which can be see in @tbl-Analysis_Dimensions. All variables where transformed and two dimensions were created: *Unemployment Change* and *Fed Rate Change*. We elected to create these because we yield greater information seeing both the absolute number for each year and the direction they moved in over the course of a particular year; albeit, in a linear fashion. Put another way, unemployment is a flow, so it useful to see if the pressure in the hose of unemployment is building or dropping. Similarly, it is informative to see if changes in the Federal Funds Rate are having any effect on the economy.
 ```{r}
 #| label: tbl-Analysis_Dimensions
 #| tbl-cap: "Variables inculde in BallMapper Point Cloud"
@@ -171,15 +167,16 @@ As we saw above we need three parts for BallMapper: a Point Cloud, a variable to
 source(paste(getwd(), "scripts/Table3_Analysis_Dimensions.R", sep = "/"))
 analysis_dimensions_table
 ```
-To our knowledge there is no generally accepted way of choosing epsilon in the literature. Since BallMapper constructs maps by selecting a point and taking a radius distance of epsilon, this is should in theory, if given an epsilon small enough, produce a graph such that every point is its own ball. Conversely, this should lead to all of our points being included in one node. For our analysis here, this is indeed the case. So to find an appropriate epsilon we first start by finding these lower and upper bounds.
-What we look for in our lower bound is a graph is an epsilon small enough make every point in our point cloud a singleton node, not connected to any other.
-For our upper bound we do the converse and look for an epsilon so large where it creates a singular node that houses all of our points.
+To our knowledge there is no generally accepted way of choosing epsilon in the literature. Since Ball Mapper constructs maps by selecting a point and creating a ball with a radius of epsilon, this is should in theory, given an epsilon small enough, produce a graph such that every point is a ball (node) of only itself. Conversely, this should lead to and epsilon big enough such that all of our points are included in one ball (node). For our analysis here, this is indeed the case. So to find an appropriate epsilon we first start by finding these lower and upper bounds.
+
+What we look for in our lower bound is a graph with an epsilon small enough make every point in our point cloud a singleton node, not connected to any other.
+For our upper bound we do the converse, we look for an epsilon so large where it creates a singular node that houses all of our points.
 Additionally, to reduce some of the computational time, we look for a lower bound where a connected component started to form, and an upper bound where we had only two connected nodes.
 
-For our data we first found a lower and upper bound which created an interval of $[0.3-1.4]$. We then applied a function to generated around 100 graphs and reviewed them, narrowing our interval to $[0.4-0.75]$. During this narrowing process we look for interesting features such as connected components forming or dissolving, flares coming off of any components, or notable sizing or coloration patterns.
-We finally decided on the value $0.511$ because it presented a little of all the aforementioned features we look for: coloration and size patterning and connected components.
+For our data we first found a lower and upper bound which created an interval of $[0.38-0.90]$. We then applied a function to generated around 100 graphs and reviewed them, narrowing our interval to $[0.40-0.70]$. During this narrowing process we look for interesting features such as connected components forming or dissolving, flares coming off of any components, or notable sizing or coloration patterns.
+We finally decided on the value $0.474$ because it presented a parts of all the aforementioned features we look for: coloration and size patterning, and connected components.
 
-The standard BallMapper package in R produces a sufficient graph for exploratory data analysis. It's graphing function uses R base plot function and default coloring scheme. We however, felt that this graph output could be improved upon and recognized that we could use alternative, and more comprehensive packages to create our graph. That is, the output of the BallMapper algorithm could use an alternative package specifically for a network-like graph such as ours. Thus, translating the direct output from the BallMapper algorithm, we created the same graph but changed the visual representation and added another helpful piece of information that we were given but not used previously. Looking at @fig-newGraph, we have the standard Ball Mapper graph output on the left (@fig-newGraph-1) and our new graph output on the right (@fig-newGraph-2). The most prominent changes is the spread of the network and coloration.
+The standard Ball Mapper package in R produces a sufficient graph for exploratory data analysis. It's graphing function uses R base plot function and default coloring scheme. We however, felt that this graph output could be improved upon and recognized that we could use alternative, and more comprehensive packages to create our graph. That is, the output of the BallMapper algorithm could use an alternative package specifically for a network-like graph such as ours. Thus, translating the direct output from the BallMapper algorithm, we created the same graph but changed the visual representation and added another helpful piece of information that we were given but not used previously. Looking at @fig-newGraph, we have the standard Ball Mapper graph output on the left (@fig-newGraph-1) and our new graph output on the right (@fig-newGraph-2). The most prominent changes is the spread of the network and coloration.
 
 ```{r}
 #| label: fig-newGraph
@@ -192,7 +189,6 @@ The standard BallMapper package in R produces a sufficient graph for exploratory
 #| fig-width: 12
 #| fig-height: 8
 #| out-width: "100%"
-#| fig-pos: "H"
 #| echo: false
 #| eval: true
 #| warning: false
@@ -203,7 +199,7 @@ coloring <- final_data |>
     as.data.frame()
 
 # Set Epsilon
-e <- 0.511
+e <- 0.474
 
 # Create BM Output
 BM_Compare <- BallMapper(points = pointcloud, values = coloring, epsilon = e)
@@ -212,29 +208,31 @@ BM_Compare2 <- bm_to_igraph(BM_Compare)
 # Output Maps
 source(paste(getwd(), "functions/bm_ggraph.R", sep = "/"))
 
-# Asus: 59146, ThinkPad: 28716
-ColorIgraphPlot(BM_Compare, seed_for_plotting = 59146)
+# Asus: 654987, ThinkPad: 28716
+ColorIgraphPlot(BM_Compare, seed_for_plotting = 654987)
 bm_ggraph(BM_Compare2, coloring = coloring, epsilon = e)
 ```
-Having the nodes spread out helps us see the structure of our graph more clearly as well as the new piece of information that was given to use but not see in @fig-newGraph-1, the edge strength. We see that in @fig-newGraph-2, highlighting the edge strength presents an insight about the relation between certain nodes. Further, out data consists of 65 rows, but one could imagine the advantage of a data set much larger that this one (e.g. looking at this data on a quarterly or monthly basis). Additionally, we changed the color palette for accessibility and readability. Looking at @fig-newGraph-1, any nodes colored in the royal blue (years approximately 2010-2015) mask the number identifier of the node.
+Having the nodes spread out helps us see the structure of our graph more clearly as well as the new piece of information that was given to us from the Ball Mapper algorithm but not seen in @fig-newGraph-1, the edge strength. We see that in @fig-newGraph-2, highlighting the edge strength presents an insight about the relation between certain nodes. Although, our data consists of 65 rows, one could imagine the advantage this graph might have with a data set much larger that this one (e.g. looking at this data on a quarterly or monthly basis). Additionally, we changed the color palette for accessibility and readability. Looking at @fig-newGraph-1, any nodes colored in the royal blue (years approximately 2010-2015) mask the number identifier of the node.
 
-For @fig-newGraph-2 and @fig-EDA, below, we use Year as our coloring variable. We started with this variable because a large motivation for this paper came from a paper by D\l{}otko, Rudkin, and Qiu,_Topologically Mapping the Macroeconomy_. In this paper was a two pronged macroeconomic analysis with Ball Mapper. The first was a dataset of five macroeconomic variables from  16 countries from the 1870s-2017. Coloring by Year they looked at the Ball Mapper graph structure as well as the the effect and recovery of the Great Depression on these countries.
-The second prong was using Ball Mapper to look at relationship between private credit growth and GDP using Ball Mapper. This part of the paper they colored by various dimension within their point cloud as well as Year which was not included in the their point cloud.[@dlotko2019mapping]
+For @fig-newGraph-2 and @fig-EDA, below, we use Year as our initial coloring variable. We started with this variable because D\l{}otko, et al. [@dlotko2019mapping] provided a framework of where to start with this type of analysis. This paper started by coloring their graphs by Year to initially understand the shape of their data. Later, in the second half of their analysis, they colored their graphs by each of the dimensions of a different pointcloud than the first. Because we have 16 dimensions to our pointcloud, a more in depth analysis is needed and is the the subject for another paper. Additionally, we should not that when D\l{}otko, et al. colored by Year, it was not in their pointcloud. Seeing that this could be useful, we extended this idea to our pointcloud and derived coloring variables that represented different economic lenses which we could view our graph. Namely, the Fisher Equation (@fig-Fisher), PPI-CPI Gap (@fig-Margin-Gap), and [ADD LAST MEASURE].
 
-because Year is a metric that is not dependent on any economic variables and is a good marker for large macroeconomic events such as the dot com bubble of the 2000s. *Year* is not included in the construction of our Point Cloud. This is an important point because we show later that being able to create metrics to color by adds a depth the Ball Mapper's usefulness, even if the metrics themselves are not included in our Point Cloud.
+**General Interpretation*
 
-# CONCLUSION
+Using @fig-EDA as our initial graph to explain, it is important to note with analysis such as this one, Ball Mapper will output the same graph unless at least one of two things changes: the size of the point cloud changes or the order of the point cloud. The former intuitively makes sense because the algorithm is creating epsilon radius balls and adding or subtracting any data will yield different results. Of course, depending on the data, the structure of the output might not change much. When choosing one variable, PPI, we had a multitude of choices and first tested PPI - All Commodities. We found a good epsilon at $0.511$ but for our analysis of PPI less CPI to understand the gap between the two, we though the PPI - Final Goods would be more insightful to look at. In fact there are 
+
+
+# DISSCUSSION
+
 **Exploratory Data Analysis (EDA) Application**
 
-For our exploratory data analysis exploration we colored our graph by the *Year*, @fig-EDA. The coloration of each node represents the average of all the years within in a node. The size of our node is commensurate with the number of years it houses. Between two nodes, th edge thickness is determined the number of same data points in each endpoint.Looking at @fig-EDA, we first observe the overall structure of our graph. There is one large connected component, one small component, and the rest singleton nodes.\footnote{A Connected Component is a subset of nodes in our graph such that each point in the subset has a path to all other points in the subset.} For the largest connected component (C1), we immediately are interested in the three large nodes (4, 24, and 26) because they are the largest in size for C1 and the same for their edge thickness (edge strength). Additionally, we also notice that each of the three large nodes have at least one flare (node connected only to themselves) as well as sharing others. What this structure tells us is, there are three distinct groups and each flare representing similar data to that specific group but perhaps is distinctly different to the other flares.
+For our exploratory data analysis we colored our graph by the *Year*, @fig-EDA. The coloration of each node represents the average of all the years within in a node. The size of our node is commensurate with the number of points it contains. Between two nodes, th edge thickness is determined the number of same data points in each endpoint.Looking at @fig-EDA, we first observe the overall structure of our graph. There is one large connected component, one small component, and the rest singleton nodes.\footnote{A Connected Component is a subset of nodes in our graph such that each point in the subset has a path to all other points in the subset.} For the largest connected component (C1), we immediately are interested in the three large nodes (4, 24, and 26) because they are the largest in size for C1 and the same for their edge thickness (edge strength). Additionally, we also notice that each of the three large nodes have at least one flare (node connected only to themselves) as well as sharing others. What this structure tells us is, there are three distinct groups and each flare representing similar data to that specific group but perhaps is distinctly different to the other flares.
 ```{r}
 #| label: fig-EDA
-#| fig-cap: "Ball Mapper Graph colored by Year with Epsilon set to 0.511."
+#| fig-cap: "Ball Mapper Graph colored by Year with Epsilon set to 0.474."
 #| fig-cap-location: bottom
 #| fig-width: 12
 #| fig-height: 8
-#| out-width: "80%"
-#| fig-pos: "H"
+#| out-width: "100%"
 #| echo: false
 #| eval: true
 #| warning: false
@@ -245,15 +243,22 @@ coloring <- final_data |>
     as.data.frame()
 
 # Set Epsilon
-e <- 0.511
+e <- 0.474
 
 # Create BM Output
 BM_Year <- BallMapper(points = pointcloud, values = coloring, epsilon = e)
 BM_Year <- bm_to_igraph(BM_Year)
 
-# Output Map
+# Generate Map
 source(paste(getwd(), "functions/bm_ggraph.R", sep = "/"))
 ggraph_Year <- bm_ggraph(BM_Year, coloring = coloring, epsilon = e)
+
+# investigate nodes
+year_members <- map(.x = V(BM_Year),
+                    .f = ~ {
+                        final_data[V(BM_Year)$members[.x] |> unlist(), ]
+                    })
+# output map
 ggraph_Year
 ```
 The small component (C2), nodes 2 and 27, are of interest because it tells us us that these related nodes are somehow distinctly different from C1 and all other nodes. Seeing a small components like this sometimes can indicate outliers in data. In our case, this could be years where large economic events happened such as a recessions or extraordinary growth. However, we also can see this behavior in singleton nodes much like we have @fig-EDA. When we look at the coloration of the singleton nodes, we see indication of outlier events such as The Great Recession and the COVID-19 Pandemic.
@@ -278,12 +283,11 @@ We also observe that for our C1 component, node 24 does show an approximate valu
 
 ```{r}
 #| label: fig-Fisher
-#| fig-cap: "Ball Mapper Graph colored by Fisher Equation with Epsilon set to 0.511."
+#| fig-cap: "Ball Mapper Graph colored by Fisher Equation with Epsilon set to 0.474."
 #| fig-cap-location: bottom
 #| fig-width: 12
 #| fig-height: 8
-#| out-width: "80%"
-#| fig-pos: "H"
+#| out-width: "100%"
 #| echo: false
 #| eval: true
 #| warning: false
@@ -294,37 +298,46 @@ coloring <- final_data |>
     as.data.frame()
 
 # Set Epsilon
-e <- 0.511
+e <- 0.474
 
 # Create BM Output
 BM_Fisher <- BallMapper(points = pointcloud, values = coloring, epsilon = e)
 BM_Fisher <- bm_to_igraph(BM_Fisher)
 
-# Output Map
+# generate Map
 source(paste(getwd(), "functions/bm_ggraph.R", sep = "/"))
 ggraph_Fisher <- bm_ggraph(BM_Fisher, coloring = coloring, epsilon = e)
+
+# investigate nodes
+fisher_members <- map(.x = V(BM_Fisher),
+                    .f = ~ {
+                        final_data[V(BM_Fisher)$members[.x] |> unlist(), ]
+                    })
+# generate graph
 ggraph_Fisher
 ```
 
+**PPI-CPI Gap**
+
+Measures the difference between rates of change between PPI - Finished Good and consumer inflation (CPI). Positive values indicated that businesses are having their revenue rise higher than consumer inflation. This could mean various things: corporate margins are expanding, they are passing through cost to customers, or....
 ```{r}
-#| label: fig-PPI_CPI_Spread
-#| fig-cap: "Ball Mapper Graph colored by the difference between PPI and CPI with Epsilon set to 0.511."
+#| label: fig-Margin_Gap
+#| fig-cap: "Ball Mapper Graph colored by the difference between CPI and PPI with Epsilon set to 0.474."
 #| fig-cap-location: bottom
 #| fig-width: 12
 #| fig-height: 8
-#| out-width: "80%"
-#| fig-pos: "H"
+#| out-width: "100%"
 #| echo: false
 #| eval: true
 #| warning: false
 
 # Set Year Coloring
 coloring <- final_data |>
-    select(PPI_CPI_Spread) |>
+    select(Margin_Gap) |>
     as.data.frame()
 
 # Set Epsilon
-e <- 0.511
+e <- 0.474
 
 # Create BM Output
 BM_Spread <- BallMapper(points = pointcloud, values = coloring, epsilon = e)
@@ -333,97 +346,35 @@ BM_Spread <- bm_to_igraph(BM_Spread)
 # Output Map
 source(paste(getwd(), "functions/bm_ggraph.R", sep = "/"))
 ggraph_Spread <- bm_ggraph(BM_Spread, coloring = coloring, epsilon = e)
+
+# investigate nodes
+spread_members <- map(.x = V(BM_Spread),
+                    .f = ~ {
+                        final_data[V(BM_Spread)$members[.x] |> unlist(), ]
+                    })
+# generate graph
 ggraph_Spread
 ```
 
 
-# DISCUSSION
+# CONCLUSION
 
 # ACKNOWLEDGEMENTS
 
-The author thanks Dr. Samuel Cook =
+The author thanks Dr. Samuel Cook...
 
+\newpage
 # REFERENCES
 
 :::{#refs}
 :::
 
 
-# SUPPLEMENTARY
-
-```{r}
-node_4 <- final_data[V(BM_Year)$members[4] |> unlist(), ]
-node_24 <- final_data[V(BM_Year)$members[24] |> unlist(), ]
-node_26 <- final_data[V(BM_Year)$members[26] |> unlist(), ]
-
-node_4 <- node_4 |> 
-  summarise(across(-Year, mean)) |> 
-  pivot_longer(everything(), names_to = "Measure", 
-               values_to = "Node 4 Avg. - The Sweet Spot")
-node_24 <- node_24 |>
-  summarise(across(-Year, mean)) |> 
-  pivot_longer(everything(), names_to = "Measure", 
-               values_to = "Node 24 Avg. - Overheating")
-node_26 <- node_26 |> 
-  summarise(across(-Year, mean)) |> 
-  pivot_longer(everything(), names_to = "Measure", 
-               values_to = "Node 26 Avg. - Healthy Recovery")
-
-all_nodes <- node_4 |> 
-  left_join(node_24, by = "Measure") |> 
-  left_join(node_26, by = "Measure") |>
-  filter(Measure != "row_id") |>
-  gt() |>
-  opt_row_striping()
-```
-
-```{r}
-#| label: tbl-C1_4
-#| tbl-cap: "Component C1, Node 4 Members"
-#| tbl-cap-location: bottom
-#| tbl-pos: "H"
-#| echo: false
-#| eval: true
-#| warning: false
-
-final_data[V(BM_Year)$members[4] |> unlist(), ] |>
-  gt() |>
-  tab_options(table.width = pct(100))
-```
-
-```{r}
-#| label: tbl-C1_24
-#| tbl-cap: "Component C1, Node 24 Members"
-#| tbl-cap-location: bottom
-#| tbl-pos: "H"
-#| echo: false
-#| eval: true
-#| warning: false
-
-final_data[V(BM_Year)$members[24] |> unlist(), ] |>
-  gt() |>
-  tab_options(table.width = pct(100))
-```
-
-```{r}
-#| label: tbl-C1_26
-#| tbl-cap: "Component C1, Node 26 Members"
-#| tbl-cap-location: bottom
-#| tbl-pos: "H"
-#| echo: false
-#| eval: true
-#| warning: false
-
-final_data[V(BM_Year)$members[26] |> unlist(), ] |>
-  gt() |>
-  tab_options(table.width = pct(100))
-```
+\newpage
 # Old Paper
 
 
 ## Discussion
-
-This paper serves as a proof-of-concept of the usefulness of TDABM as a methodology for exploratory data analysis. By no means is this a totally comprehensive method to gain insight into data, but instead TDA BallMapper proves itself to be useful tool wehen employed in addition to other traditional analyses. 
 
 In our section we briefly went over two ways to interpret TDABM graphs. As seen in many other, longer papers written by Dlotko and colleagues, there is a lot of room to expound our TDABM graph here,though that is beyond the scope of this paper. In general, though, we can see that TDBM can give insight into our data that we might not see otherwise. Seeing that there is data that is not like the others gives an indication that there is something to investigate. Consider our comparison of the 08' - 09' financial crisis and the 2020 COVID Pandemic: We see learned that the years following the financial crisis were similar economically. Another way to view this is, clustering revels that the financial crisis was a singular problem that spurred the collapse of the financial system. Conversely, the COVID pandemic was a singular issue but exposed many different weaknesses in our current world.
 
