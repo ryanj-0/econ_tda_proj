@@ -4,7 +4,7 @@
 
 # General Selection of Analysis Data --------------------------------------
 # From our Sources section, we select:
-dataSources <- c("PPI_All",
+dataSources <- c("PPI_Finished",
                  "PID",
                  "GDP",
                  "CPI",
@@ -16,7 +16,7 @@ dataSources <- c("PPI_All",
 analysisData <- all_annual[dataSources]
 
 # Mutate cols in `change_tbl` to calculate pct annual change using log diff.
-change_tbl <- c("PPI_All", "CPI", "housingStarts")
+change_tbl <- c("PPI_Finished", "CPI", "housingStarts")
 analysisData <- map2(analysisData, names(analysisData),
                      ~ {
                          if(.y %in% change_tbl) {
@@ -36,8 +36,9 @@ analysisData <- map2(analysisData, names(analysisData),
 
 
 # Changing Specific Table Cols --------------------------------------------
-analysisData[["PPI_All"]] <- analysisData[["PPI_All"]] |>
-    select(year, pctChange_PPIACO)
+
+analysisData[["PPI_Finished"]] <- analysisData[["PPI_Finished"]] |>
+    select(year, pctChange_WPSFD49207)
 
 # Reduce Personal Income and it's Disposition columns.
 # Since this is a large macroeconomic analysis we are going to try and
@@ -98,7 +99,7 @@ final_data <- final_data |>
     left_join(nberRecessions |> select(year, recession_span)) |>
     left_join(nberExpansion |> select(year, expansion_span)) |>
     rename(Year = year,
-           PPI_Change = pctChange_PPIACO,
+           PPI_Finished_Change = pctChange_WPSFD49207,
            Personal_Income = Personal_income_PID,
            Compensation = Compensation_of_employees_PID,
            Entrepreneurship =
@@ -122,7 +123,7 @@ final_data <- final_data |>
         row_id = row_number(),
         # Macro Analysis Variables
         Fisher_Equation = Fed_Rate - Inflation,
-        PPI_CPI_Spread = PPI_Change - Inflation,
+        Margin_Gap = Inflation - PPI_Finished_Change,
         Non_Income_Labor_Gap = Personal_Income - Compensation,
         Ex_Transfers = Personal_Income - Transfers)
 
@@ -134,7 +135,7 @@ pointcloud <- final_data |>
         recession_span,
         expansion_span,
         Fisher_Equation,
-        PPI_CPI_Spread,
+        Margin_Gap,
         Non_Income_Labor_Gap,
         Ex_Transfers
     )) |>

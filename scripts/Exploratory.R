@@ -12,7 +12,7 @@ exploratory_bm <- function(ep) {
         select(Year) |>
         as.data.frame()
 
-    explore_bm <- BallMapper(points = pointcloud,
+    explore_bm <- BallMapper(points = test_pointcloud,
                      values = explore_coloring,
                      epsilon = ep)
     explore_final <- bm_to_igraph(explore_bm)
@@ -21,7 +21,7 @@ exploratory_bm <- function(ep) {
 }
 
 # computing
-epsilon_seq <- seq(0.5, 0.8, 0.01)
+epsilon_seq <- c(0.474, 0.476, 0.488, 0.488, 0.514, 0.521, 0.570, 0.606)
 
 # set workers
 if(Sys.info()[["nodename"]] == "zenbook") {
@@ -45,12 +45,17 @@ plan(sequential)
 gc()
 
 # plot all bm graphs
+explore_coloring <- final_data |>
+    select(Year) |>
+    as.data.frame()
 pdf(paste0(format(Sys.Date(), "%Y%m%d"), "_explore_loop.pdf"))
 walk2(
     .x = explore_list,
     .y = epsilon_seq,
     .f = ~ {
-        p <- bm_ggraph(.x, .y)
+        p <- bm_ggraph(bm_igraph = .x,
+                       coloring = explore_coloring,
+                       epsilon = .y)
         print(p)
     }
 )

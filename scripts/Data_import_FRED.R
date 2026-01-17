@@ -66,8 +66,8 @@ ECI_A <- ECI_Q |>
 # on our calculation notes above.
 
 seriesTable <- tibble(
-    id = c("CPIAUCSL", "HOUST", "PPIACO", "PPIFIS", "UNRATE"),
-    name = c("CPI", "housingStarts", "PPI_All", "PPI_Final", "unemployment")
+    id = c("CPIAUCSL", "HOUST", "WPSFD49207", "UNRATE"),
+    name = c("CPI", "housingStarts", "PPI_Finished", "unemployment")
 )
 
 FRED_data <-

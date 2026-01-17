@@ -5,10 +5,10 @@
 # Global Data -------------------------------------------------------------
 
 coloring <- final_data |>
-    select(Year) |>
+    select(Margin_Gap) |>
     as.data.frame()
 
-e <- 1.4
+e <- 0.474
 
 
 # Investigation

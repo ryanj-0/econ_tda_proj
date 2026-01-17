@@ -38,7 +38,7 @@ if(Sys.Date() > last_pulled + 3) {
     rm(nipaConfig,
        gdpA_list, gdpQ_list,
        pidA_list, pidQ_list,
-       FFR_M, seriesTable)
+       seriesTable)
 
 } else
     message("Last Date Pulled: ", last_pulled, "\n",

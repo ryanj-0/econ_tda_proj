@@ -19,12 +19,10 @@ if(Sys.Date() > last_pulled + 3) {
     BEA_quarterly <- inner_join(GDP_Q, PID_Q, by = join_by(year, quarter))
     FRED_quarterly <-map(FRED_data, "quarterly")
 
-    # Dropping "PPI_Final" b/c short year range
-    FRED_quarterly[["PPI_Final"]] <- NULL
+    # Quarterly Combined
     all_quarterly <- c(
         list(GDP = GDP_Q,
              PID = PID_Q,
-             FFR = FFR_Q,
              ECI = ECI_Q
         ),
         FRED_quarterly
@@ -37,8 +35,6 @@ if(Sys.Date() > last_pulled + 3) {
 
     FRED_annual <-map(FRED_data, "annual")
 
-    # Dropping "PPI_Final" b/c short year range
-    FRED_annual[["PPI_Final"]] <- NULL
     all_annual <- c(
         list(GDP = GDP_A,
              PID = PID_A,
@@ -64,7 +60,6 @@ if(Sys.Date() > last_pulled + 3) {
 }
 
 # Recession Dates ---------------------------------------------------------
-
 
 nber_business_cycles <-
     fredr(series_id = "USRECQ") |>

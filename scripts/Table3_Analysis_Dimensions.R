@@ -20,7 +20,7 @@ analysis_dimensions <- analysisData |>
             series == "ECI" ~ "Employment Cost Index",
             series == "CPI" ~ "Consumer Price Index",
             series == "housingStarts" ~ "New Privately-Owned Housing Units Started",
-            series == "PPI_All" ~ "Producer Price Index - All Commodities",
+            series == "PPI_Finished" ~ "Producer Price Index - Finished Goods",
             series == "unemployment" ~ "Unemployment Rate"
         )
     ) |>
@@ -33,16 +33,17 @@ analysis_dimensions <- analysisData |>
     filter(long_name != "Gross Domestic Product") |>
     cbind(short_name = c("Year", names(pointcloud))) |>
     mutate(across(short_name, ~ str_replace_all(.x, "_", " "))) |>
-    mutate(row_id = row_number())
+    mutate(row_id = row_number()) |>
+    select(short_name, series_name, long_name, row_id)
 
 
     # Analysis Data Summary Table -----------------------------------------
 analysis_dimensions_table <- analysis_dimensions |>
     gt() |>
     cols_label(
+        short_name = "Dimension/Variable",
         series_name = "Data Series",
-        long_name = "Official Measure",
-        short_name = "Analysis Name"
+        long_name = "Official Measure"
     ) |>
     tab_style(
         style = list(

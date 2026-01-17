@@ -20,12 +20,12 @@ data_summary <- all_annual |>
             series == "ECI" ~ "Employment Cost Index",
             series == "CPI" ~ "Consumer Price Index",
             series == "housingStarts" ~ "New Privately-Owned Housing Units Started",
-            series == "PPI_All" ~ "Producer Price Index - All Commodities",
+            series == "PPI_Finished" ~ "Producer Price Index - Finished Goods",
             series == "unemployment" ~ "Unemployment Rate"
         ),
         series_abbreviation =  case_when(
             series == "housingStarts" ~ "Housing Starts",
-            series == "PPI_All" ~ "PPI",
+            series == "PPI_Finished" ~ "PPI",
             series == "unemployment" ~ "Unrate",
             .default = series
         ),
@@ -45,7 +45,7 @@ data_summary <- all_annual |>
             series == "ECI" ~ "Index",
             series == "CPI" ~ "Index",
             series == "housingStarts" ~ "Flow*",
-            series == "PPI_All" ~ "Index",
+            series == "PPI_Finished" ~ "Index",
             series == "unemployment" ~ "Rate"
         ),
         API =  case_when(
