@@ -5,7 +5,7 @@
 # Global Data -------------------------------------------------------------
 
 coloring <- final_data |>
-    select(Margin_Gap) |>
+    select(Private_Public_Driver) |>
     as.data.frame()
 
 e <- 0.474

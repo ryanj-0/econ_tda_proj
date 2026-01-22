@@ -123,9 +123,9 @@ final_data <- final_data |>
         row_id = row_number(),
         # Macro Analysis Variables
         Fisher_Equation = Fed_Rate - Inflation,
-        Margin_Gap = Inflation - PPI_Finished_Change,
-        Non_Income_Labor_Gap = Personal_Income - Compensation,
-        Ex_Transfers = Personal_Income - Transfers)
+        PPI_CPI_Gap = PPI_Finished_Change - Inflation,
+        Wage_Growth = Compensation - Inflation,
+        Private_Public_Driver = Domestic_Investment - Government_Spending)
 
 pointcloud <- final_data |>
     select(-c(
@@ -135,9 +135,9 @@ pointcloud <- final_data |>
         recession_span,
         expansion_span,
         Fisher_Equation,
-        Margin_Gap,
-        Non_Income_Labor_Gap,
-        Ex_Transfers
+        PPI_CPI_Gap,
+        Wage_Growth,
+        Private_Public_Driver
     )) |>
     as.data.frame() |>
     normalize_to_min_0_max_1()
