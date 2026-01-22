@@ -80,11 +80,11 @@ The second prong was to look at relationship between private credit growth and G
 
 We hope that this paper will serve as an on-ramp for anyone interested in TDA but feels inundated with jargon upon early stage researching. If successful this analysis will also expand the small body of literature whose main focus is applications with Ball Mapper.[@madukpe2025mapper]
 
-Using widely used U.S. macroeconomic data from the Bureau of Economic Analysis (BEA), the Federal Reserve Bank (FRB), and the Bureau of Labor Statistics (BLS), we plan to achieve these objectives by first showing Ball Mapper's use in exploratory data analysis (EDA). This includes general structural observations about our graphs as well as some more nuanced ways to interpret the Ball Mapper output. We follow this by extending Ball Mappers use in EDA to looking at its graphs through various economic lens: The Fisher Equation, [@mcclung2024fisher; @michaelides2024fisher] PPI\footnote{Producer Price Index - Finished Goods}-CPI Gap, [@bls_ppi_cpi_comparison] and [ADD LAST MEASURE].
+Using widely used U.S. macroeconomic data from the Bureau of Economic Analysis (BEA), the Federal Reserve Bank (FRB), and the Bureau of Labor Statistics (BLS), we plan to achieve these objectives by first showing Ball Mapper's use in exploratory data analysis (EDA). This includes general structural observations about our graphs as well as some more nuanced ways to interpret the Ball Mapper output. We follow this by extending Ball Mappers use in EDA to looking at its graphs through various economic lens: The Fisher Equation, [@mcclung2024fisher; @michaelides2024fisher] PPI\footnote{Producer Price Index - Finished Goods}-CPI Gap, [@bls_ppi_cpi_comparison] and Real-Wage Growth.[@sullivan1997trends].
 
 # METHODS AND PROCEDURES
 
-## *Data Selection & Preparation*
+*Data Selection & Preparation*
 This paper relied on three publicly available data from US government sources. The Bureau of Economic Analysis (BEA), The Federal Reserve Board (FRB), and The Bureau of Labor Statistics (BLS).[@bea_data; @fred_data] The data were gathered using R using two application programming interfaces (APIs): one for data from the BEA, and the other from the Federal Reserve Economic Data (FRED) API.[@bea_r_package; @fredr_package] FRED aggregates data from national and international sources, as well as public and private sources. We additionally used recession dates based on business cycle contractions and expansions provided by the National Bureau of Economic Research (NBER). These agencies were selected because of they are authoritative sources for U.S. economic data. Their widespread use in both the private and public sector gives us high confidence in the accuracy and integrity of the data.[@hughes2019value]
 ```{r}
 #| label: tbl-Data_Sources
@@ -99,19 +99,6 @@ source(paste(getwd(), "scripts/Table1_Data_Summary.R", sep = "/"))
 data_summary_table
 ```
 @tbl-Data_Sources shows all the data series we considered for this analysis. We excluded Employment Cost Index (ECI) and Foreign Direct Investment (FDI) due to their limited availability of years. Of the remaining data series, New Privately-Owned Housing Units Started (Housing Starts) has the smallest range and will provide the lower end for the years used in our analysis (1960-2024). @tbl-Analysis_Data shows the final data series we will be using. These specific series were chosen because they represent different aspects of the macroeconomy, and are described in *Functional Description*. Additionally, we are focusing on an annual time frame for this analysis so some data transformation was needed. The final data series transformations follow.
-```{r}
-#| label: tbl-Analysis_Data
-#| tbl-cap: "All years for analysis are 1960-2024."
-#| tbl-cap-location: bottom
-#| tbl-pos: "H"
-#| echo: false
-#| eval: true
-#| warning: false
-
-# Summary of Analysis Data
-source(paste(getwd(), "scripts/Table2_Analysis_Data_Summary.R", sep = "/"))
-analysis_data_summary_table
-```
 
 The first transformation was Personal Income and Its Disposition (Personal Income).\footnote{Table 2.1, BEA NIPA}
 Personal Income is reported in nominal dollars, so it does not account for inflation. Thus, we first adjusted it using the Consumer Price Index (CPI) to get Personal Income into Real Dollars.[@dallasfed_nominal]
@@ -128,9 +115,21 @@ Our next transformation was on Housing Starts, Producer Price Index - Finished G
 All three of these sources were only provided on a monthly time frame, so to get an annual value we used a simple arithmetic mean.
 Once these data are in annual form, we then found the percent change from the previous year using @eq-deltaLog for their final data in our analysis.
 
-## METHODS
+```{r}
+#| label: tbl-Analysis_Data
+#| tbl-cap: "All years for analysis are 1960-2024."
+#| tbl-cap-location: bottom
+#| tbl-pos: "H"
+#| echo: false
+#| eval: true
+#| warning: false
 
+# Summary of Analysis Data
+source(paste(getwd(), "scripts/Table2_Analysis_Data_Summary.R", sep = "/"))
+analysis_data_summary_table
+```
 *BallMapper*
+
 In depth descriptions of Ball Mapper's theory have been covered in various papers. [@dlotko2019ball; @rudkin2025ballmapper;@qiu2020refining] As the aim of our paper is to provided a introductory foray into BallMapper and TDA in general, we will omit some of the more technical details below but provide reference to more in-depth explanations.
 
 Mathematically, the concept of Ball Mapper supposes we are given a dataset $X$ in $K$ dimensions with $N$ observations.
@@ -143,6 +142,7 @@ d(x_i, x_j) =
 \sqrt{(x_{i_1} - x_{j_1})^2 + (x_{i_2} - x_{j_2})^2 + \ldots + (x_{i_k} - x_{j_k})^2} < \epsilon
 $$ {#eq-euclideanDistance}
 
+\newpage
 As an algorithm, Ball Mapper is as follows:
 
 1. Select a random point $x_i$ from point cloud $X$.
@@ -151,22 +151,10 @@ As an algorithm, Ball Mapper is as follows:
 4. Repeat steps 1-3 until all $x \in X$ belong to some $b(x, \epsilon)$.
 5. Draw an edge between $b_i, b_j \in B$ if they contain the same $x$, weighting the edge based on number distinct $x$ values $b_i$ and $b_j$ both contain.
 
-*Analysis*
+*Implementation*
 
-As we saw above we need three parts for BallMapper: a Point Cloud, a variable to color by, and an epsilon. For this analysis, our point cloud was made up of 16 variables (dimensions) which can be see in @tbl-Analysis_Dimensions. All variables where transformed and two dimensions were created: *Unemployment Change* and *Fed Rate Change*. We elected to create these because we yield greater information seeing both the absolute number for each year and the direction they moved in over the course of a particular year; albeit, in a linear fashion. Put another way, unemployment is a flow, so it useful to see if the pressure in the hose of unemployment is building or dropping. Similarly, it is informative to see if changes in the Federal Funds Rate are having any effect on the economy.
-```{r}
-#| label: tbl-Analysis_Dimensions
-#| tbl-cap: "Variables inculde in BallMapper Point Cloud"
-#| tbl-cap-location: bottom
-#| tbl-pos: "H"
-#| echo: false
-#| eval: true
-#| warning: false
+As we saw above we need three parts for BallMapper: a Point Cloud, a variable to color by, and an epsilon. For this analysis, our point cloud was made up of 16 variables (dimensions), two of which were created using raw data: *Unemployment Change* and *Fed Rate Change*. We elected to create these first because Unemployment and the Federal Funds Rate were the only two dimensions which did not have a transformation and thus did not have a year-over-year change. Having the rate of change for both Unemployment and the Fed Rate is also important because it gives us additional information beyond the intrinsic value of each of the measures. Both measures on their own give us a current state of the economy at large, the Unemployment Rate telling us how many who are not working but want to,[@bls_cps_concepts] and the Fed Rate signals the structural cost of capital.[@fed_monetary_goals] 
 
-# Summary of Analysis Data
-source(paste(getwd(), "scripts/Table3_Analysis_Dimensions.R", sep = "/"))
-analysis_dimensions_table
-```
 To our knowledge there is no generally accepted way of choosing epsilon in the literature. Since Ball Mapper constructs maps by selecting a point and creating a ball with a radius of epsilon, this is should in theory, given an epsilon small enough, produce a graph such that every point is a ball (node) of only itself. Conversely, this should lead to and epsilon big enough such that all of our points are included in one ball (node). For our analysis here, this is indeed the case. So to find an appropriate epsilon we first start by finding these lower and upper bounds.
 
 What we look for in our lower bound is a graph with an epsilon small enough make every point in our point cloud a singleton node, not connected to any other.
@@ -176,7 +164,7 @@ Additionally, to reduce some of the computational time, we look for a lower boun
 For our data we first found a lower and upper bound which created an interval of $[0.38-0.90]$. We then applied a function to generated around 100 graphs and reviewed them, narrowing our interval to $[0.40-0.70]$. During this narrowing process we look for interesting features such as connected components forming or dissolving, flares coming off of any components, or notable sizing or coloration patterns.
 We finally decided on the value $0.474$ because it presented a parts of all the aforementioned features we look for: coloration and size patterning, and connected components.
 
-The standard Ball Mapper package in R produces a sufficient graph for exploratory data analysis. It's graphing function uses R base plot function and default coloring scheme. We however, felt that this graph output could be improved upon and recognized that we could use alternative, and more comprehensive packages to create our graph. That is, the output of the BallMapper algorithm could use an alternative package specifically for a network-like graph such as ours. Thus, translating the direct output from the BallMapper algorithm, we created the same graph but changed the visual representation and added another helpful piece of information that we were given but not used previously. Looking at @fig-newGraph, we have the standard Ball Mapper graph output on the left (@fig-newGraph-1) and our new graph output on the right (@fig-newGraph-2). The most prominent changes is the spread of the network and coloration.
+Before describing some visual changes we made to the Ball Mapper output graph,it is important to note that Ball Mapper will output the same graph unless at least one of two things changes: the size of the point cloud changes or the order of the point cloud. The former intuitively makes sense, the algorithm is creating epsilon radius balls so adding or subtracting any data will yield a different amount of points in at least one ball. Depending on the data being changed or number of points, the structure of the output might not change much. In our case, when we were choosing one variable, PPI, we had a multitude of choices. Wanting to look at the the larger picture of the US we first tested PPI - All Commodities. We found a good epsilon at $0.511$, however for part of our analysis we wanted to look at the gap between PPI less CPI.As we saw above, PPI tracks finished goods including capital expenditures. In plain language this translates to, physical equipment or machines that help a business produce their product; think, company cars, bottling machines, computers, etc. On the other hand CPI tracks consumer goods which will leave out some of these items tracked in PPI.[@bls_cpi_concepts] However, there is some overlap between the two indexes and this gap can serve as a proxy for a leading inflation indicator. Thus we decided to use PPI - Finished Goods because using all commodities will lead to double counting.
 
 ```{r}
 #| label: fig-newGraph
@@ -188,6 +176,7 @@ The standard Ball Mapper package in R produces a sufficient graph for explorator
 #| layout-ncol: 2
 #| fig-width: 12
 #| fig-height: 8
+#| fig-pos: "H"
 #| out-width: "100%"
 #| echo: false
 #| eval: true
@@ -212,27 +201,21 @@ source(paste(getwd(), "functions/bm_ggraph.R", sep = "/"))
 ColorIgraphPlot(BM_Compare, seed_for_plotting = 654987)
 bm_ggraph(BM_Compare2, coloring = coloring, epsilon = e)
 ```
+
+The standard Ball Mapper package in R produces a sufficient graph for analysis. It's graphing function uses R base plot function and default coloring scheme. We however, felt that this graph output could be improved upon and recognized that we could use alternative, and more comprehensive packages to create our graph. That is, the output of the BallMapper algorithm could use an alternative package specifically for a network-like graph such as ours. Thus, translating the direct output from the BallMapper algorithm, we created the same graph but changed the visual representation and added another helpful piece of information that we were given but not used previously. Looking at @fig-newGraph, we have the standard Ball Mapper graph output on the left ,@fig-newGraph-1, and our new graph output on the right, @fig-newGraph-2. The most prominent changes is the spread of the network and coloration.
+
 Having the nodes spread out helps us see the structure of our graph more clearly as well as the new piece of information that was given to us from the Ball Mapper algorithm but not seen in @fig-newGraph-1, the edge strength. We see that in @fig-newGraph-2, highlighting the edge strength presents an insight about the relation between certain nodes. Although, our data consists of 65 rows, one could imagine the advantage this graph might have with a data set much larger that this one (e.g. looking at this data on a quarterly or monthly basis). Additionally, we changed the color palette for accessibility and readability. Looking at @fig-newGraph-1, any nodes colored in the royal blue (years approximately 2010-2015) mask the number identifier of the node.
 
-For @fig-newGraph-2 and @fig-EDA, below, we use Year as our initial coloring variable. We started with this variable because D\l{}otko, et al. [@dlotko2019mapping] provided a framework of where to start with this type of analysis. This paper started by coloring their graphs by Year to initially understand the shape of their data. Later, in the second half of their analysis, they colored their graphs by each of the dimensions of a different pointcloud than the first. Because we have 16 dimensions to our pointcloud, a more in depth analysis is needed and is the the subject for another paper. Additionally, we should not that when D\l{}otko, et al. colored by Year, it was not in their pointcloud. Seeing that this could be useful, we extended this idea to our pointcloud and derived coloring variables that represented different economic lenses which we could view our graph. Namely, the Fisher Equation (@fig-Fisher), PPI-CPI Gap (@fig-Margin-Gap), and [ADD LAST MEASURE].
+For @fig-newGraph-2 and @fig-EDA, we use Year as our initial coloring variable. We started with this variable because D\l{}otko, et al. [@dlotko2019mapping] provided a framework for this type of analysis. The aforementioned paper started by coloring their graphs by Year to initially understand the shape of their data. Later, in the second half of their analysis, they colored their graphs by each of the dimensions of a different pointcloud than the first. Because we have 16 dimensions to our pointcloud, a more in depth analysis is needed and is the the subject for another paper. Additionally, when D\l{}otko, et al. colored by Year, it was not in their pointcloud, and seeing usefulness of this technique, we extended this idea to our pointcloud. Specifically, our calculated variables that represented different economic lenses: abathe Fisher Equation (@fig-Fisher), PPI-CPI Gap (@fig-PPI-CPI_Gap), and Real Wage Growth (@fig-Wage_Growth).
 
-**General Interpretation*
-
-Using @fig-EDA as our initial graph to explain, it is important to note with analysis such as this one, Ball Mapper will output the same graph unless at least one of two things changes: the size of the point cloud changes or the order of the point cloud. The former intuitively makes sense because the algorithm is creating epsilon radius balls and adding or subtracting any data will yield different results. Of course, depending on the data, the structure of the output might not change much. When choosing one variable, PPI, we had a multitude of choices and first tested PPI - All Commodities. We found a good epsilon at $0.511$ but for our analysis of PPI less CPI to understand the gap between the two, we though the PPI - Final Goods would be more insightful to look at. In fact there are 
-
-
-# DISSCUSSION
-
-**Exploratory Data Analysis (EDA) Application**
-
-For our exploratory data analysis we colored our graph by the *Year*, @fig-EDA. The coloration of each node represents the average of all the years within in a node. The size of our node is commensurate with the number of points it contains. Between two nodes, th edge thickness is determined the number of same data points in each endpoint.Looking at @fig-EDA, we first observe the overall structure of our graph. There is one large connected component, one small component, and the rest singleton nodes.\footnote{A Connected Component is a subset of nodes in our graph such that each point in the subset has a path to all other points in the subset.} For the largest connected component (C1), we immediately are interested in the three large nodes (4, 24, and 26) because they are the largest in size for C1 and the same for their edge thickness (edge strength). Additionally, we also notice that each of the three large nodes have at least one flare (node connected only to themselves) as well as sharing others. What this structure tells us is, there are three distinct groups and each flare representing similar data to that specific group but perhaps is distinctly different to the other flares.
 ```{r}
 #| label: fig-EDA
 #| fig-cap: "Ball Mapper Graph colored by Year with Epsilon set to 0.474."
 #| fig-cap-location: bottom
 #| fig-width: 12
 #| fig-height: 8
-#| out-width: "100%"
+#| fig-pos: "H"
+#| out-width: "80%"
 #| echo: false
 #| eval: true
 #| warning: false
@@ -261,25 +244,13 @@ year_members <- map(.x = V(BM_Year),
 # output map
 ggraph_Year
 ```
-The small component (C2), nodes 2 and 27, are of interest because it tells us us that these related nodes are somehow distinctly different from C1 and all other nodes. Seeing a small components like this sometimes can indicate outliers in data. In our case, this could be years where large economic events happened such as a recessions or extraordinary growth. However, we also can see this behavior in singleton nodes much like we have @fig-EDA. When we look at the coloration of the singleton nodes, we see indication of outlier events such as The Great Recession and the COVID-19 Pandemic.
 
-To hark back to our discussion of C1, when we investigate nodes 4, 24, and 26 we indeed notice a pattern with the three generally: for the whole year the US was in an expansionary state. Node 4 shows us an "ideal" version of the economy. We have personal income and compensation slightly higher than inflation, sitting around 2%. Unemployment is a little elevated but historically not unusually high.
-For Nodes 24 and 26 we see two different sides of large economic shocks. Node 24 shows us years where the economy is starting to get "over it's skis". That is, it is starting growing faster than it can keep up with but it's not necessarily too late. Node 26 on the other hand consists of years following right after recessions or points where the economy was over heating. Most of the years in Node 26, follow what economist call a "Jobless Recovery".[@kolesnikova2011jobless] Usually marked by growth returning to the economy but unemployment being "sticky" and not falling as business starts to take off.
-For the flares and smaller points that are connect each of our large nodes in C1, we find that some years are in both the smaller node and larger one, which creates our edge. However they also contain additional years which are related nodes 4, 24, or 26 but instead describe transition years to these large nodes.
+# RESULTS
 
-**Fisher Effect**
+*Exploratory Data Analysis*
 
-Using the Fisher Equation we can color our topological graph with the approximated real interested rate (@eq-fisherEquation).[@mcclung2024fisher] Although we know that the Fisher Equation is an approximation and does not hold well when nominal interest rates (Fed Rate) are relatively high and time spans are short, @fig-Fisher shows us a stark picture of our economic history and important time periods.[@michaelides2024fisher]
-
-$$
-\text{Real Interest Rate} \approx \text{Fed Rate} - \text{Inflation}
-$$ {#eq-fisherEquation}
-
-Looking at nodes 19-22, we notice that these years consists of the years 1981-1984, the years during and following the "Volker Shock".[@bryan2013greatinflation] What is interesting about why these nodes are colored is that these nodes see to show the impact of Volker's decision to raise interest and the lag that took place when raising rates.[@stlouisfed2023lags]
-
-On the lower end the of Fisher Effect, we notice nodes 14, 28, 31, 33, 34 (1975, 2008, 2011-2012, 2021, 2022 respectively) show a negative value for @eq-fisherEquation. In these year rates were already extremely low, or the economy just came off a huge economic shock. In 1975 the fed aggressively lowered rates due to climbing inflation and high unemployment rates from the 1973-'74 oil embargo.[@corbett2013oilshock] In 2021-'22 the COVID-19 Pandemic stimulus checks were going to cause inflation but the fed did not want to raise rates too aggressively.
-
-We also observe that for our C1 component, node 24 does show an approximate value from our Fisher Equation to be above the stated target rate of 2%. This indicates that indeed the economy for these nodes are showing signs of a "hot" economy.
+There are two general categories of nodes when interpreting Ball Mapper outputs: connected or not connected. @fig-EDA shows three different connected nodes (connected components), and many nodes not connected to any others (singletons). These singletons suggests that the data is unlike all the other data points and indicates possible outliers in the dataset. [@dlotko2019mapping] 
+The three connected components, there is one large and two small components. Moving clockwise, starting with the large component and will label them C1,\footnote{Nodes: 4, 24, 25, 27, 29, 34, 35, 40} C2,\footnote{Nodes: 7 and 8} and C3\footnote{Nodes: 2 and 28} for conversational ease. 
 
 ```{r}
 #| label: fig-Fisher
@@ -287,7 +258,8 @@ We also observe that for our C1 component, node 24 does show an approximate valu
 #| fig-cap-location: bottom
 #| fig-width: 12
 #| fig-height: 8
-#| out-width: "100%"
+#| fig-pos: "H"
+#| out-width: "80%"
 #| echo: false
 #| eval: true
 #| warning: false
@@ -316,24 +288,55 @@ fisher_members <- map(.x = V(BM_Fisher),
 # generate graph
 ggraph_Fisher
 ```
+Focusing more on our connected components for now, we start by looking at C1. Since C1 has more than two nods, any nodes which are not directly connected by an edge (e.g. Nodes 24 and 4), can be interpreted as alike in some fashion, but also signal a significant difference within the component. Additionally, we know that the size of the node is commensurate with the number of points in contains.[@dlotko2019mapping]
+
+ Additionally, we see that edge exists between nodes in our components, this means that node on either end of an edge contain at least one node. As mentioned above, we added the edge strength feature included in the original Ball Mapper algorithm output but not the traditional Ball Mapper graph. This is displayed in our new output by how thick a line appears between two nodes (e.g. nodes 4 and 29). One very interesting conclusion, and important to our analysis later, that D\l{}otko, et al. [@dlotko2019mapping] makes is that if two nodes within a component are not directly connected by one edge, they should be considered separate entities or parts of our point cloud. That is, nodes that make up a connected component have a large theme between all nodes in the component. Within a particular component, though, there are different parts to whatever throughline the component is picking up.
+
+A nice relative measure one can use is that singletons are not just nodes by themselves but also usually only house one or two points. That said, we observe that C2 and C3 most likely house only a few points, albeit they are a connected components.
+
+Finally, looking at the coloration of our Ball Mapper graph, the first things we look at are any particular patterning. For C1 we see some grouping withing the component, C2 it seems to be stable, and C3 there is some inconsistency. These smaller patches of color in C1 and the inconsistency in C3 are something to take note about. However, it is important to take into consideration the variable you are coloring by and how the Ball Mapper algorithm colors by the average value. Overall, though, there is not significant pattern for this particular coloring. We should also add that if you color by the different dimensions of the point cloud, dimensions that are highly correlated will end up with similar coloring patterns. Conversely, negatively correlated dimensions show opposite coloring.[@dlotko2019mapping]
+
+Looking at @fig-EDA, we first observe the overall structure of our graph. There is one large connected component, one small component, and the rest singleton nodes. For the largest connected component (C1), we immediately are interested in the three large nodes (4, 24, and 26) because they are the largest in size for C1 and the same for their edge thickness (edge strength). Additionally, we also notice that each of the three large nodes have at least one flare (node connected only to themselves) as well as sharing others. What this structure tells us is, there are three distinct groups and each flare representing similar data to that specific group but perhaps is distinctly different to the other flares.
+
+The small component (C2), nodes 2 and 27, are of interest because it tells us us that these related nodes are somehow distinctly different from C1 and all other nodes. Seeing a small components like this sometimes can indicate outliers in data. In our case, this could be years where large economic events happened such as a recessions or extraordinary growth. However, we also can see this behavior in singleton nodes much like we have @fig-EDA. When we look at the coloration of the singleton nodes, we see indication of outlier events such as The Great Recession and the COVID-19 Pandemic.
+
+To hark back to our discussion of C1, when we investigate nodes 4, 24, and 26 we indeed notice a pattern with the three generally: for the whole year the US was in an expansionary state. Node 4 shows us an "ideal" version of the economy. We have personal income and compensation slightly higher than inflation, sitting around 2%. Unemployment is a little elevated but historically not unusually high.
+For Nodes 24 and 26 we see two different sides of large economic shocks. Node 24 shows us years where the economy is starting to get "over it's skis". That is, it is starting growing faster than it can keep up with but it's not necessarily too late. Node 26 on the other hand consists of years following right after recessions or points where the economy was over heating. Most of the years in Node 26, follow what economist call a "Jobless Recovery".[@kolesnikova2011jobless] Usually marked by growth returning to the economy but unemployment being "sticky" and not falling as business starts to take off.
+For the flares and smaller points that are connect each of our large nodes in C1, we find that some years are in both the smaller node and larger one, which creates our edge. However they also contain additional years which are related nodes 4, 24, or 26 but instead describe transition years to these large nodes.
+
+**Fisher Effect**
+
+Using the Fisher Equation we can color our topological graph with the approximated real interested rate (@eq-fisherEquation).[@mcclung2024fisher] Although we know that the Fisher Equation is an approximation and does not hold well when nominal interest rates (Fed Rate) are relatively high and time spans are short, @fig-Fisher shows us a stark picture of our economic history and important time periods.[@michaelides2024fisher]
+
+$$
+\text{Real Interest Rate} \approx \text{Fed Rate} - \text{Inflation}
+$$ {#eq-fisherEquation}
+
+Looking at nodes 19-22, we notice that these years consists of the years 1981-1984, the years during and following the "Volker Shock".[@bryan2013greatinflation] What is interesting about why these nodes are colored is that these nodes see to show the impact of Volker's decision to raise interest and the lag that took place when raising rates.[@stlouisfed2023lags]
+
+On the lower end the of Fisher Effect, we notice nodes 14, 28, 31, 33, 34 (1975, 2008, 2011-2012, 2021, 2022 respectively) show a negative value for @eq-fisherEquation. In these year rates were already extremely low, or the economy just came off a huge economic shock. In 1975 the fed aggressively lowered rates due to climbing inflation and high unemployment rates from the 1973-'74 oil embargo.[@corbett2013oilshock] In 2021-'22 the COVID-19 Pandemic stimulus checks were going to cause inflation but the fed did not want to raise rates too aggressively.
+
+We also observe that for our C1 component, node 24 does show an approximate value from our Fisher Equation to be above the stated target rate of 2%. This indicates that indeed the economy for these nodes are showing signs of a "hot" economy.
+
 
 **PPI-CPI Gap**
 
 Measures the difference between rates of change between PPI - Finished Good and consumer inflation (CPI). Positive values indicated that businesses are having their revenue rise higher than consumer inflation. This could mean various things: corporate margins are expanding, they are passing through cost to customers, or....
 ```{r}
-#| label: fig-Margin_Gap
-#| fig-cap: "Ball Mapper Graph colored by the difference between CPI and PPI with Epsilon set to 0.474."
+#| label: fig-PPI-CPI_Gap
+#| fig-cap: "Ball Mapper Graph colored by PPI less CPI with Epsilon set to 0.474."
 #| fig-cap-location: bottom
 #| fig-width: 12
 #| fig-height: 8
-#| out-width: "100%"
+#| fig-pos: "H"
+#| out-width: "80%"
 #| echo: false
 #| eval: true
 #| warning: false
 
 # Set Year Coloring
 coloring <- final_data |>
-    select(Margin_Gap) |>
+    select(PPI_CPI_Gap) |>
     as.data.frame()
 
 # Set Epsilon
@@ -356,6 +359,84 @@ spread_members <- map(.x = V(BM_Spread),
 ggraph_Spread
 ```
 
+```{r}
+#| label: fig-Wage_Growth
+#| fig-cap: "Ball Mapper Graph colored by Wage Growth with Epsilon set to 0.474."
+#| fig-cap-location: bottom
+#| fig-width: 12
+#| fig-height: 8
+#| fig-pos: "H"
+#| out-width: "80%"
+#| echo: false
+#| eval: true
+#| warning: false
+
+# Set Year Coloring
+coloring <- final_data |>
+    select(Wage_Growth) |>
+    as.data.frame()
+
+# Set Epsilon
+e <- 0.474
+
+# Create BM Output
+BM_Wage_Growth <- BallMapper(points = pointcloud, values = coloring, epsilon = e)
+BM_Wage_Growth <- bm_to_igraph(BM_Wage_Growth)
+
+# generate Map
+source(paste(getwd(), "functions/bm_ggraph.R", sep = "/"))
+ggraph_Wage_Growth <- bm_ggraph(BM_Wage_Growth, coloring = coloring, epsilon = e)
+
+# investigate nodes
+wage_growth_members <- map(.x = V(BM_Wage_Growth),
+                    .f = ~ {
+                        final_data[V(BM_Wage_Growth)$members[.x] |> unlist(), ]
+                    })
+# generate graph
+ggraph_Wage_Growth
+```
+
+
+```{r}
+#| label: fig-Private_Public
+#| fig-cap: "Ball Mapper Graph colored by Private Public Engine with Epsilon set to 0.474."
+#| fig-cap-location: bottom
+#| fig-width: 12
+#| fig-height: 8
+#| fig-pos: "H"
+#| out-width: "80%"
+#| echo: false
+#| eval: true
+#| warning: false
+
+# Set Year Coloring
+coloring <- final_data |>
+    select(Private_Public_Driver) |>
+    as.data.frame()
+
+# Set Epsilon
+e <- 0.474
+
+# Create BM Output
+BM_Public_Private <- BallMapper(points = pointcloud, values = coloring, epsilon = e)
+BM_Public_Private <- bm_to_igraph(BM_Public_Private)
+
+# generate Map
+source(paste(getwd(), "functions/bm_ggraph.R", sep = "/"))
+ggraph_Public_Private <- bm_ggraph(BM_Public_Private, coloring = coloring, epsilon = e)
+
+# investigate nodes
+Public_Private_members <- map(.x = V(BM_Public_Private),
+                    .f = ~ {
+                        final_data[V(BM_Public_Private)$members[.x] |> unlist(), ]
+                    })
+# generate graph
+ggraph_Public_Private
+```
+
+
+
+# DISSCUSSION
 
 # CONCLUSION
 
@@ -379,3 +460,18 @@ The author thanks Dr. Samuel Cook...
 In our section we briefly went over two ways to interpret TDABM graphs. As seen in many other, longer papers written by Dlotko and colleagues, there is a lot of room to expound our TDABM graph here,though that is beyond the scope of this paper. In general, though, we can see that TDBM can give insight into our data that we might not see otherwise. Seeing that there is data that is not like the others gives an indication that there is something to investigate. Consider our comparison of the 08' - 09' financial crisis and the 2020 COVID Pandemic: We see learned that the years following the financial crisis were similar economically. Another way to view this is, clustering revels that the financial crisis was a singular problem that spurred the collapse of the financial system. Conversely, the COVID pandemic was a singular issue but exposed many different weaknesses in our current world.
 
 For the future development of TDABM, and TDA in general, there are many possibilities of future research and one glaring downside. The downside to TDA is that it is a high barrier to entry to understand the methodologies inner workings. Those with a technical background will have an easier time, but nonetheless a higher barrier than methods such as linear regressions.  Subject wise, TDA has an advantage in some of the social sciences because it can be somewhat of a bridge between qualitative and quantitative analyses. TDABM has been used to analyze the Brexit Vote data, seeking to understand quantitative and qualitative motivations behind its outcome @Rudkin2023. TDA also has the advantages of dimension reduction which could be useful to the life-sciences. Fields such as genetics, chemistry, and biology have many fields of data, and being able to consolidate it into an understandable form could benefit the body of knowledge greatly.
+
+
+```{r}
+#| label: tbl-Analysis_Dimensions
+#| tbl-cap: "Variables inculde in BallMapper Point Cloud"
+#| tbl-cap-location: bottom
+#| tbl-pos: "H"
+#| echo: false
+#| eval: true
+#| warning: false
+
+# Summary of Analysis Data
+source(paste(getwd(), "scripts/Table3_Analysis_Dimensions.R", sep = "/"))
+analysis_dimensions_table
+```
