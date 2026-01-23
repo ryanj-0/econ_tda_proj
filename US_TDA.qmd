@@ -206,7 +206,12 @@ The standard Ball Mapper package in R produces a sufficient graph for analysis. 
 
 Having the nodes spread out helps us see the structure of our graph more clearly as well as the new piece of information that was given to us from the Ball Mapper algorithm but not seen in @fig-newGraph-1, the edge strength. We see that in @fig-newGraph-2, highlighting the edge strength presents an insight about the relation between certain nodes. Although, our data consists of 65 rows, one could imagine the advantage this graph might have with a data set much larger that this one (e.g. looking at this data on a quarterly or monthly basis). Additionally, we changed the color palette for accessibility and readability. Looking at @fig-newGraph-1, any nodes colored in the royal blue (years approximately 2010-2015) mask the number identifier of the node.
 
-For @fig-newGraph-2 and @fig-EDA, we use Year as our initial coloring variable. We started with this variable because D\l{}otko, et al. [@dlotko2019mapping] provided a framework for this type of analysis. The aforementioned paper started by coloring their graphs by Year to initially understand the shape of their data. Later, in the second half of their analysis, they colored their graphs by each of the dimensions of a different pointcloud than the first. Because we have 16 dimensions to our pointcloud, a more in depth analysis is needed and is the the subject for another paper. Additionally, when D\l{}otko, et al. colored by Year, it was not in their pointcloud, and seeing usefulness of this technique, we extended this idea to our pointcloud. Specifically, our calculated variables that represented different economic lenses: abathe Fisher Equation (@fig-Fisher), PPI-CPI Gap (@fig-PPI-CPI_Gap), and Real Wage Growth (@fig-Wage_Growth).
+For @fig-newGraph-2 and @fig-EDA, we use Year as our initial coloring variable. We started with this variable because D\l{}otko, et al. [@dlotko2019mapping] provided a framework for this type of analysis. The aforementioned paper started by coloring their graphs by Year to initially understand the shape of their data. Later, in the second half of their analysis, they colored their graphs by each of the dimensions of a different point cloud than the first. Because we have 16 dimensions to our point cloud, a more in depth analysis is needed and is the the subject for another paper. Additionally, when D\l{}otko, et al. colored by Year, it was not in their point cloud, and seeing usefulness of this technique, we extended this idea to our point cloud. Specifically, our calculated variables that represented different economic lenses: the Fisher Equation (@fig-Fisher), PPI-CPI Gap (@fig-PPI-CPI_Gap), and Real Wage Growth (@fig-Wage_Growth).
+
+# RESULTS
+
+*Exploratory Data Analysis*
+
 
 ```{r}
 #| label: fig-EDA
@@ -245,12 +250,58 @@ year_members <- map(.x = V(BM_Year),
 ggraph_Year
 ```
 
-# RESULTS
-
-*Exploratory Data Analysis*
-
 There are two general categories of nodes when interpreting Ball Mapper outputs: connected or not connected. @fig-EDA shows three different connected nodes (connected components), and many nodes not connected to any others (singletons). These singletons suggests that the data is unlike all the other data points and indicates possible outliers in the dataset. [@dlotko2019mapping] 
 The three connected components, there is one large and two small components. Moving clockwise, starting with the large component and will label them C1,\footnote{Nodes: 4, 24, 25, 27, 29, 34, 35, 40} C2,\footnote{Nodes: 7 and 8} and C3\footnote{Nodes: 2 and 28} for conversational ease. 
+
+Looking at C1, we note that one large difference between it and C2 and C3 is that it has more than two nodes. Since it does, any nodes which are not directly connected by an edge (e.g. Nodes 24 and 4), can be interpreted as alike in some fashion, but also signal a significant difference within the component.[@dlotko2019mapping]
+What is unclear, though is if path length between two nodes is commensurate with the similarity in data and something that could be explored for future research. This also applies the nodes of large size that are connected. We have not found any literature that supports this idea that proximity is commensurate with relatedness. What we can conclude about size is that the size of the node indicates the number of points that nodes has. Similarly, our edge strength is shown this ways with a thicker line representing more shared points between two nodes.
+
+Most often coloration of Ball Mapper graph is used to highlight a variable of interest, or certain know structures in the data. However, we also will look for any patterning (e.g. a smooth gradient from one end of the graph to the other), or nodes which do not conform to patterning. For our map some coloration of interest is the three sub-groups of colors in C1 as well as the mismatching colors for C3. It is important to remember when looking at coloration that the value of the color is an average value and is susceptible to large variances.
+
+Since out graph consists of 40 nodes and three components we will provide all the singletons in a table 
+
+```{r}
+#| label: tbl-Sington_Summary
+#| tbl-cap: "Singlton nodes and the years they contain."
+#| tbl-cap-location: bottom
+#| tbl-pos: "H"
+#| echo: false
+#| eval: true
+#| warning: false
+#| 
+component_nodes <- c("25", "24", "27", "35", "34", "4", "40", "36", "29",
+                     "8", "7",
+                     "2", "28")
+
+singlton_summary <- year_members |>
+  discard_at(component_nodes) |>
+  list_rbind(names_to = "Node") |>
+  group_by(Node) |>
+  summarise(
+    "Year(s)" = toString(Year)
+  ) |>
+  gt() |>
+  gt_two_column_layout(nrows =  nrow(singlton_summary)/2) |>
+  opt_row_striping() |>
+  cols_align(
+    align = "left",
+    columns = c("Node", "Year(s)")
+  )
+
+singlton_summary
+```
+
+
+
+Additionally, we also notice that each of the three large nodes have at least one flare (node connected only to themselves) as well as sharing others. What this structure tells us is, there are three distinct groups and each flare representing similar data to that specific group but perhaps is distinctly different to the other flares.
+
+The small component (C2), nodes 2 and 27, are of interest because it tells us us that these related nodes are somehow distinctly different from C1 and all other nodes. Seeing a small components like this sometimes can indicate outliers in data. In our case, this could be years where large economic events happened such as a recessions or extraordinary growth. However, we also can see this behavior in singleton nodes much like we have @fig-EDA. When we look at the coloration of the singleton nodes, we see indication of outlier events such as The Great Recession and the COVID-19 Pandemic.
+
+To hark back to our discussion of C1, when we investigate nodes 4, 24, and 26 we indeed notice a pattern with the three generally: for the whole year the US was in an expansionary state. Node 4 shows us an "ideal" version of the economy. We have personal income and compensation slightly higher than inflation, sitting around 2%. Unemployment is a little elevated but historically not unusually high.
+For Nodes 24 and 26 we see two different sides of large economic shocks. Node 24 shows us years where the economy is starting to get "over it's skis". That is, it is starting growing faster than it can keep up with but it's not necessarily too late. Node 26 on the other hand consists of years following right after recessions or points where the economy was over heating. Most of the years in Node 26, follow what economist call a "Jobless Recovery".[@kolesnikova2011jobless] Usually marked by growth returning to the economy but unemployment being "sticky" and not falling as business starts to take off.
+For the flares and smaller points that are connect each of our large nodes in C1, we find that some years are in both the smaller node and larger one, which creates our edge. However they also contain additional years which are related nodes 4, 24, or 26 but instead describe transition years to these large nodes.
+
+**Fisher Effect**
 
 ```{r}
 #| label: fig-Fisher
@@ -288,24 +339,6 @@ fisher_members <- map(.x = V(BM_Fisher),
 # generate graph
 ggraph_Fisher
 ```
-Focusing more on our connected components for now, we start by looking at C1. Since C1 has more than two nods, any nodes which are not directly connected by an edge (e.g. Nodes 24 and 4), can be interpreted as alike in some fashion, but also signal a significant difference within the component. Additionally, we know that the size of the node is commensurate with the number of points in contains.[@dlotko2019mapping]
-
- Additionally, we see that edge exists between nodes in our components, this means that node on either end of an edge contain at least one node. As mentioned above, we added the edge strength feature included in the original Ball Mapper algorithm output but not the traditional Ball Mapper graph. This is displayed in our new output by how thick a line appears between two nodes (e.g. nodes 4 and 29). One very interesting conclusion, and important to our analysis later, that D\l{}otko, et al. [@dlotko2019mapping] makes is that if two nodes within a component are not directly connected by one edge, they should be considered separate entities or parts of our point cloud. That is, nodes that make up a connected component have a large theme between all nodes in the component. Within a particular component, though, there are different parts to whatever throughline the component is picking up.
-
-A nice relative measure one can use is that singletons are not just nodes by themselves but also usually only house one or two points. That said, we observe that C2 and C3 most likely house only a few points, albeit they are a connected components.
-
-Finally, looking at the coloration of our Ball Mapper graph, the first things we look at are any particular patterning. For C1 we see some grouping withing the component, C2 it seems to be stable, and C3 there is some inconsistency. These smaller patches of color in C1 and the inconsistency in C3 are something to take note about. However, it is important to take into consideration the variable you are coloring by and how the Ball Mapper algorithm colors by the average value. Overall, though, there is not significant pattern for this particular coloring. We should also add that if you color by the different dimensions of the point cloud, dimensions that are highly correlated will end up with similar coloring patterns. Conversely, negatively correlated dimensions show opposite coloring.[@dlotko2019mapping]
-
-Looking at @fig-EDA, we first observe the overall structure of our graph. There is one large connected component, one small component, and the rest singleton nodes. For the largest connected component (C1), we immediately are interested in the three large nodes (4, 24, and 26) because they are the largest in size for C1 and the same for their edge thickness (edge strength). Additionally, we also notice that each of the three large nodes have at least one flare (node connected only to themselves) as well as sharing others. What this structure tells us is, there are three distinct groups and each flare representing similar data to that specific group but perhaps is distinctly different to the other flares.
-
-The small component (C2), nodes 2 and 27, are of interest because it tells us us that these related nodes are somehow distinctly different from C1 and all other nodes. Seeing a small components like this sometimes can indicate outliers in data. In our case, this could be years where large economic events happened such as a recessions or extraordinary growth. However, we also can see this behavior in singleton nodes much like we have @fig-EDA. When we look at the coloration of the singleton nodes, we see indication of outlier events such as The Great Recession and the COVID-19 Pandemic.
-
-To hark back to our discussion of C1, when we investigate nodes 4, 24, and 26 we indeed notice a pattern with the three generally: for the whole year the US was in an expansionary state. Node 4 shows us an "ideal" version of the economy. We have personal income and compensation slightly higher than inflation, sitting around 2%. Unemployment is a little elevated but historically not unusually high.
-For Nodes 24 and 26 we see two different sides of large economic shocks. Node 24 shows us years where the economy is starting to get "over it's skis". That is, it is starting growing faster than it can keep up with but it's not necessarily too late. Node 26 on the other hand consists of years following right after recessions or points where the economy was over heating. Most of the years in Node 26, follow what economist call a "Jobless Recovery".[@kolesnikova2011jobless] Usually marked by growth returning to the economy but unemployment being "sticky" and not falling as business starts to take off.
-For the flares and smaller points that are connect each of our large nodes in C1, we find that some years are in both the smaller node and larger one, which creates our edge. However they also contain additional years which are related nodes 4, 24, or 26 but instead describe transition years to these large nodes.
-
-**Fisher Effect**
-
 Using the Fisher Equation we can color our topological graph with the approximated real interested rate (@eq-fisherEquation).[@mcclung2024fisher] Although we know that the Fisher Equation is an approximation and does not hold well when nominal interest rates (Fed Rate) are relatively high and time spans are short, @fig-Fisher shows us a stark picture of our economic history and important time periods.[@michaelides2024fisher]
 
 $$
