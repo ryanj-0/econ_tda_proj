@@ -258,7 +258,7 @@ What is unclear, though is if path length between two nodes is commensurate with
 
 Most often coloration of Ball Mapper graph is used to highlight a variable of interest, or certain know structures in the data. However, we also will look for any patterning (e.g. a smooth gradient from one end of the graph to the other), or nodes which do not conform to patterning. For our map some coloration of interest is the three sub-groups of colors in C1 as well as the mismatching colors for C3. It is important to remember when looking at coloration that the value of the color is an average value and is susceptible to large variances.
 
-Since out graph consists of 40 nodes and three components we will provide all the singletons in a table 
+Since out graph consists of 40 nodes and three components we will provide all the singletons in a table (@fig-Singlton_Summary), and talk more in depth about our components below.
 
 ```{r}
 #| label: tbl-Sington_Summary
@@ -281,7 +281,6 @@ singlton_summary <- year_members |>
     "Year(s)" = toString(Year)
   ) |>
   gt() |>
-  gt_two_column_layout(nrows =  nrow(singlton_summary)/2) |>
   opt_row_striping() |>
   cols_align(
     align = "left",
@@ -290,6 +289,8 @@ singlton_summary <- year_members |>
 
 singlton_summary
 ```
+Still using @fig-EDA, we first will examine C2 closer. Adding to some of our initial observations we see that C2's nodes are colored very similarly, and are of the same size. As a relative measure, using @tbl-Sington_Summary, we look at our singletons and notice that many only hold one point. Thus comparing C2 nodes we should expect around one to two points in each of the nodes, as well as C3. When looking at what points C2 contains we find the years 1968 and 1969 in nodes 7 and 8, respectively, and 2000 being in both nodes, creating the edge. C2 is a good example where coloring by average value can be misleading. Conversely, looking at C3, we first notice that both nodes are colored differently. This inconsistent coloration could be meaningful if we had a strong global coloration pattern, however since C3 is such a small component, much like a small sample size, does not provide us with a lot of further detail than observation. Looking at the nodes we find that node 2 contains 1961 and node 28 contains 2001, with 2002 being our bridge year between the two.
+
 
 
 
