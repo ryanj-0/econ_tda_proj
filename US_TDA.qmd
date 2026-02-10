@@ -21,7 +21,7 @@ format:
       - \renewcommand{\thefootnote}{\textbf{\Alph{footnote}}}
 
 bibliography: references.bib
-csl: https://www.zotero.org/styles/vancouver-superscript
+csl: aip.csl
 
 editor: source
 ---
@@ -49,7 +49,7 @@ source(paste(getwd(), "scripts/Method_Data.R", sep = "/"))
 
 *Ryan Johnson*\textsuperscript{*}
 
-*[?] Department of Mathematics, University of Alaska Anchorage, Anchorage, AK*
+*Graduate, Department of Mathematics, University of Alaska Anchorage, Anchorage, AK*
 
 Student: *johnson.ryan-0@pm.me*\textsuperscript{*} \newline
 Mentor: *scook25@alaska.edu*
@@ -59,28 +59,20 @@ Topological Data Analysis; Topology; TDA; BallMapper; Mapper;
 Data Science; Economics; Macroeconomics;
 
 # ABSTRACT
-Topological Data Analysis is (TDA) is a new data analysis method which gained popularity starting in the early 21st century. Currently, a large body of TDA research utilizes the traditional Mapper algorithm. We aim to fill an entry level gap into TDA as well as expand the body of literature using Ball Mapper--a Mapper adjacent algorithm. Using widely used U.S. macroeconomic data from the Bureau of Economic Analysis (BEA), the Federal Reserve Bank (FRB), and the Bureau of Labor Statistics (BLS), we achieve our goal by first showcasing Ball Mapper's use in Exploratory Data Analysis. We then combined Ball Mapper with the Fisher Equation, PPI-CPI Gap, and [ADD FINAL MEASURE] to show it's use beyond Exploratory Data Analysis. Our findings suggest that Ball Mapper is a useful data analysis tool to look at large multidimensional datasets and extract meaningful relationships in insights about our data quickly [...]
+Topological Data Analysis is (TDA) is a developing data analysis method which gained popularity starting in the early 21st century. Currently, a large body of TDA research utilizes the traditional Mapper algorithm. Some goals of this paper is to show and entry level path into TDA as well as expand the body of literature using Ball Mapper--a traditional Mapper adjacent algorithm. Using U.S. macroeconomic data from the Bureau of Economic Analysis (BEA), the Federal Reserve Bank (FRB), and the Bureau of Labor Statistics (BLS), we achieve our goal by first showcasing Ball Mapper's use in Exploratory Data Analysis. We then show how we can effectively use Ball Mapper in combination with other derived economic measures: the Fisher Equation, PPI-CPI Gap, and Wage Growth. Our findings suggest that Ball Mapper is a useful data analysis tool to look at large multidimensional datasets and extract meaningful relationships in insights about our data quickly [...]
 
 # INTRODUCTION
-Topological Data Analysis (TDA) is a new and emerging field of data analysis that is increasing in popularity. Broadly, traditional TDA applications use two tools: an algorithm called Mapper that is represented by a mathematical graph and and analysis technique called Persistence Homology.[@madukpe2025mapper]\footnote{A mathematical graph, from Graph Theory, is most closely associated with a Network Graph that consits of nodes and edges.}
-To provide a bridge from traditional statistical analysis, Mapper can be thought of the visual side and Persistent Homology as a the underlying theory and mathematics of our methodology.
+Topological Data Analysis (TDA) is an emerging field of data analysis that is increasing in popularity. Broadly, traditional TDA applications use two tools: an algorithm called Mapper whose output is represented by a mathematical graph and an analysis technique called Persistence Homology.[@madukpe2025mapper]\footnote{A mathematical graph, from Graph Theory, is a diagram that consits of nodes and edges.} These two tools are not necessarily dependent on one another and do provide information about data in their own right. Moreover, the combination of Mapper and Persistence Homology is what forms the central argument for TDA: data contains an underlying shape, and this shape can provide us with qualitative, and sometimes quantitative, insights about large multidimensional datasets.[@chazal2021introduction] 
 
-In traditional statistical analysis, one might do some exploratory data analysis (EDA) looking at each variables distribution, variance, and  other summary statistics. That is, obtain information about the data to further make appropriate choices of which models to use for analysis.
-Persistence Homology (PH) on the other hand is more akin to statistical models like the Linear Regression. To clarify this analogy, PH comes from mathematical fields of Algebraic Topology, and Linear Regression models have assumptions which use Probability Theory.[@kemme2025persistent; @trotta2023linear; @gfg_probability] Moreover, the combination of Mapper and Persistence Homology is what forms the central argument for TDA: data contains an underlying shape, and this shape can provide us with qualitative, and sometimes quantitative, insights about large multidimensional datasets.[@chazal2021introduction]
+As a helpful general framework, Mapper can be thought of the visual side of TDA, and Persistent Homology as a the underlying engine. For this analysis we will be focusing on the "visual side" of TDA, the graph creation. Specifically, we are examining various macroeconomic indicators of the United States of America (U.S.) using a Mapper-adjacent algorithm called Ball Mapper(BM). Ball Mapper is of particular interest to us because it reduces the parameters compared to traditional Mapper, allowing for easier implementation. Further, this reduction in parameters removes some of the barriers to start learning TDA; i.e. needed background and coding knowledge.
 
-For this analysis we will be focusing on the graph creation portion of TDA. Specifically, we are examining various macroeconomic indicators of the United States of America (U.S.) using a Mapper-adjacent algorithm called BallMapper(BM).
-Ball Mapper is of particular interest to us because it reduces the parameters needed for analysis. This is helpful because removes some of the barriers to start learning TDA by reducing the needed background and coding knowledge.
-In traditional Mapper, one must pass the data through three stages, all with their own parameters, in order to generate a graph. Ball Mapper however only needs one parameter before producing a graph.[@dlotko2019ball] An important trade off between Ball Mapper and traditional Mapper is the following: BM reduces the number of steps needed to produce similar outcomes of traditional Mapper, but we lose control of being able fine tune out these outputs.
-Those who have a mathematical background, introductory course in Topology, or conceptual knowledge of data science methods and algorithms will fare much easier to learning TDA. However, if you are not equipped with any of the aforementioned tools or knowledge, TDA might seem unnecessarily complicated for data analysis, or impossible to learn.
+In traditional Mapper, one must pass the data through three stages, all with their own parameters, in order to generate a graph. Ball Mapper however only needs one parameter before producing a graph.[@dlotko2019ball] An important trade off between Ball Mapper and traditional Mapper is the following: BM reduces the number of steps needed to produce similar outcomes of traditional Mapper, but one loses control of fine tuning these output. Additionally, traditional Mapper presents itself as needing a minimum mathematical background, introductory course in Topology, or conceptual knowledge of data science methods and algorithms to understand it. Although it is not impossible to learn TDA without the aforementioned backgrounds, without them, TDA might seem unnecessarily complicated for data analysis, or impossible to decipher.
 
-One major motivation for this paper is a paper written by  that applied TDABM to a global macroeconomic dataset to  We could not find other TDA literature found specifically focused on the macroeconomic economy of singular countries. Hence, our topic of choice.
+One major motivation for this paper came from a paper by D\l{}otko, et al. [@dlotko2019mapping] This paper was a two pronged macroeconomic analysis using Ball Mapper. The first was a dataset of five macroeconomic variables from  16 countries from the 1870s-2017. The authors were interested in comparing how countries have evolved over time, their transformation from the Great Depression Era, and various views on wealth and inequality. The second prong was to look at relationship between private credit growth and GDP of various countries. This paper was the only on in the literature that we could find which combines both macroeconomics and Ball Mapper.
 
-One major motivation for this paper came from a paper by D\l{}otko, et al. [@dlotko2019mapping] This paper was a two pronged macroeconomic analysis using Ball Mapper. The first was a dataset of five macroeconomic variables from  16 countries from the 1870s-2017. It was interested in comparing how countries have evolved over time, their transformation from the Great Depression Era, and various views on wealth and inequality.
-The second prong was to look at relationship between private credit growth and GDP of various countries. This paper was the only literature that we could find which combines both macroeconomics and Ball Mapper. Hence our choice of topic.
+If successful this analysis will expand the small body of literature whose main focus is applications with Ball Mapper.[@madukpe2025mapper] We also hope that it will serve as an on-ramp for anyone interested in TDA but feels inundated with jargon upon early stage researching.
 
-We hope that this paper will serve as an on-ramp for anyone interested in TDA but feels inundated with jargon upon early stage researching. If successful this analysis will also expand the small body of literature whose main focus is applications with Ball Mapper.[@madukpe2025mapper]
-
-Using widely used U.S. macroeconomic data from the Bureau of Economic Analysis (BEA), the Federal Reserve Bank (FRB), and the Bureau of Labor Statistics (BLS), we plan to achieve these objectives by first showing Ball Mapper's use in exploratory data analysis (EDA). This includes general structural observations about our graphs as well as some more nuanced ways to interpret the Ball Mapper output. We follow this by extending Ball Mappers use in EDA to looking at its graphs through various economic lens: The Fisher Equation, [@mcclung2024fisher; @michaelides2024fisher] PPI\footnote{Producer Price Index - Finished Goods}-CPI Gap, [@bls_ppi_cpi_comparison] and Real-Wage Growth.[@sullivan1997trends].
+Using publicly available U.S. macroeconomic data from the Bureau of Economic Analysis (BEA), the Federal Reserve Bank (FRB), and the Bureau of Labor Statistics (BLS), we plan to achieve these objectives in two stages. The first is to show Ball Mapper's use in exploratory data analysis (EDA) by looking at structural observations, coloration, as well as size variation of our graph. Then using what we showed in our first stage, we extend that framework to other derived macroeconomic measures: The Fisher Equation, [@mcclung2024fisher; @michaelides2024fisher] PPI-CPI Gap,\footnote{Producer Price Index: Finished Goods less Consumer Price Index. Details on data transformation in Methods and Procedures section.}[@bls_ppi_cpi_comparison] and Real-Wage Growth.[@sullivan1997trends]\footnote{Compesation less Inflation (CPI). Details on data transformation in Methods and Procedures section.}
 
 # METHODS AND PROCEDURES
 
@@ -105,7 +97,7 @@ Personal Income is reported in nominal dollars, so it does not account for infla
 $$
 \text{Real Dollars} = \frac{\text{Nominal Dollars}}{\text{CPI}} * 100
 $$ {#eq-CPI_Real}
-We then took the the log difference (@eq-deltaLog) from the output from @eq-CPI_Real to get a percentage change from the preceding year. This log difference helps to make our data more linear which aides BallMapper's use of the standard Euclidean Distance between each row of data. (CHECK - If BM did not use the Euclidean distance between points, we might not need to take log differences. However topic is for another paper.)[@hamilton2014logarithms]
+We then took the the log difference (@eq-deltaLog) from the output from @eq-CPI_Real to get a percentage change from the preceding year. This log difference helps to make our data more linear which aides BallMapper's use of the standard Euclidean Distance between each row of data.[@hamilton2014logarithms]
 $$
 \Delta\ln{(\text{Level})} = 
 [\ln{(\text{Level}_{t})} - \ln{(\text{Level}_{t-1})}]*100
@@ -134,9 +126,11 @@ In depth descriptions of Ball Mapper's theory have been covered in various paper
 
 Mathematically, the concept of Ball Mapper supposes we are given a dataset $X$ in $K$ dimensions with $N$ observations.
 Then for some point $x \in X$ and given $\epsilon > 0$, we create a ball, $b(x, \epsilon)$, centered around $x$ with radius $\epsilon$.
-Our aim to create set of balls, $B$, such that $B = \bigcup_{i = 0}^{n} b(x, \epsilon)$ for all $x \in B$.
+From there our aim to create set of balls that cover the point cloud.
 
-We call our dataset $X$ a Point Cloud where each of the $N$ rows represents a point in our cloud. Our dimension, $K$, are each column of our data and commonly our point cloud has dimensions $K > 2$. When we are selecting a point, $x_i \in X$, to draw a ball, we are randomly selecting a row of our point cloud and then taking he Euclidean Distance in $K$ dimensions such that $i \neq j$ and $x_i, x_j \in X$ to every other $x_j$ in our point cloud. Then with our given epsilon, $\epsilon > 0$, we assign any points where the distance is less to epsilon to a ball with center $x_i$ (@eq-euclideanDistance).
+[REFINE THIS, such that $B = \bigcup_{i = 0}^{n} b(x, \epsilon)$ for all $x \in B$.
+
+We call our dataset $X$ a Point Cloud where each of the $N$ rows represents a point in our cloud. Our dimension, $K$, are each column of our data and commonly our point cloud has dimensions $K > 2$. When we are selecting a point, $x_i \in X$, to draw a ball, we are randomly selecting a row of our point cloud and then taking the Euclidean Distance in $K$ dimensions such that $i \neq j$ and $x_i, x_j \in X$ to every other $x_j$ in our point cloud. Then with our given epsilon, $\epsilon > 0$, we assign any points where the distance is less to epsilon to a ball with center $x_i$ (@eq-euclideanDistance).
 $$
 d(x_i, x_j) = 
 \sqrt{(x_{i_1} - x_{j_1})^2 + (x_{i_2} - x_{j_2})^2 + \ldots + (x_{i_k} - x_{j_k})^2} < \epsilon
@@ -147,7 +141,7 @@ As an algorithm, Ball Mapper is as follows:
 
 1. Select a random point $x_i$ from point cloud $X$.
 2. Given $\epsilon > 0$, construct a ball $b(x_i, \epsilon)$ with a center $x_i$ by associating all other points where $d(x_i, x_j) < \epsilon$ and $i \neq j$. (@eq-euclideanDistance)
-3. Place $b_i, \epsilon)$ in a set of balls $B$.
+3. Place $(b_i, \epsilon)$ in a set of balls $B$.
 4. Repeat steps 1-3 until all $x \in X$ belong to some $b(x, \epsilon)$.
 5. Draw an edge between $b_i, b_j \in B$ if they contain the same $x$, weighting the edge based on number distinct $x$ values $b_i$ and $b_j$ both contain.
 
@@ -164,7 +158,7 @@ Additionally, to reduce some of the computational time, we look for a lower boun
 For our data we first found a lower and upper bound which created an interval of $[0.38-0.90]$. We then applied a function to generated around 100 graphs and reviewed them, narrowing our interval to $[0.40-0.70]$. During this narrowing process we look for interesting features such as connected components forming or dissolving, flares coming off of any components, or notable sizing or coloration patterns.
 We finally decided on the value $0.474$ because it presented a parts of all the aforementioned features we look for: coloration and size patterning, and connected components.
 
-Before describing some visual changes we made to the Ball Mapper output graph,it is important to note that Ball Mapper will output the same graph unless at least one of two things changes: the size of the point cloud changes or the order of the point cloud. The former intuitively makes sense, the algorithm is creating epsilon radius balls so adding or subtracting any data will yield a different amount of points in at least one ball. Depending on the data being changed or number of points, the structure of the output might not change much. In our case, when we were choosing one variable, PPI, we had a multitude of choices. Wanting to look at the the larger picture of the US we first tested PPI - All Commodities. We found a good epsilon at $0.511$, however for part of our analysis we wanted to look at the gap between PPI less CPI.As we saw above, PPI tracks finished goods including capital expenditures. In plain language this translates to, physical equipment or machines that help a business produce their product; think, company cars, bottling machines, computers, etc. On the other hand CPI tracks consumer goods which will leave out some of these items tracked in PPI.[@bls_cpi_concepts] However, there is some overlap between the two indexes and this gap can serve as a proxy for a leading inflation indicator. Thus we decided to use PPI - Finished Goods because using all commodities will lead to double counting.
+Before describing some visual changes we made to the Ball Mapper output graph,it is important to note that Ball Mapper will output the same graph unless at least one of two things changes: the size of the point cloud changes or the order of the point cloud. The former intuitively makes sense, the algorithm is creating epsilon radius balls so adding or subtracting any data will yield a different amount of points in at least one ball. Depending on the data being changed or number of points, the structure of the output might not change much. In our case, when we were choosing one variable, PPI, we had a multitude of choices. Wanting to look at the the larger picture of the US we first tested PPI - All Commodities. We found a good epsilon at $0.474$, however for part of our analysis we wanted to look at the gap between PPI less CPI. As we saw above, PPI tracks finished goods including capital expenditures. In plain language this translates to, physical equipment or machines that help a business produce their product; think, company cars, bottling machines, computers, etc. On the other hand CPI tracks consumer goods which will leave out some of these items tracked in PPI.[@bls_cpi_concepts] However, there is some overlap between the two indexes and this gap can serve as a proxy for a leading inflation indicator. Thus we decided to use PPI - Finished Goods because using all commodities will lead to double counting. [MAKING CLEAR ABOUT THE DATA SWITCH]
 
 ```{r}
 #| label: fig-newGraph
@@ -254,21 +248,22 @@ There are two general categories of nodes when interpreting Ball Mapper outputs:
 The three connected components, there is one large and two small components. Moving clockwise, starting with the large component and will label them C1,\footnote{Nodes: 4, 24, 25, 27, 29, 34, 35, 40} C2,\footnote{Nodes: 7 and 8} and C3\footnote{Nodes: 2 and 28} for conversational ease. 
 
 Looking at C1, we note that one large difference between it and C2 and C3 is that it has more than two nodes. Since it does, any nodes which are not directly connected by an edge (e.g. Nodes 24 and 4), can be interpreted as alike in some fashion, but also signal a significant difference within the component.[@dlotko2019mapping]
-What is unclear, though is if path length between two nodes is commensurate with the similarity in data and something that could be explored for future research. This also applies the nodes of large size that are connected. We have not found any literature that supports this idea that proximity is commensurate with relatedness. What we can conclude about size is that the size of the node indicates the number of points that nodes has. Similarly, our edge strength is shown this ways with a thicker line representing more shared points between two nodes.
+What is unclear, though is if path length between two nodes is commensurate with the similarity in data and something that could be explored for future research. [THINK ABOUT MOVING THIS PARAGRPAH TO DISCUSSION, AT LEAST THIS SENTENC(BEFORE)] This also applies the nodes of large size that are connected. We have not found any literature that supports this idea that proximity is commensurate with relatedness. What we can conclude about size is that the size of the node indicates the number of points that nodes has. Similarly, our edge strength is shown this ways with a thicker line representing more shared points between two nodes.
 
 Most often coloration of Ball Mapper graph is used to highlight a variable of interest, or certain know structures in the data. However, we also will look for any patterning (e.g. a smooth gradient from one end of the graph to the other), or nodes which do not conform to patterning. For our map some coloration of interest is the three sub-groups of colors in C1 as well as the mismatching colors for C3. It is important to remember when looking at coloration that the value of the color is an average value and is susceptible to large variances.
 
-Since out graph consists of 40 nodes and three components we will provide all the singletons in a table (@fig-Singlton_Summary), and talk more in depth about our components below.
+Since out graph consists of 40 nodes and three components we will provide all the singletons in a table (@tbl-Singlton_Summary), and talk more in depth about our components below.
 
 ```{r}
-#| label: tbl-Sington_Summary
+#| label: tbl-Singlton_Summary
 #| tbl-cap: "Singlton nodes and the years they contain."
 #| tbl-cap-location: bottom
 #| tbl-pos: "H"
 #| echo: false
 #| eval: true
 #| warning: false
-#| 
+
+
 component_nodes <- c("25", "24", "27", "35", "34", "4", "40", "36", "29",
                      "8", "7",
                      "2", "28")
@@ -280,29 +275,79 @@ singlton_summary <- year_members |>
   summarise(
     "Year(s)" = toString(Year)
   ) |>
+  mutate(Node = as.numeric(Node)) |>
+  arrange(Node) |>
+  mutate(
+    col_group = if_else(row_number() <= 14, 1, 2)
+  ) |>
+  mutate(
+    row_id = row_number(),
+    .by = col_group
+  ) |>
+  pivot_wider(
+    names_from = col_group, 
+    values_from = c(Node, "Year(s)"),
+    names_vary = "slowest"
+  ) |>
   gt() |>
-  opt_row_striping() |>
+  sub_missing(
+    columns = everything(),
+    missing_text = ""
+  ) |>
   cols_align(
     align = "left",
-    columns = c("Node", "Year(s)")
-  )
+    columns = c("Year(s)_1", "Year(s)_2")
+  ) |>
+  cols_align(
+    align = "center",
+    columns = c(Node_1, Node_2)
+  ) |>
+  cols_label(
+    Node_1 = "Node",
+    "Year(s)_1" = "Year(s)",
+    Node_2 = "Node",
+    "Year(s)_2" = "Year(s)"
+  ) |>
+  cols_width(
+    everything() ~ px(170)
+  ) |>
+  tab_style(
+        style = list(
+            cell_fill(color = "#F2F2F2"),
+            cell_borders(
+                sides = c("left", "right"),
+                color = "#F2F2F2",
+                weight = px(1)
+            )
+        ),
+        locations = list(
+            cells_body(rows = row_id %% 2 == 0),
+            cells_stub(rows = row_id %% 2 == 0)
+        )
+    ) |>
+  cols_hide(columns = row_id) |>
+  tab_options(
+    table.width = pct(100),
+    table.font.size = "8pt"
+  ) |>
+  opt_table_font(font = "EB Garamond")
+  
 
 singlton_summary
 ```
-Still using @fig-EDA, we first will examine C2 closer. Adding to some of our initial observations we see that C2's nodes are colored very similarly, and are of the same size. As a relative measure, using @tbl-Sington_Summary, we look at our singletons and notice that many only hold one point. Thus comparing C2 nodes we should expect around one to two points in each of the nodes, as well as C3. When looking at what points C2 contains we find the years 1968 and 1969 in nodes 7 and 8, respectively, and 2000 being in both nodes, creating the edge. C2 is a good example where coloring by average value can be misleading. Conversely, looking at C3, we first notice that both nodes are colored differently. This inconsistent coloration could be meaningful if we had a strong global coloration pattern, however since C3 is such a small component, much like a small sample size, does not provide us with a lot of further detail than observation. Looking at the nodes we find that node 2 contains 1961 and node 28 contains 2001, with 2002 being our bridge year between the two.
+Still using @fig-EDA, we first will examine C2 closer. Adding to some of our initial observations we see that C2's nodes are colored very similarly, and are of the same size. As a relative measure, using @tbl-Singlton_Summary, we look at our singletons and notice that many only hold one point. Thus comparing C2 nodes we should expect around one to two points in each of the nodes, as well as C3. When looking at what points C2 contains we find the years 1968 and 1969 in nodes 7 and 8, respectively, and 2000 being in both nodes, creating the edge. C2 is a good example where coloring by average value can be misleading. Conversely, looking at C3, we first notice that both nodes are colored differently. This inconsistent coloration could be meaningful if we had a strong global coloration pattern, however since C3 is such a small component, much like a small sample size, does not provide us with a lot of further detail than observation. Looking at the nodes we find that node 2 contains 1961 and node 28 contains 2001, with 2002 being our bridge year between the two.
 
+As mentioned above, C1 contains three subgroups of different colors. For the left flare in C1 (nodes 25, 24, 27), all the years are in the range of 1987-2006. These three nodes have 13 points total and a interquartile range (IQR) being between 1990 and 1996, and is consistent with this flare's coloration. Moving towards the bottom flare and connection with the main body of C1 (nodes 34, 35, 29), visual inspection tells us we should expect to find years from the mid 2000's to the 2010's. Upon inspection we also find that these three nodes contain 13 points, however the IQR and range are larger with the IQR being 2004-2014 and range being 1993-2018. Next looking at nodes 36 and 40 we find that they consist of 7 points with a range 2016-2024, a much tighter range than the two previous sub groups. Our last node, node 4, has a bit of all of the sub groups. It points range from 1963 to 2024, with and IQR of 1996-1026, much larger. Indeed, we find the coloration consistent with its wide range, but we also see how wide ranges can be misleading.
 
-
-
-Additionally, we also notice that each of the three large nodes have at least one flare (node connected only to themselves) as well as sharing others. What this structure tells us is, there are three distinct groups and each flare representing similar data to that specific group but perhaps is distinctly different to the other flares.
-
-The small component (C2), nodes 2 and 27, are of interest because it tells us us that these related nodes are somehow distinctly different from C1 and all other nodes. Seeing a small components like this sometimes can indicate outliers in data. In our case, this could be years where large economic events happened such as a recessions or extraordinary growth. However, we also can see this behavior in singleton nodes much like we have @fig-EDA. When we look at the coloration of the singleton nodes, we see indication of outlier events such as The Great Recession and the COVID-19 Pandemic.
-
-To hark back to our discussion of C1, when we investigate nodes 4, 24, and 26 we indeed notice a pattern with the three generally: for the whole year the US was in an expansionary state. Node 4 shows us an "ideal" version of the economy. We have personal income and compensation slightly higher than inflation, sitting around 2%. Unemployment is a little elevated but historically not unusually high.
-For Nodes 24 and 26 we see two different sides of large economic shocks. Node 24 shows us years where the economy is starting to get "over it's skis". That is, it is starting growing faster than it can keep up with but it's not necessarily too late. Node 26 on the other hand consists of years following right after recessions or points where the economy was over heating. Most of the years in Node 26, follow what economist call a "Jobless Recovery".[@kolesnikova2011jobless] Usually marked by growth returning to the economy but unemployment being "sticky" and not falling as business starts to take off.
-For the flares and smaller points that are connect each of our large nodes in C1, we find that some years are in both the smaller node and larger one, which creates our edge. However they also contain additional years which are related nodes 4, 24, or 26 but instead describe transition years to these large nodes.
+Focusing on the structure of C1 there are two distinct features that we notice: the three largest nodes are all connected to each other (nodes 4, 29, and 36), and the sweeping arm on the left side of the component that contains two flares at each end (nodes 25, 24, 27, 35, and 34). The three large nodes that form a triangle, they also have the strongest strength between one another relative any other two nodes. The next strongest connection is between nodes 25 and 24. Between the three nodes we find that 2017 and 2018 are the only years which reside in all three nodes. The middle portion of our sweeping arm (nodes 24, 27, 35) contain most points during the late 80s and the early-mid 90s. The flares (25 and 24) are rather different than the middle nodes. Node 25 has a wide range of years, skipping from 1990 to 1995 and then to 2006. Node 34 on the other hand has years 2011 and 2012, a very tight grouping of years.
 
 **Fisher Effect**
+
+Using the Fisher Equation we colored our graph with the approximated real interested rate (@eq-fisherEquation).[@mcclung2024fisher] Albeit, the Fisher Equation is an approximation and does not hold well when nominal interest rates (Fed Rate) are relatively high and with time spans are short, @fig-Fisher shows us a stark picture of our economic history and important time periods.[@michaelides2024fisher]
+
+$$
+\text{Real Interest Rate} \approx \text{Fed Rate} - \text{Inflation}
+$$ {#eq-fisherEquation}
 
 ```{r}
 #| label: fig-Fisher
@@ -340,22 +385,18 @@ fisher_members <- map(.x = V(BM_Fisher),
 # generate graph
 ggraph_Fisher
 ```
-Using the Fisher Equation we can color our topological graph with the approximated real interested rate (@eq-fisherEquation).[@mcclung2024fisher] Although we know that the Fisher Equation is an approximation and does not hold well when nominal interest rates (Fed Rate) are relatively high and time spans are short, @fig-Fisher shows us a stark picture of our economic history and important time periods.[@michaelides2024fisher]
+The most prominent nodes that stand out will be those on the far ends of our scale on the bottom of @fig-Fisher. Looking at @eq-fisherEquation, we see that when the Fed Rate is lower than Inflation, we get negative values, and vice versa when the Fed Rate is later than Inflation.
 
-$$
-\text{Real Interest Rate} \approx \text{Fed Rate} - \text{Inflation}
-$$ {#eq-fisherEquation}
+Singleton nodes 19-22 have relatively high values (average of 6.178%) consist of years 1981-1984. This directly lines up with the experience "Volcker Shock". [@bryan2013greatinflation] On the opposite end, moving from the twelve o'clock position clockwise, we can visually see nodes 39, 14, 38, 31, 33, 34 (2022, 1975, 2021, 2008, 2010, 2011-2012 respectively) show a negative value (@eq-fisherEquation). 
 
-Looking at nodes 19-22, we notice that these years consists of the years 1981-1984, the years during and following the "Volker Shock".[@bryan2013greatinflation] What is interesting about why these nodes are colored is that these nodes see to show the impact of Volker's decision to raise interest and the lag that took place when raising rates.[@stlouisfed2023lags]
-
-On the lower end the of Fisher Effect, we notice nodes 14, 28, 31, 33, 34 (1975, 2008, 2011-2012, 2021, 2022 respectively) show a negative value for @eq-fisherEquation. In these year rates were already extremely low, or the economy just came off a huge economic shock. In 1975 the fed aggressively lowered rates due to climbing inflation and high unemployment rates from the 1973-'74 oil embargo.[@corbett2013oilshock] In 2021-'22 the COVID-19 Pandemic stimulus checks were going to cause inflation but the fed did not want to raise rates too aggressively.
-
-We also observe that for our C1 component, node 24 does show an approximate value from our Fisher Equation to be above the stated target rate of 2%. This indicates that indeed the economy for these nodes are showing signs of a "hot" economy.
-
+We also observe that in C1, most nodes along with C3 seem to have Real Interest Rates showing between -1% and 2%. To contrast this, we see that nodes 25, 24, and C2 look to be above 2% but not above 4-5%.
 
 **PPI-CPI Gap**
 
-Measures the difference between rates of change between PPI - Finished Good and consumer inflation (CPI). Positive values indicated that businesses are having their revenue rise higher than consumer inflation. This could mean various things: corporate margins are expanding, they are passing through cost to customers, or....
+@fig-PPI-CPI_Gap shows us the difference between PPI - Finished Goods and CPI (consumer inflation). More specifically, this graph shows us percent change from the previous year of at-cost prices (before adding margin) that producers are paying. Consumer Price Index (CPI) is the "inflation" measure. It is important to note that although CPI is used for general inflation, the Federal Reserve prefers Personal Consumption Expenditures because it tracks more normal consumer behavior such s substitution of products.
+
+Similar to @fig-Fisher, and subsequently @fig-Wage_Growth, we see that singleton nodes tend to be colored at the extreme ends and our components having mostly a consistent coloring. Node 39, 39, and 13 (2022, 2021, 1974) show high positive values indicating higher PPI values relative to Inflation. On the opposite end, the nodes which represent highest inflation relative to PPI values are nodes 23, 22, 20, 37, 9, 2, 28, 26, and 32 (1985-86, 1984, 1982, 2020, 1970, 1961 and 2002, 2001-02, 1991, and 2009 respectively).
+
 ```{r}
 #| label: fig-PPI-CPI_Gap
 #| fig-cap: "Ball Mapper Graph colored by PPI less CPI with Epsilon set to 0.474."
@@ -393,6 +434,12 @@ spread_members <- map(.x = V(BM_Spread),
 ggraph_Spread
 ```
 
+*Wage Growth*
+
+For @fig-Wage_Growth, we are looking at the difference between Compensation and Inflation. With this measure we were looking at if people annually were getting paid faster than inflation - i.e. wages were keeping up with inflation. Similar to The Fisher Equation and the PPI-CPI spread, positive numbers indicate that wages are growing faster than inflation, and if inflation is outpacing wages, then people are effectively taking a pay cut.
+
+Looking at nodes 19, 17, 18, 39, 14, and 13,\footnote{1981, 1979, 1980, 2022, 1975, 1974 respectively} we see that these are the worst in terms of inflation outpacing people's compensation. Indeed, when we look at the years contained in the nodes, they are years which had record breaking inflation - The 1970s Oil Embargo, The Volcker Shock, and 2022 once all the stimulus cash made its way through the economy. On our positive end we have nodes 11, 5 and 3 which consist of years 1972 and 1998, 1966, as well as 1962 and 1965. What is interesting that we don't see in @fig-Fisher or @fig-PPI-CPI_Gap is that the legend shows a long tail with our zero point being on the far right end. Notice, most of our points are shades of yellow (around zero or little below) but we have very few values that represent negative double digits.
+
 ```{r}
 #| label: fig-Wage_Growth
 #| fig-cap: "Ball Mapper Graph colored by Wage Growth with Epsilon set to 0.474."
@@ -429,6 +476,44 @@ wage_growth_members <- map(.x = V(BM_Wage_Growth),
 # generate graph
 ggraph_Wage_Growth
 ```
+# DISSCUSSION
+
+When first looking our graph, it is hard not to notice C1 and then see that there are two other components. What was so striking about C1 was that there seem to be two shapes, a triangle and a arc that seems to be attached to the triangle's left side. Although we have not found any literature that explores the relationship between nodes and edge strength (how many points they share), it was something immediately of interest. Since our point cloud was made up of economic data, we considered that these nodes (4, 29, and 36) could represent a certain extended time period or "phase" of the economy. [EXTEND PARAGRAPH TO EXTEND PHASE OF ECONOMY IDEA] Further, we extended this idea to the arc on the left side of C1 with the two flares, as well as C2 and C3.
+
+Starting with C1 we found that nodes 4, 29, 36 largely represented different expansionary states of the economy. Looking at our complete data set [UPDATE: need to put in blurb about "full" data set in the data section.] we find that for all points in our triangle, all years 
+
+To hark back to our discussion of C1, when we investigate nodes 4, 24, and 26 we indeed notice a pattern with the three generally: for the whole year the US was in an expansionary state. Node 4 shows us an "ideal" version of the economy. We have personal income and compensation slightly higher than inflation, sitting around 2%. Unemployment is a little elevated but historically not unusually high.
+For Nodes 24 and 26 we see two different sides of large economic shocks. Node 24 shows us years where the economy is starting to get "over it's skis". That is, it is starting growing faster than it can keep up with but it's not necessarily too late. Node 26 on the other hand consists of years following right after recessions or points where the economy was over heating. Most of the years in Node 26, follow what economist call a "Jobless Recovery".[@kolesnikova2011jobless] Usually marked by growth returning to the economy but unemployment being "sticky" and not falling as business starts to take off.
+For the flares and smaller points that are connect each of our large nodes in C1, we find that some years are in both the smaller node and larger one, which creates our edge. However they also contain additional years which are related nodes 4, 24, or 26 but instead describe transition years to these large nodes.
+
+
+
+
+
+
+
+
+C2 represents a textbook definition of demand-pull inflation. The formation of this component seems to be driven by the distinct and parallel macroeconomic structure of each point. 1968, 1969, and 2000 were a culmination of factors which led the economy into a state of "too much money chasing too few goods." [@investopedia_demandpull] In the late 1960s, the demand was primarily driven by an injection of cash from Johnson's "Great Society" policies and spending on the Vietnam War during the mid-1960s. [@marsh2021inflation] Conversely, in 2000 demand accelerated due to the private sector increasing their capital expenditures in anticipation of the digital age. [@evercore2024booms]
+
+Additionally, demographic and psychological factors played a role during these years' demand shocks. The 1960s saw the Baby Boomer generation hitting their prime working-age years. This rise in the workforce and subsequent creation of households led to an increase in consumption and lower unemployment - signs of a healthy economy. 2000 presented a similar outcome of high consumption via a different mechanism. As mentioned previously, corporate spending was accelerating. This led to high stock valuations and, in turn, high stock market returns -- and a general rise in asset values. Known today as the "Wealth Effect", this led consumers to increase their spending, placing more upward pressure on demand. [@sussman2019wealth]
+
+
+
+
+
+The small component (C2), nodes 2 and 27, are of interest because it tells us us that these related nodes are somehow distinctly different from C1 and all other nodes. Seeing a small components like this sometimes can indicate outliers in data. In our case, this could be years where large economic events happened such as a recessions or extraordinary growth. However, we also can see this behavior in singleton nodes much like we have @fig-EDA. When we look at the coloration of the singleton nodes, we see indication of outlier events such as The Great Recession and the COVID-19 Pandemic.
+
+
+
+Further this short time period not only is represented by  interesting about why these nodes are colored is that these nodes see to show the impact of Volker's decision to raise interest and the lag that took place when raising rates.[@stlouisfed2023lags]
+
+In these year rates were already extremely low, or the economy just came off a huge economic shock. In 1975 the fed aggressively lowered rates due to climbing inflation and high unemployment rates from the 1973-'74 oil embargo.[@corbett2013oilshock] In 2021-'22 the COVID-19 Pandemic stimulus checks were going to cause inflation but the fed did not want to raise rates too aggressively.
+
+Positive values indicated that businesses are having their revenue rise higher than consumer inflation. This could mean various things: corporate margins are expanding, they are passing through cost to customers, or....
+# CONCLUSION
+
+
+
 
 
 ```{r}
@@ -467,13 +552,6 @@ Public_Private_members <- map(.x = V(BM_Public_Private),
 # generate graph
 ggraph_Public_Private
 ```
-
-
-
-# DISSCUSSION
-
-# CONCLUSION
-
 # ACKNOWLEDGEMENTS
 
 The author thanks Dr. Samuel Cook...
@@ -493,7 +571,7 @@ The author thanks Dr. Samuel Cook...
 
 In our section we briefly went over two ways to interpret TDABM graphs. As seen in many other, longer papers written by Dlotko and colleagues, there is a lot of room to expound our TDABM graph here,though that is beyond the scope of this paper. In general, though, we can see that TDBM can give insight into our data that we might not see otherwise. Seeing that there is data that is not like the others gives an indication that there is something to investigate. Consider our comparison of the 08' - 09' financial crisis and the 2020 COVID Pandemic: We see learned that the years following the financial crisis were similar economically. Another way to view this is, clustering revels that the financial crisis was a singular problem that spurred the collapse of the financial system. Conversely, the COVID pandemic was a singular issue but exposed many different weaknesses in our current world.
 
-For the future development of TDABM, and TDA in general, there are many possibilities of future research and one glaring downside. The downside to TDA is that it is a high barrier to entry to understand the methodologies inner workings. Those with a technical background will have an easier time, but nonetheless a higher barrier than methods such as linear regressions.  Subject wise, TDA has an advantage in some of the social sciences because it can be somewhat of a bridge between qualitative and quantitative analyses. TDABM has been used to analyze the Brexit Vote data, seeking to understand quantitative and qualitative motivations behind its outcome @Rudkin2023. TDA also has the advantages of dimension reduction which could be useful to the life-sciences. Fields such as genetics, chemistry, and biology have many fields of data, and being able to consolidate it into an understandable form could benefit the body of knowledge greatly.
+For the future development of TDABM, and TDA in general, there are many possibilities of future research and one glaring downside. The downside to TDA is that it is a high barrier to entry to understand the methodologies inner workings. Those with a technical background will have an easier time, but nonetheless a higher barrier than methods such as linear regressions.  Subject wise, TDA has an advantage in some of the social sciences because it can be somewhat of a bridge between qualitative and quantitative analyses. TDABM has been used to analyze the Brexit Vote data, seeking to understand quantitative and qualitative motivations behind its outcome. TDA also has the advantages of dimension reduction which could be useful to the life-sciences. Fields such as genetics, chemistry, and biology have many fields of data, and being able to consolidate it into an understandable form could benefit the body of knowledge greatly.
 
 
 ```{r}
@@ -509,3 +587,17 @@ For the future development of TDABM, and TDA in general, there are many possibil
 source(paste(getwd(), "scripts/Table3_Analysis_Dimensions.R", sep = "/"))
 analysis_dimensions_table
 ```
+
+
+
+
+Draft Review
+
+
+INTRODUCTION
+- frame tda goals regarding statistics rather than provide the analogy, change how am presenting TDA, instead of maiking claim betwen analysis and stats
+- lens (end of paragraph), change how I am portraying
+
+
+METHODS AN DPROCEDUES
+- clairify functiontaion decription
