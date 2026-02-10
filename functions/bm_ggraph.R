@@ -47,6 +47,7 @@ bm_ggraph <- function(bm_igraph_output, coloring, epsilon) {
         scale_fill_gradientn(
             name = coloring_name,
             colors = c("#0072B2", "#66C2A5", "#AA3377", "#F0E442", "#FF9F1C"),
+            n.breaks = 8,
             guide = guide_colorbar(
                 title.position = "bottom",
                 title.hjust = 0.5,
