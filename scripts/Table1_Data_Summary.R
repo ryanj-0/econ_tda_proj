@@ -37,16 +37,16 @@ data_summary <- all_annual |>
             series == "ECI" ~ "Quarterly",
             .default = "Monthly"
         ),
-        data_type =  case_when(
-            series == "GDP" ~ "Flow",
-            series == "PID" ~ "Flow",
-            series == "FDI" ~ "Flow",
-            series == "FFR" ~ "Rate",
-            series == "ECI" ~ "Index",
-            series == "CPI" ~ "Index",
-            series == "housingStarts" ~ "Flow*",
-            series == "PPI_Finished" ~ "Index",
-            series == "unemployment" ~ "Rate"
+        data_series =  case_when(
+            series == "GDP" ~ "Table 1.1.1",
+            series == "PID" ~ "Table 2.1",
+            series == "FDI" ~ "Direct Investment and MNE",
+            series == "FFR" ~ "RIFSPFFNA",
+            series == "ECI" ~ "ECIALLCIV",
+            series == "CPI" ~ "CPIAUCSL",
+            series == "housingStarts" ~ "HOUST",
+            series == "PPI_Finished" ~ "WPSFD49207",
+            series == "unemployment" ~ "UNRATE"
         ),
         API =  case_when(
             series == "GDP" ~ "BEA",
@@ -69,7 +69,7 @@ data_summary_table <- data_summary |>
             series_abbreviation,
             year_start,
             year_end,
-            data_type,
+            data_series,
             data_frequency,
             API
         )
@@ -80,8 +80,8 @@ data_summary_table <- data_summary |>
         series_abbreviation = "Series Abbreviation",
         year_start = "Year Start",
         year_end = "Year End",
-        data_frequency = "Data Frequency",
-        data_type = "Data Type"
+        data_frequency = "Frequency",
+        data_series = "Series"
     ) |>
     tab_style(
         style = list(
