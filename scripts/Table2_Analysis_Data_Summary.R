@@ -14,12 +14,12 @@ analysis_data_summary <- analysisData |>
     mutate(
         series_name =  case_when(
             series == "housingStarts" ~ "Housing Starts",
-            series == "PPI_All" ~ "PPI",
+            series == "PPI_Finished" ~ "PPI",
             series == "unemployment" ~ "UnRate",
             .default = series
         ),
         economic_label = case_when(
-            series == "PPI_All" ~
+            series == "PPI_Finished" ~
                 "Supply-Side Signal",
             series == "PID" ~
                 "Income Structure",
@@ -35,7 +35,7 @@ analysis_data_summary <- analysisData |>
                 "Leading Indicator"
         ),
         economic_description = case_when(
-            series == "PPI_All" ~
+            series == "PPI_Finished" ~
                 "Producer Costs & Measures Cost-Push Inflation",
             series == "PID" ~
                 "Wages, Entrepreneurship, Gov. Transfers",
@@ -50,12 +50,6 @@ analysis_data_summary <- analysisData |>
             series == "housingStarts" ~
                 "Physical Residential Production"
         ),
-        cyclical_timing = case_when(
-            series %in% c("PPI_All", "housingStarts") ~ "Leading",
-            series %in% c("unemployment", "CPI") ~ "Lagging",
-            series %in% c("GDP", "PID") ~ "Concurrent",
-            series == "FFR" ~ "Policy/Reactive"
-        ),
         transformation = case_when(
             series %in% c("PPI_All", "CPI", "housingStarts") ~
                 "12-month Avg. & Log Difference",
@@ -65,22 +59,17 @@ analysis_data_summary <- analysisData |>
             series == "GDP" ~ "None (Source in % Change)"
         ),
         row_id = row_number()
-    ) |> relocate(cyclical_timing, .after = economic_label) |>
+    ) |>
     select(-c(series, num_cols))
 
     # Analysis Data Summary Table -----------------------------------------
 analysis_data_summary_table <- analysis_data_summary |>
     gt() |>
-    cols_width(
-        economic_description ~ px(150),
-        transformation ~ px(150)
-    ) |>
     cols_label(
         series_name = "Series Abbreviation",
         economic_label = "Economic Role",
         economic_description = "Functional Descriptioin",
-        transformation = "Transformation Applied",
-        cyclical_timing = "Business Cycle Timing"
+        transformation = "Transformation Applied"
     ) |>
     tab_style(
         style = list(
