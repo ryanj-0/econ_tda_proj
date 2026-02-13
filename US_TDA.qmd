@@ -55,7 +55,7 @@ Student: *johnson.ryan-0@pm.me*\textsuperscript{*} \newline
 Mentor: *scook25@alaska.edu*
 
 # KEYWORDS
-Topological Data Analysis; Topology; TDA; BallMapper; Mapper; 
+Topological Data Analysis; Topology; TDA; Ball Mapper; Mapper; 
 Data Science; Economics; Macroeconomics;
 
 # ABSTRACT
@@ -72,12 +72,13 @@ One major motivation for this paper came from a paper by D\l{}otko, et al. [@dlo
 
 If successful this analysis will expand the small body of literature whose main focus is applications with Ball Mapper.[@madukpe2025mapper] We also hope that it will serve as an on-ramp for anyone interested in TDA but feels inundated with jargon upon early stage researching.
 
-Using publicly available U.S. macroeconomic data from the Bureau of Economic Analysis (BEA), the Federal Reserve Bank (FRB), and the Bureau of Labor Statistics (BLS), we plan to achieve these objectives in two stages. The first is to show Ball Mapper's use in exploratory data analysis (EDA) by looking at structural observations, coloration, as well as size variation of our graph. Then using what we showed in our first stage, we extend that framework to other derived macroeconomic measures: The Fisher Equation, [@mcclung2024fisher; @michaelides2024fisher] PPI-CPI Gap,\footnote{Producer Price Index: Finished Goods less Consumer Price Index. Details on data transformation in Methods and Procedures section.}[@bls_ppi_cpi_comparison] and Real-Wage Growth.[@sullivan1997trends]\footnote{Compesation less Inflation (CPI). Details on data transformation in Methods and Procedures section.}
+Using U.S. macroeconomic data from the Bureau of Economic Analysis (BEA), the Federal Reserve Bank (FRB), and the Bureau of Labor Statistics (BLS), we plan to achieve these objectives in two stages. The first is to show Ball Mapper's use in exploratory data analysis (EDA) by looking at structural observations, coloration, as well as size variation of our graph. Then using what we showed in our first stage, we extend that framework to other derived macroeconomic measures: The Fisher Equation, [@mcclung2024fisher; @michaelides2024fisher] PPI-CPI Gap,\footnote{Producer Price Index: Finished Goods less Consumer Price Index. Details on data transformation in Methods and Procedures section.}[@bls_ppi_cpi_comparison] and Real-Wage Growth.[@sullivan1997trends]\footnote{Compesation less Inflation (CPI). Details on data transformation in Methods and Procedures section.}
 
 # METHODS AND PROCEDURES
 
 *Data Selection & Preparation*
-This paper relied on three publicly available data from US government sources. The Bureau of Economic Analysis (BEA), The Federal Reserve Board (FRB), and The Bureau of Labor Statistics (BLS).[@bea_data; @fred_data] The data were gathered using R using two application programming interfaces (APIs): one for data from the BEA, and the other from the Federal Reserve Economic Data (FRED) API.[@bea_r_package; @fredr_package] FRED aggregates data from national and international sources, as well as public and private sources. We additionally used recession dates based on business cycle contractions and expansions provided by the National Bureau of Economic Research (NBER). These agencies were selected because of they are authoritative sources for U.S. economic data. Their widespread use in both the private and public sector gives us high confidence in the accuracy and integrity of the data.[@hughes2019value]
+
+We pulled data from three publicly available data from U.S. government sources: The Bureau of Economic Analysis (BEA), The Federal Reserve Board (FRB), and The Bureau of Labor Statistics (BLS).[@bea_data; @fred_data] The data were gathered using R using two application programming interfaces (APIs): one for data from the BEA, and the other from the Federal Reserve Economic Data (FRED) API.[@bea_r_package; @fredr_package]\footnote{FRED aggregates data from national and international sources, as well as public and private sources.} We additionally used recession dates based on business cycle contractions and expansions provided by the National Bureau of Economic Research (NBER). These agencies were selected because of they are authoritative sources for U.S. economic data. Their widespread use in both the private and public sectors gives us high confidence in the accuracy and integrity of the data.[@hughes2019value]
 ```{r}
 #| label: tbl-Data_Sources
 #| tbl-cap: "*Housing Starts is considered a flow because it is provided as a Seasonally Adjusted Annual Rate (SAAR)."
@@ -90,14 +91,18 @@ This paper relied on three publicly available data from US government sources. T
 source(paste(getwd(), "scripts/Table1_Data_Summary.R", sep = "/"))
 data_summary_table
 ```
-@tbl-Data_Sources shows all the data series we considered for this analysis. We excluded Employment Cost Index (ECI) and Foreign Direct Investment (FDI) due to their limited availability of years. Of the remaining data series, New Privately-Owned Housing Units Started (Housing Starts) has the smallest range and will provide the lower end for the years used in our analysis (1960-2024). @tbl-Analysis_Data shows the final data series we will be using. These specific series were chosen because they represent different aspects of the macroeconomy, and are described in *Functional Description*. Additionally, we are focusing on an annual time frame for this analysis so some data transformation was needed. The final data series transformations follow.
+@tbl-Data_Sources shows all the data series we considered for this analysis. We excluded Employment Cost Index (ECI) and Foreign Direct Investment (FDI) due to their limited availability of years. Of the remaining data series, New Privately-Owned Housing Units Started (Housing Starts) had the smallest range and so set our lower bound for the range years used (1960-2024). Our upper bound was the latest full calendar year that was available. We wanted to represent the economy from various vantage points. i.e. the broad economy, policy makers, consumers, business owners, etc. @tbl-Analysis_Data shows the data series that we felt were representative of the economy as a whole and had data for our time period of interest. Within each of these series we used a subset of columns to construct our final dataset for analysis. To see what parts of the economy we determined each series plays, the column Functional Description, can be found @tbl-Analysis_Data.
 
-The first transformation was Personal Income and Its Disposition (Personal Income).\footnote{Table 2.1, BEA NIPA}
-Personal Income is reported in nominal dollars, so it does not account for inflation. Thus, we first adjusted it using the Consumer Price Index (CPI) to get Personal Income into Real Dollars.[@dallasfed_nominal]
+For this analysis we are focusing on an annual time frame and some data transformation was needed. Looking at @tbl-Data_Sources, you can see that not all our data was provided on an annual basis. @tbl-Analysis_Data shows a summary of the transformation taken and the details for each follow.
+
+\newpage
+The first transformation we did was on Personal Income and Its Disposition (Personal Income).
+Personal Income, consisting of a few different lines of income according to the BEA, is reported in nominal dollars. Nominal dollars do not account for inflation, so using Consumer Price Index (CPI) we transformed our values to Real Dollars (@eq-CPI_Real).[@dallasfed_nominal] We then took the the log difference (@eq-deltaLog) from the output from @eq-CPI_Real to get a percentage change from the preceding year. 
 $$
 \text{Real Dollars} = \frac{\text{Nominal Dollars}}{\text{CPI}} * 100
 $$ {#eq-CPI_Real}
-We then took the the log difference (@eq-deltaLog) from the output from @eq-CPI_Real to get a percentage change from the preceding year. This log difference helps to make our data more linear which aides BallMapper's use of the standard Euclidean Distance between each row of data.[@hamilton2014logarithms]
+
+This log difference helps to make our data more linear and although not the exact change, is a good approximation.[@hamilton2014logarithms] An interesting point that has not been studied to our knowledge is the relationship between linearized data and underlying distance metric that Ball Mapper uses, the Euclidean distance. That is to say, if we did not linearize our data, we do not know how different our results would be, but this is later touched on in the discussion.
 $$
 \Delta\ln{(\text{Level})} = 
 [\ln{(\text{Level}_{t})} - \ln{(\text{Level}_{t-1})}]*100
