@@ -51,7 +51,7 @@ analysis_data_summary <- analysisData |>
                 "Physical Residential Production"
         ),
         transformation = case_when(
-            series %in% c("PPI_All", "CPI", "housingStarts") ~
+            series %in% c("PPI_Finished", "CPI", "housingStarts") ~
                 "12-month Avg. & Log Difference",
             series %in% c("FFR", "unemployment") ~
                 "None (Annual Rate) & Simple Difference",
