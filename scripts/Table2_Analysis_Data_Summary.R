@@ -12,80 +12,52 @@ analysis_data_summary <- analysisData |>
     ) |>
     arrange(-num_cols) |>
     mutate(
-        series_name =  case_when(
+        series_name = case_when(
             series == "housingStarts" ~ "Housing Starts",
             series == "PPI_Finished" ~ "PPI",
             series == "unemployment" ~ "UnRate",
             .default = series
         ),
         economic_label = case_when(
-            series == "PPI_Finished" ~
-                "Supply-Side Signal",
-            series == "PID" ~
-                "Income Structure",
-            series == "GDP" ~
-                "Growth Composition",
-            series == "CPI" ~
-                "Demand-Side Signal",
-            series == "unemployment" ~
-                "Labor Market Dynamics",
-            series == "FFR" ~
-                "Monetary Policy",
-            series == "housingStarts" ~
-                "Leading Indicator"
+            series == "PPI_Finished" ~ "Supply-Side Signal",
+            series == "PID" ~ "Income Structure",
+            series == "GDP" ~ "Growth Composition",
+            series == "CPI" ~ "Demand-Side Signal",
+            series == "unemployment" ~ "Labor Market Dynamics",
+            series == "FFR" ~ "Monetary Policy",
+            series == "housingStarts" ~ "Leading Indicator"
         ),
         economic_description = case_when(
-            series == "PPI_Finished" ~
-                "Producer Costs & Measures Cost-Push Inflation",
-            series == "PID" ~
-                "Wages, Entrepreneurship, Gov. Transfers",
-            series == "GDP" ~
-                "Consumption, Investment, Gov., and Trade",
-            series == "CPI" ~
-                "Cost of Living & Measures Demand-Pull Inflation",
-            series == "unemployment" ~
-                "Labor Distress Level and Trend",
-            series == "FFR" ~
-                "Cost of Capital and Borrowing Conditions",
-            series == "housingStarts" ~
-                "Physical Residential Production"
+            series == "PPI_Finished" ~ "Producer Costs & Measures Cost-Push Inflation",
+            series == "PID" ~ "Wages, Entrepreneurship, Gov. Transfers",
+            series == "GDP" ~ "Consumption, Investment, Gov., and Trade",
+            series == "CPI" ~ "Cost of Living & Measures Demand-Pull Inflation",
+            series == "unemployment" ~ "Labor Distress Level and Trend",
+            series == "FFR" ~ "Cost of Capital and Borrowing Conditions",
+            series == "housingStarts" ~ "Physical Residential Production"
         ),
         transformation = case_when(
-            series %in% c("PPI_Finished", "CPI", "housingStarts") ~
-                "12-month Avg. & Log Difference",
-            series %in% c("FFR", "unemployment") ~
-                "None (Annual Rate) & Simple Difference",
+            series %in% c("PPI_Finished", "CPI", "housingStarts") ~ "12-month Avg. & Log Difference",
+            series %in% c("FFR", "unemployment") ~ "None (Annual Rate) & Simple Difference",
             series == "PID" ~ "Real Adjustment & Log Difference",
             series == "GDP" ~ "None (Source in % Change)"
-        ),
-        row_id = row_number()
+        )
     ) |>
     select(-c(series, num_cols))
 
-    # Analysis Data Summary Table -----------------------------------------
+# Analysis Data Summary Table -----------------------------------------
 analysis_data_summary_table <- analysis_data_summary |>
     gt() |>
     cols_label(
         series_name = "Series Abbreviation",
         economic_label = "Economic Role",
-        economic_description = "Functional Descriptioin",
+        economic_description = "Functional Description",
         transformation = "Transformation Applied"
     ) |>
     tab_style(
-        style = list(
-            cell_fill(color = "#F2F2F2"),
-            cell_borders(
-                sides = c("left", "right"),
-                color = "#F2F2F2",
-                weight = px(1)
-            )
-        ),
-        locations = list(
-            cells_body(rows = row_id %% 2 == 0),
-            cells_stub(rows = row_id %% 2 == 0)
-        )
+        style = cell_fill(color = "#F2F2F2"),
+        locations = cells_body(rows = seq(2, nrow(analysis_data_summary), 2))
     ) |>
-    cols_hide(columns = row_id) |>
     tab_options(
         table.width = pct(100),
         table.font.size = "8pt"

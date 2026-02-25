@@ -53,8 +53,7 @@ data_summary <- all_annual |>
             series == "PID" ~ "BEA",
             series == "FDI" ~ "BEA",
             .default = "FRED"
-        ),
-        row_id = row_number()
+        )
     ) |>
     relocate(c(series_name, series_abbreviation), .before = series) |>
     select(-series)
@@ -74,7 +73,7 @@ data_summary_table <- data_summary |>
             API
         )
     ) |>
-    cols_width(series_abbreviation ~ px(150)) |>
+    cols_width(data_series ~ px(120)) |>
     cols_label(
         series_name = "Data Series",
         series_abbreviation = "Series Abbreviation",
@@ -84,20 +83,9 @@ data_summary_table <- data_summary |>
         data_series = "Series"
     ) |>
     tab_style(
-        style = list(
-            cell_fill(color = "#F2F2F2"),
-            cell_borders(
-                sides = c("left", "right"),
-                color = "#F2F2F2",
-                weight = px(12)
-            )
-        ),
-        locations = list(
-            cells_body(rows = row_id %% 2 == 0),
-            cells_stub(rows = row_id %% 2 == 0)
-        )
+        style = cell_fill(color = "#F2F2F2"),
+        locations = cells_body(rows = seq(2, nrow(data_summary), 2))
     ) |>
-    cols_hide(columns = row_id) |>
     tab_options(
         table.width = pct(100),
         table.font.size = "8pt"
