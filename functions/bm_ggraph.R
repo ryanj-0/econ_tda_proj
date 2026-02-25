@@ -3,15 +3,13 @@
 # graph it in a ggraph output for
 # easier readability.
 ############################################
-
-bm_ggraph <- function(bm_igraph_output, coloring, epsilon) {
-
+bm_ggraph <- function(bm_igraph_output, coloring, epsilon, legend_label = "Default") {
     # Set graph details
     coloring_name <- coloring |>
         names() |>
         str_replace_all("_", " ")
+    legend_title <- if (!is.null(legend_label)) legend_label else coloring_name
     num_nodes <- vcount(bm_igraph_output)
-
     ggraph(bm_igraph_output, layout = "kk") +
         geom_edge_link(
             aes(width = weight,
@@ -45,7 +43,7 @@ bm_ggraph <- function(bm_igraph_output, coloring, epsilon) {
             guide = "none"
         ) +
         scale_fill_gradientn(
-            name = coloring_name,
+            name = legend_title,
             colors = c("#0072B2", "#66C2A5", "#AA3377", "#F0E442", "#FF9F1C"),
             n.breaks = 8,
             guide = guide_colorbar(
@@ -59,6 +57,6 @@ bm_ggraph <- function(bm_igraph_output, coloring, epsilon) {
         theme(
             text = element_text(family = "EB Garamond"),
             legend.position = "bottom",
-            legend.key.width = unit(0.1, "npc")
+            legend.key.width = unit(4, "cm")
         )
 }
