@@ -565,22 +565,33 @@ In 1979 Paul Volcker became the Federal Reserve chairman. Prior to Volcker, the 
 \newpage
 *Final Notes and Future Research*
 
+As the last part of our discussion there are two primary parts. We first touch on the limitations found during our analysis, both with Ball Mapper and the design of our analysis. The second part will examine some of the unanswered questions that arose during analysis and are possible avenues for future research.
 
+The primary limitations we had were the choice of time period and number of variables. Initially we used a set of variables we thought would represent the U.S. economy as a whole but found that they all had various time ranges available. Some, such as the Federal Funds Rate, ranged as far back as the early 1900s, and others were only created recently, such as Foreign Direct Investment (2014). While we had 65 years of data, we were not able to capture early structural economic changes or events such as the Great Depression, the New Deal, and WWII. Alternatively, we could have chosen a different frequency of data such as monthly or quarterly. This would have given us more points in our point cloud and perhaps a more nuanced picture of the U.S. economy. Our analysis also could have included more dimensions, testing Ball Mapper's ability to handle a multitude of dimensions, or asked a more focused economic question to see if there is a nuanced structure in a particular area of the economy.
+
+
+
+
+
+
+- robust BM graph and semi-random algorithm
+
+Talk about the semi-randomization of BM. If any data in the point cloud is modified in anyway, this ball creation process will change..
+
+look at each variable coloring
+
+differnt distance metrics
+
+
+
+---
 - relationship between:
   - node edge length between nodes
   - edge strength and nodes
   - node size and connectedness
   - location on graph relative to toher points
-- robust BM graph and semi-random algorithm
-- smaller, longer, or wider (++dimensions) time frame study
 
 
-
-
-
-
-
-Talk about the semi-randomization of BM. If any data in the point cloud is modified in anyway, this ball creation process will change..
 
 Robustness in data
 
@@ -590,17 +601,14 @@ unknown if distances on our graph indicates something? 34-35 path is small and l
 
 This also applies the nodes of large size that are connected. We have not found any literature that supports this idea that proximity is commensurate with relatedness. 
 
-Analysis showed only 65 years of data and nodes contains some points which were structural at the time. smaller time periods might show more robustness and that the Year or time period is less of a factor than what we might find here.
-
 Look at distribution of nodes to each, if spacing is meaningful or not
 
 Relationship of years that create edges signal that throughout that year the economy went through various stages
 
+
+
 For the future development of TDABM, and TDA in general, there are many possibilities of future research and one glaring downside. The downside to TDA is that it is a high barrier to entry to understand the methodologies inner workings. Those with a technical background will have an easier time, but nonetheless a higher barrier than methods such as linear regressions.  Subject wise, TDA has an advantage in some of the social sciences because it can be somewhat of a bridge between qualitative and quantitative analyses. TDABM has been used to analyze the Brexit Vote data, seeking to understand quantitative and qualitative motivations behind its outcome. TDA also has the advantages of dimension reduction which could be useful to the life-sciences. Fields such as genetics, chemistry, and biology have many dimensions of data, and being able to consolidate it into an understandable form could benefit the body of knowledge greatly.
 
-*Unused, so far*
-
-Another way to view this is, clustering revels that the financial crisis was a singular problem that spurred the collapse of the financial system. Conversely, the COVID pandemic was a singular issue but exposed many different weaknesses in our current world.
 
 # CONCLUSION
 
