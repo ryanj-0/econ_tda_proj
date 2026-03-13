@@ -569,6 +569,7 @@ As the last part of our discussion there are two primary parts. We first touch o
 
 The primary limitations we had were the choice of time period and number of variables. Initially we used a set of variables we thought would represent the U.S. economy as a whole but found that they all had various time ranges available. Some, such as the Federal Funds Rate, ranged as far back as the early 1900s, and others were only created recently, such as Foreign Direct Investment (2014). While we had 65 years of data, we were not able to capture early structural economic changes or events such as the Great Depression, the New Deal, and WWII. Alternatively, we could have chosen a different frequency of data such as monthly or quarterly. This would have given us more points in our point cloud and perhaps a more nuanced picture of the U.S. economy. Our analysis also could have included more dimensions, testing Ball Mapper's ability to handle a multitude of dimensions, or asked a more focused economic question to see if there is a nuanced structure in a particular area of the economy.
 
+Focusing on the technical limitations, we discovered that the standard Euclidean Distance between points is one. Currently, in Ball Mapper (R version) there is no way to easily change the distance metric. To do so one would need to copy the source code of the *BallMapper* function and either: adapt the code to add an argument for a distance metric, or hard code it into a copy of the original function. Another discovery we made about the *BallMapper* function in R is how it uses a semi-random algorithm to chooses points to compare.
 
 
 
@@ -578,9 +579,6 @@ The primary limitations we had were the choice of time period and number of vari
 
 Talk about the semi-randomization of BM. If any data in the point cloud is modified in anyway, this ball creation process will change..
 
-look at each variable coloring
-
-differnt distance metrics
 
 
 
