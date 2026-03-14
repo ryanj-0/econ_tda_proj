@@ -155,7 +155,7 @@ analysis_dimensions_table
 
 In-depth descriptions of Ball Mapper's theory have been covered in various papers. [@dlotko2019ball; @rudkin2025ballmapper;@qiu2020refining] As the aim of our paper is to provide an introductory foray into Ball Mapper and TDA in general, we will omit some of the more technical details below.
 
-Theoretically, Ball Mapper supposes we are given a dataset $X$ with $K$ dimensions, $N$ observations and some metric $d$. Then to create a Ball Mapper graph, our goal is to construct a collection of balls, let's call it $B$, with a constant radius, $\epsilon$, such that every observation of our dataset is covered by at least one ball in $B$. Mathematically, this is written as follows: Let $(X, d)$ be a metric space where $X \subset \mathbb{R}^K$ is our dataset and $d$ is a distance metric on $X$. For a fixed radius $\epsilon >0$, let $C \subseteq X$ be a set of center points. Then for each $c \in C$, we define a ball $b(c, \epsilon) = \{x \in X : d(c, x) < \epsilon\}$. Our collection then is $B = \{b(c, \epsilon) : c \in C\}$ and $\bigcup_{b \in B} b = X$.
+Theoretically, Ball Mapper supposes we are given a dataset $X$ with $K$ dimensions, $N$ observations and some metric $d$. Then to create a Ball Mapper graph, our goal is to construct a collection of balls, let's call it $B$, with a constant radius, $\epsilon$, such that every observation of our dataset is covered by at least one ball in $B$. Mathematically, this is written as follows: Let $(X, d)$ be a metric space where $X \subset \mathbb{R}^K$ is our dataset and $d$ is a distance metric on $X$. For a fixed radius $\epsilon >0$, let $C \subseteq X$ be a set of center points. Then for each $c \in C$, we define a ball $b(c, \epsilon) = \{x \in X : d(c, x) \leq \epsilon\}$. Our collection then is $B = \{b(c, \epsilon) : c \in C\}$ and $\bigcup_{b \in B} b = X$.
 
 In practice, our dataset $X$ is called a Point Cloud. Our $N$ observations or rows are normally referenced as points, and our $K$ dimensions, the columns of $X$, are denoted variables. Since Ball Mapper is known to handle large multidimensional datasets well, it is common to have point clouds with dimensions $K > 2$. Ball Mapper was originally written in R, but later on was adapted for use in Python. For this analysis we used R and the Ball Mapper package aptly named "BallMapper".[@ballmapper_package]
 
@@ -166,9 +166,9 @@ d(x_i, x_j) =
 \sqrt{(x_{i_1} - x_{j_1})^2 + (x_{i_2} - x_{j_2})^2 + \ldots + (x_{i_k} - x_{j_k})^2} < \epsilon
 $$ {#eq-euclideanDistance}
 
-The iterative ball creation is carried out in a linear fashion from the first row to the last of the point cloud. The result of this linear selection process is a pseudo-random creation of ball centers. How this works is that it takes the first point, let's call it $c_1$, of the point cloud and assigns it as the center of the first node in our graph. Then using the default distance metric, the Euclidean Distance (@eq-euclideanDistance), it compares every point in the point cloud to $c_1$ to create $b_1 = b(c_1, \epsilon) = \{x \in X : d(c_1, x) < \epsilon \}$. After this first ball is created, Ball Mapper looks for the next row in the point cloud that is not a member of the first ball, and assigns it as the next center. This process continues until all the points are in a ball and the union of balls covers our whole point cloud. 
+The iterative ball creation is carried out in a linear fashion from the first row to the last of the point cloud. The result of this linear selection process is a greedy, sequential creation of ball centers. How this works is that it takes the first point, let's call it $c_1$, of the point cloud and assigns it as the center of the first node in our graph. Then using the default distance metric, the Euclidean Distance (@eq-euclideanDistance), it compares every point in the point cloud to $c_1$ to create $b_1 = b(c_1, \epsilon) = \{x \in X : d(c_1, x) < \epsilon \}$. After this first ball is created, Ball Mapper looks for the next row in the point cloud that is not a member of the first ball, and assigns it as the next center. This process continues until all the points are in a ball and the union of balls covers our whole point cloud. 
 
-Hopefully, it is clear now why this process can be described as pseudo-random because it relies a great deal on the point cloud as well as the epsilon. In fact, the Ball Mapper graph changes for epsilons sufficiently large enough to change at least one point's inclusion or exclusion to a ball; the graph can also change for unique orders of the point cloud rows. We touch on this in greater detail during our Discussion.
+Hopefully, it is clear now why this process can be described as a greedy and sequential. It relies a great deal on the point cloud order as well as the epsilon. In fact, the Ball Mapper graph changes for epsilons sufficiently large enough to change at least one point's inclusion or exclusion to a ball; the graph can also change for unique orders of the point cloud rows. We touch on this in greater detail during our Discussion.
 
 The last step to the Ball Mapper graph is to draw the edges if they exist. The way the BM algorithm is structured,
 it allows for the possibility of points to be in multiple balls. When two balls (also called nodes) contain the same point, they are said to intersect. If two nodes share at least one point, then an edge is created. If there is more than one shared point, the number of shared points dictates the edge strength. So, once we have all the nodes, edges, and edge strengths, we then can construct a Ball Mapper graph. The Ball Mapper algorithm described above can be broken down as follows:
@@ -565,48 +565,15 @@ In 1979 Paul Volcker became the Federal Reserve chairman. Prior to Volcker, the 
 \newpage
 *Final Notes and Future Research*
 
-As the last part of our discussion there are two primary parts. We first touch on the limitations found during our analysis, both with Ball Mapper and the design of our analysis. The second part will examine some of the unanswered questions that arose during analysis and are possible avenues for future research.
+As the last part of our discussion, there are two primary areas. The first half touches on the limitations we found both with Ball Mapper and the design of our analysis. The second examines some of the unanswered questions that arose during the analysis which are possible avenues for future research.
 
-The primary limitations we had were the choice of time period and number of variables. Initially we used a set of variables we thought would represent the U.S. economy as a whole but found that they all had various time ranges available. Some, such as the Federal Funds Rate, ranged as far back as the early 1900s, and others were only created recently, such as Foreign Direct Investment (2014). While we had 65 years of data, we were not able to capture early structural economic changes or events such as the Great Depression, the New Deal, and WWII. Alternatively, we could have chosen a different frequency of data such as monthly or quarterly. This would have given us more points in our point cloud and perhaps a more nuanced picture of the U.S. economy. Our analysis also could have included more dimensions, testing Ball Mapper's ability to handle a multitude of dimensions, or asked a more focused economic question to see if there is a nuanced structure in a particular area of the economy.
+The primary limitations we had were the choice of time period and number of variables. Initially we used a set of variables we thought would represent the U.S. economy as a whole, but found that they did not all have consistent time ranges. Some data series, such as the Federal Funds Rate, ranged as far back as the early 1900s, and others were only created recently, such as Foreign Direct Investment (2014). While we had 65 years of data, we were not able to capture early structural economic changes or events such as the Great Depression, the New Deal, and WWII. Alternatively, we could have chosen a different frequency of data, such as monthly or quarterly. This would have given us more points in our point cloud and perhaps a more nuanced picture of the U.S. economy. Our analysis also could have included more dimensions, testing Ball Mapper's ability to handle a multitude of dimensions. It also could have asked a more focused economic question to see if there is a nuanced structure in a particular area of the economy.
 
-Focusing on the technical limitations, we discovered that the standard Euclidean Distance between points is one. Currently, in Ball Mapper (R version) there is no way to easily change the distance metric. To do so one would need to copy the source code of the *BallMapper* function and either: adapt the code to add an argument for a distance metric, or hard code it into a copy of the original function. Another discovery we made about the *BallMapper* function in R is how it uses a semi-random algorithm to chooses points to compare.
+Focusing on the technical limitations, the first is that the standard Euclidean Distance between points is the only distance metric used. Currently, in Ball Mapper (R version) there is no way to easily change the distance metric. To do so one would need to copy the source code of the *BallMapper* function and either: adapt the code to add an argument for a distance metric, or hard code it into a copy of the original function. Additionally, the BallMapper function in R uses a greedy, sequential algorithm to select ball centers. When a landmark is chosen, the Ball Mapper algorithm does so in a sequential top-down order. This rigid structure is good when others would like to verify the output of the graph; having the same dataset, in the same order, using the same epsilon, will produce the exact same graph. However, Ball Mapper could be susceptible to seasonal data where you have large naturally occurring spaces between the data. While seasonality is a valid characteristic of a dataset, it might not be the true underlying structure. Because of Ball Mapper's greedy, sequential algorithm, it may pick up on the seasonality of the data right away rather than comprehensively looking at the dataset. To fix some of these issues, one could randomize the dataset every time Ball Mapper is run, or make sure to seasonally adjust or normalize any data. Currently, some of these fixes have been implemented in the package *pyBallMapper*, written in Python. In this package they have added an order argument to allow randomization of rows. They also have included a distance metric argument so a user can choose what distance metric they would like to use. Finally, pyBallMapper uses Python's NumPy package which utilizes vectorization, speeding up the sequential nature of the Ball Mapper algorithm.
 
+To start the second half, we noticed during the analysis there is not a clear way to know whether Ball Mapper is giving us a stable graph of our data. We discussed that if given the same data, in the same order, it indeed will give us the same graph. However, we did not find any literature answering this exact question. The closest paper we could find was one which studied the Brexit Vote using Ball Mapper. At the end of this paper they wrote about a robustness test they implemented by showing why the vote to leave the European Union passed.[@rudkin2024brexit] What is unclear is how they ran a stated 10,000 repetitions. From what we know about the Ball Mapper algorithm, we could infer that they randomize the order of their data every time, or took infinitesimal slices of an interval such that theoretically Ball Mapper would produce a different graph. The former would be a good standard to show general robustness for any Ball Mapper output and could look like running many repetitions while randomizing the order of the data every time, and simultaneously collecting summary statistics of each graph. Some example statistics might include the number of components, nodes, and edges at a singular epsilon or a range of epsilons. One could also look at edges and edge weights for consistency, as well as some sort of base value, noting if there is a large or small variance.
 
-
-
-
-- robust BM graph and semi-random algorithm
-
-Talk about the semi-randomization of BM. If any data in the point cloud is modified in anyway, this ball creation process will change..
-
-
-
-
----
-- relationship between:
-  - node edge length between nodes
-  - edge strength and nodes
-  - node size and connectedness
-  - location on graph relative to toher points
-
-
-
-Robustness in data
-
-What is unclear, and unstudied to our knowledge, is if the path length between two nodes is a function of similarity.
-
-unknown if distances on our graph indicates something? 34-35 path is small and logical recovery. 24-25 is large but the resistance is quite dis jointed.
-
-This also applies the nodes of large size that are connected. We have not found any literature that supports this idea that proximity is commensurate with relatedness. 
-
-Look at distribution of nodes to each, if spacing is meaningful or not
-
-Relationship of years that create edges signal that throughout that year the economy went through various stages
-
-
-
-For the future development of TDABM, and TDA in general, there are many possibilities of future research and one glaring downside. The downside to TDA is that it is a high barrier to entry to understand the methodologies inner workings. Those with a technical background will have an easier time, but nonetheless a higher barrier than methods such as linear regressions.  Subject wise, TDA has an advantage in some of the social sciences because it can be somewhat of a bridge between qualitative and quantitative analyses. TDABM has been used to analyze the Brexit Vote data, seeking to understand quantitative and qualitative motivations behind its outcome. TDA also has the advantages of dimension reduction which could be useful to the life-sciences. Fields such as genetics, chemistry, and biology have many dimensions of data, and being able to consolidate it into an understandable form could benefit the body of knowledge greatly.
-
+Moving to more abstract questions that came up during our analysis, our questions revolved around nodes' relationships to each other based on various factors: edge strength, connectedness (degree), and node size. Acknowledging that node relationships could have a combination of these factors, our primary questions are: does edge strength between nodes indicate a stronger relationship? For our graph, does the edge strength between nodes 4 and 29 represent a stronger structural signal than the edge between node 25 and 24? There is also the question of connectedness or degree--how many edges a node has. Similar to edge strength, does the fact that node 27 has three edges indicate its importance over node 34 with just one edge? Lastly, and in combination with the previous two, does node size carry any relational value? Using our node 4 and node 29 example again, since they are the largest nodes with the strongest edge weight, does this combination indicate that their relationship is stronger? That is, if we were to look at this graph over many epsilons, would the connection between nodes 4 and 29 persist while the connection between nodes 4 and 40 does not? All of these questions came up during our analysis, and to our knowledge have not been studied; they are all areas for future research on Ball Mapper.
 
 # CONCLUSION
 
@@ -619,11 +586,7 @@ As seen in many other, longer papers, using app
 written by Dlotko and colleagues, there is a lot of room to expound our TDABM graph here,though that is beyond the scope of this paper.
 
 
-
-In general, though, 
-
-Consider our comparison of the 08' - 09' financial crisis and the 2020 COVID Pandemic: We see learned that the years following the financial crisis were similar economically. 
-
+For the future development of TDABM, and TDA in general, there are many possibilities of future research and one glaring downside. The downside to TDA is that it is a high barrier to entry to understand the methodologies inner workings. Those with a technical background will have an easier time, but nonetheless a higher barrier than methods such as linear regressions.  Subject wise, TDA has an advantage in some of the social sciences because it can be somewhat of a bridge between qualitative and quantitative analyses. TDABM has been used to analyze the Brexit Vote data, seeking to understand quantitative and qualitative motivations behind its outcome. TDA also has the advantages of dimension reduction which could be useful to the life-sciences. Fields such as genetics, chemistry, and biology have many dimensions of data, and being able to consolidate it into an understandable form could benefit the body of knowledge greatly.
 # REFERENCES
 
 :::{#refs}
