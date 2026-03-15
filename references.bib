@@ -1,3 +1,19 @@
+# Project Context
+
+This document contains a comprehensive BibTeX reference list for a research project that applies advanced data analysis techniques to macroeconomic indicators.
+
+Based on the compiled sources, the research intersects three primary domains:
+1. **Topological Data Analysis (TDA):** The theoretical foundation and application of shape-based data analysis, specifically focusing on the Mapper and Ball Mapper algorithms to summarize high-dimensional data.
+2. **Macroeconomics and Monetary Policy:** An analysis of historical and current economic conditions, including inflation dynamics (demand-pull, the Great Inflation of the 1970s vs. the 1960s), the Fisher Effect, jobless recoveries, capital spending cycles, the stock market wealth effect, and Federal Reserve policy lags.
+3. **Computational Tools and Government Data:** The methodology and application of accessing US government economic data (BLS, BEA, FRED, Census Bureau construction data) and modeling it using R programming packages (`bea.R`, `fredr`, `BallMapper`, `igraph`, and `ggraph`).
+
+This list provides the theoretical framework, the data methodologies, and the software citations necessary to construct and validate TDA models on US macroeconomic data.
+
+---
+
+# References
+
+```bibtex
 % Reference 1
 @article{madukpe2025mapper,
   title = {A Comprehensive Review of the {M}apper Algorithm, a Topological Data Analysis Technique, and Its Applications Across Various Fields (2007–2025)},
@@ -60,6 +76,18 @@
 }
 
 % Reference 7
+@incollection{michaelides2024fisher,
+  title = {The Fisher Equation},
+  author = {Michaelides, Panayotis G.},
+  booktitle = {21 Equations that Shaped the World Economy: Understanding the Theory Behind the Equations},
+  year = {2024},
+  publisher = {Springer},
+  pages = {113--120},
+  doi = {10.1007/978-3-031-76140-9_9},
+  url = {https://link.springer.com/chapter/10.1007/978-3-031-76140-9_9}
+}
+
+% Reference 8
 @misc{bls_ppi_cpi_comparison,
   title = {How Does the Producer Price Index Differ from the Consumer Price Index? Comparing the Personal Consumption {PPI} with the {CPI}},
   author = {{Bureau of Labor Statistics}},
@@ -69,7 +97,7 @@
   note = {Methodology Report. Accessed February 2026}
 }
 
-% Reference 8
+% Reference 9
 @article{sullivan1997trends,
   title = {Trends in Real Wage Growth},
   author = {Sullivan, Daniel G.},
@@ -82,7 +110,7 @@
   note = {accessed February 2026}
 }
 
-% Reference 9
+% Reference 10
 @misc{bea_data,
   title = {Interactive Data Application},
   author = {{Bureau of Economic Analysis}},
@@ -91,7 +119,7 @@
   note = {accessed February 2026}
 }
 
-% Reference 10
+% Reference 11
 @misc{fred_data,
   title = {Federal Reserve Economic Data (FRED)},
   author = {{Federal Reserve Bank of St. Louis}},
@@ -100,7 +128,7 @@
   note = {accessed February 2026}
 }
 
-% Reference 11
+% Reference 12
 @manual{bea_r_package,
   title = {bea.R: Bureau of Economic Analysis API},
   author = {Batch, Andrea and Chen, Jeff and Kampas, Walt},
@@ -109,7 +137,7 @@
   url = {https://CRAN.R-project.org/package=bea.R}
 }
 
-% Reference 12
+% Reference 13
 @manual{fredr_package,
   title = {fredr: An R Client for the 'FRED' API},
   author = {Boysel, Sam and Vaughan, Davis},
@@ -118,7 +146,7 @@
   url = {https://CRAN.R-project.org/package=fredr}
 }
 
-% Reference 13
+% Reference 14
 @article{hughes2019value,
   title = {The Value of {US} Government Data to {US} Business Decisions},
   author = {Hughes-Cromwick, Ellen and Coronado, Julia},
@@ -130,7 +158,7 @@
   doi = {10.1257/jep.33.1.131}
 }
 
-% Reference 14
+% Reference 15
 @misc{dallasfed_nominal,
   title = {Deflating Nominal Values to Real Values},
   author = {{Federal Reserve Bank of Dallas}},
@@ -139,7 +167,7 @@
   note = {accessed February 2026}
 }
 
-% Reference 15
+% Reference 16
 @misc{hamilton2014logarithms,
   title = {Use of logarithms in economics},
   author = {Hamilton, James D. and Chinn, Menzie},
@@ -149,7 +177,7 @@
   note = {Econbrowser. Accessed February 2026}
 }
 
-% Reference 16
+% Reference 17
 @misc{census_soc_methodology,
   title = {Survey of Construction (SOC): Methodology},
   author = {{U.S. Census Bureau}},
@@ -158,7 +186,7 @@
   note = {accessed February 2026}
 }
 
-% Reference 17
+% Reference 18
 @misc{bls_ppi_handbook,
   title = {Producer Price Indexes: Handbook of Methods},
   author = {{Bureau of Labor Statistics}},
@@ -167,7 +195,7 @@
   note = {Accessed February 2026}
 }
 
-% Reference 18
+% Reference 19
 @misc{bls_cpi_concepts,
   title = {Consumer Price Index: Concepts},
   author = {{Bureau of Labor Statistics}},
@@ -177,7 +205,7 @@
   note = {BLS Handbook of Methods. Accessed February 2026}
 }
 
-% Reference 19
+% Reference 20
 @article{rudkin2025ballmapper,
   title = {An Introduction to Topological Data Analysis Ball Mapper in R},
   author = {Rudkin, Simon},
@@ -187,7 +215,7 @@
   note = {accessed February 2026}
 }
 
-% Reference 20
+% Reference 21
 @article{qiu2020refining,
   title = {Refining understanding of corporate failure through a topological data analysis mapping of {A}ltman's {Z}-score model},
   author = {Qiu, Wanling and Rudkin, Simon and D{\l}otko, Pawe{\l}},
@@ -198,7 +226,7 @@
   doi = {10.1016/j.eswa.2020.113475}
 }
 
-% Reference 21
+% Reference 22
 @manual{ballmapper_package,
   title = {BallMapper: The Ball Mapper Algorithm},
   author = {D{\l}otko, Pawe{\l}},
@@ -207,7 +235,7 @@
   url = {https://CRAN.R-project.org/package=BallMapper}
 }
 
-% Reference 22
+% Reference 23
 @misc{bls_cps_concepts,
   title = {Current Population Survey: Concepts},
   author = {{Bureau of Labor Statistics}},
@@ -217,50 +245,7 @@
   note = {BLS Handbook of Methods. Accessed February 2026}
 }
 
-% Reference 23
-@misc{investopedia_demandpull,
-  title = {Demand-Pull Inflation: Definition, How It Works, Causes, vs. Cost-Push Inflation},
-  author = {{Investopedia}},
-  year = {n.d.},
-  url = {https://www.investopedia.com/terms/d/demandpullinflation.asp},
-  note = {accessed February 2026}
-}
-
 % Reference 24
-@article{marsh2021inflation,
-  title = {Look at 1960s, not 1970s, to learn how {US} inflation took hold},
-  author = {Marsh, David},
-  year = {2021},
-  month = {November},
-  journal = {OMFIF},
-  url = {https://www.omfif.org/2021/11/look-at-1960s-not-1970s-to-learn-how-us-inflation-took-hold/},
-  note = {accessed February 2026}
-}
-
-% Reference 25
-@misc{evercore2024booms,
-  title = {Booms and Busts: A Brief History of Capital Spending Cycles},
-  author = {{Evercore Wealth and Trust}},
-  year = {2024},
-  month = {September},
-  day = {30},
-  url = {https://evercorewealthandtrust.com/booms-and-busts-a-brief-history-of-capital-spending-cycles/},
-  note = {accessed February 2026}
-}
-
-% Reference 26
-@article{sussman2019wealth,
-  title = {New Estimates of the Stock Market Wealth Effect},
-  author = {Sussman, Anna Louie},
-  year = {2019},
-  month = {August},
-  journal = {NBER Digest},
-  publisher = {National Bureau of Economic Research},
-  url = {https://www.nber.org/digest/aug19/new-estimates-stock-market-wealth-effect},
-  note = {accessed February 2026}
-}
-
-% Reference 27
 @misc{fed_monetary_goals,
   title = {Monetary Policy: What Are Its Goals? How Does It Work?},
   author = {{Board of Governors of the Federal Reserve System}},
@@ -270,7 +255,7 @@
   note = {accessed February 2026}
 }
 
-% Reference 28
+% Reference 25
 @article{csardi2006igraph,
   title = {The igraph software package for complex network research},
   author = {Csardi, Gabor and Nepusz, Tamas},
@@ -283,7 +268,7 @@
   note = {accessed February 2026}
 }
 
-% Reference 29
+% Reference 26
 @manual{pedersen2024ggraph,
   title = {ggraph: An Implementation of Grammar of Graphics for Graphs and Networks},
   author = {Pedersen, Thomas Lin},
@@ -292,7 +277,7 @@
   url = {https://CRAN.R-project.org/package=ggraph}
 }
 
-% Reference 30
+% Reference 27
 @misc{jacoby2022behind,
   title = {What Does it Mean When the Fed is 'Behind the Curve?'},
   author = {Jacoby, Tony},
@@ -304,39 +289,50 @@
   note = {accessed February 2026}
 }
 
-% Reference 31
-@incollection{michaelides2024fisher,
-  title = {The Fisher Equation},
-  author = {Michaelides, Panayotis G.},
-  booktitle = {21 Equations that Shaped the World Economy: Understanding the Theory Behind the Equations},
+% Reference 28
+@misc{investopedia_demandpull,
+  title = {Demand-Pull Inflation: Definition, How It Works, Causes, vs. Cost-Push Inflation},
+  author = {{Investopedia}},
+  year = {n.d.},
+  url = {https://www.investopedia.com/terms/d/demandpullinflation.asp},
+  note = {accessed February 2026}
+}
+
+% Reference 29
+@article{marsh2021inflation,
+  title = {Look at 1960s, not 1970s, to learn how {US} inflation took hold},
+  author = {Marsh, David},
+  year = {2021},
+  month = {November},
+  journal = {OMFIF},
+  url = {https://www.omfif.org/2021/11/look-at-1960s-not-1970s-to-learn-how-us-inflation-took-hold/},
+  note = {accessed February 2026}
+}
+
+% Reference 30
+@misc{evercore2024booms,
+  title = {Booms and Busts: A Brief History of Capital Spending Cycles},
+  author = {{Evercore Wealth and Trust}},
   year = {2024},
-  publisher = {Springer},
-  pages = {113--120},
-  doi = {10.1007/978-3-031-76140-9_9},
-  url = {https://link.springer.com/chapter/10.1007/978-3-031-76140-9_9}
+  month = {September},
+  day = {30},
+  url = {https://evercorewealthandtrust.com/booms-and-busts-a-brief-history-of-capital-spending-cycles/},
+  note = {accessed February 2026}
+}
+
+% Reference 31
+@article{sussman2019wealth,
+  title = {New Estimates of the Stock Market Wealth Effect},
+  author = {Sussman, Anna Louie},
+  year = {2019},
+  month = {August},
+  journal = {NBER Digest},
+  publisher = {National Bureau of Economic Research},
+  url = {https://www.nber.org/digest/aug19/new-estimates-stock-market-wealth-effect},
+  note = {accessed February 2026}
 }
 
 % Reference 32
-@misc{bryan2013greatinflation,
-  title = {The Great Inflation},
-  author = {Bryan, Michael},
-  year = {2013},
-  month = {November},
-  url = {https://www.federalreservehistory.org/essays/great-inflation},
-  note = {Federal Reserve History. Accessed February 2026}
-}
-
-% Reference 33
-@misc{stlouisfed2023lags,
-  title = {What Are "Long and Variable Lags" in Monetary Policy?},
-  author = {{Federal Reserve Bank of St. Louis}},
-  year = {2023},
-  month = {October},
-  url = {https://www.stlouisfed.org/on-the-economy/2023/oct/what-are-long-variable-lags-monetary-policy},
-  note = {On the Economy Blog. Accessed February 2026}
-}
-
-% Reference 34
 @misc{corbett2013oilshock,
   title = {Oil Shock of 1973–74},
   author = {Corbett, Michael},
@@ -346,7 +342,17 @@
   note = {Federal Reserve History. Accessed February 2026}
 }
 
-% Reference 35
+% Reference 33
+@misc{bryan2013greatinflation,
+  title = {The Great Inflation},
+  author = {Bryan, Michael},
+  year = {2013},
+  month = {November},
+  url = {https://www.federalreservehistory.org/essays/great-inflation},
+  note = {Federal Reserve History. Accessed February 2026}
+}
+
+% Reference 34
 @article{rudkin2024brexit,
   title = {An economic topology of the {B}rexit vote},
   author = {Rudkin, Simon and Barros, Lucy and D{\l}otko, Pawe{\l} and Qiu, Wanling},
