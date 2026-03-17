@@ -1,0 +1,1674 @@
+% ============================================================
+%  US_TDA_clean.tex  -  AJUR submission version
+%  Cleaned from Quarto-generated output.
+%  Compile with XeLaTeX (required for EB Garamond via fontspec).
+%
+%  Figure files expected in:  figures/
+%    fig-newGraph-1.pdf   fig-newGraph-2.pdf
+%    fig-EDA-1.pdf        fig-Fisher-1.pdf
+%    fig-PPI-CPI_Gap-1.pdf  fig-Wage_Growth-1.pdf
+%
+%  Recommended R export settings (in your .qmd chunks):
+%    Single figures (fig-EDA, fig-Fisher, etc.):
+%      fig-width: 6.73   fig-height: <match original>   dpi: 300
+%    Side-by-side pair (fig-newGraph):
+%      fig-width: 8.42   fig-height: <match original>   dpi: 300
+% ============================================================
+
+\documentclass[10pt, letterpaper]{article}
+
+% ------ Page geometry (AJUR: 1" T/L/B, 0.5" R) ----------------
+\usepackage[top=1in, left=1in, bottom=1in, right=0.5in]{geometry}
+
+% ------ Font: EB Garamond (requires XeLaTeX or LuaLaTeX) -------
+\usepackage{fontspec}
+\setmainfont{EB Garamond}
+\usepackage{anyfontsize}
+
+% ------ Math ---------------------------------------------------
+\usepackage{amsmath, amssymb}
+
+% ------ Microtypography ----------------------------------------
+\usepackage{microtype}
+
+% ------ Spacing & paragraph style (AJUR: single, no indent) ----
+\usepackage{setspace}
+\setstretch{1}
+\frenchspacing
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+\setlength{\emergencystretch}{3em}
+
+% ------ Section headings: bold, ALL CAPS already in text, unnumbered
+\setcounter{secnumdepth}{-\maxdimen}
+\usepackage{titlesec}
+\titleformat{\section}{\normalfont\bfseries}{}{0em}{}
+\titlespacing{\section}{0pt}{12pt plus 4pt minus 2pt}{4pt plus 1pt minus 1pt}
+\titleformat{\subsection}{\normalfont\itshape}{}{0em}{}
+\titlespacing{\subsection}{0pt}{8pt}{2pt}
+
+% ------ Captions: AJUR size-8, bold label, period separator ----
+\usepackage{caption}
+\usepackage{subcaption}
+\captionsetup{
+  font            = {small},
+  labelfont       = {bf},
+  labelsep        = period,
+  justification   = raggedright,
+  singlelinecheck = false
+}
+
+% ------ Tables -------------------------------------------------
+\usepackage{longtable, booktabs, array, colortbl, multirow, calc}
+\usepackage[table]{xcolor}
+\usepackage{float}
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+
+% ------ Graphics -----------------------------------------------
+\usepackage{graphicx}
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+% ------ Footnotes: bold uppercase letters (AJUR style) ---------
+\renewcommand{\thefootnote}{\textbf{\Alph{footnote}}}
+
+% ------ Hyperlinks ---------------------------------------------
+\usepackage{bookmark}
+\usepackage{xurl}
+\urlstyle{same}
+\usepackage[draft]{hyperref}
+\hypersetup{
+  colorlinks = true,
+  linkcolor  = {blue},
+  filecolor  = {Maroon},
+  citecolor  = {Blue},
+  urlcolor   = {Blue}
+}
+
+% ------ Tight list spacing (Pandoc helper) ---------------------
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+% ------ Citation machinery (Pandoc citeproc) -------------------
+\NewDocumentCommand\citeproctext{}{}
+\NewDocumentCommand\citeproc{mm}{%
+  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
+\makeatletter
+  \let\@cite@ofmt\@firstofone
+  \def\@biblabel#1{}
+  \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
+\makeatother
+
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newenvironment{CSLReferences}[2]
+  {\begin{list}{}{%
+    \setlength{\itemindent}{0pt}
+    \setlength{\leftmargin}{0pt}
+    \setlength{\parsep}{0pt}
+    \ifodd #1
+      \setlength{\leftmargin}{\cslhangindent}
+      \setlength{\itemindent}{-1\cslhangindent}
+    \fi
+    \setlength{\itemsep}{#2\baselineskip}}}
+  {\end{list}}
+\newcommand{\CSLBlock}[1]{\hfill\break\parbox[t]{\linewidth}{\strut\ignorespaces#1\strut}}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+
+\begin{document}
+
+
+{
+\centering
+{\fontsize{16}{19}\selectfont\textbf{Mapping the Shape of the U.S. Economy: A Topological Data Analysis Approach with Ball Mapper}}\par
+\vspace{6pt}
+}
+
+\emph{Ryan Johnson}\textsuperscript{*}
+
+\emph{Graduate, Department of Mathematics, University of Alaska
+Anchorage, Anchorage, AK}
+
+Student: \emph{johnson.ryan-0@pm.me}\textsuperscript{*} \newline Mentor:
+\emph{scook25@alaska.edu}
+
+\section{ABSTRACT}\label{abstract}
+
+Topological Data Analysis (TDA) is a developing data analysis method.
+Currently, a large body of TDA research utilizes the traditional Mapper
+algorithm. This paper aims to show an entry-level path into TDA, and to
+expand the body of literature using Ball Mapper--an algorithm adjacent
+to traditional Mapper. Using U.S. macroeconomic data from the Bureau of
+Economic Analysis (BEA), the Federal Reserve Bank (FRB), and the Bureau
+of Labor Statistics (BLS), we begin by showcasing Ball Mapper's use in
+exploratory data analysis. We then show how we can effectively use Ball
+Mapper in combination with other derived economic measures: the Real
+Interest Rate, PPI-CPI Gap, and Real Wage Growth. Our results reveal an
+underlying structure in the U.S. economy from 1960 to 2024. Illustrated
+through Ball Mapper's graphs, we find that economic expansion contains
+distinct stages, that peaks and troughs are structurally separate from
+the broader expansion cycle, and that no two economic contractions are
+alike. Notably, despite not being included as an input, our analyses
+uncovered meaningful relationships between years, which suggests that
+the relationships seen are inherent to the economic data itself.
+
+\section{KEYWORDS}\label{keywords}
+
+Topological Data Analysis; Topology; TDA; Ball Mapper; Mapper; Data
+Science; Economics; Macroeconomics
+
+\section{INTRODUCTION}\label{introduction}
+
+Topological Data Analysis (TDA) is an emerging field of data analysis
+that offers a unique vantage point for exploring complex data. Broadly,
+traditional TDA applications use two tools: an algorithm called Mapper,
+whose output is represented by a mathematical graph, and an analysis
+technique called Persistent
+Homology.\textsuperscript{\citeproc{ref-madukpe2025mapper}{\textbf{1}}}\footnote{A mathematical graph, from Graph Theory, is a diagram that consists of nodes and edges.}
+These two tools are not necessarily dependent on one another and both
+provide information about data in their own right. Moreover, Mapper and
+Persistent Homology are central to TDA's core argument: data contains an
+underlying shape, and this shape can provide us with qualitative, and
+sometimes quantitative, insights about large multidimensional
+datasets.\textsuperscript{\citeproc{ref-chazal2021introduction}{\textbf{2}}}
+
+At a high level, Mapper is used to explore and visualize
+high-dimensional data. Briefly, the Mapper algorithm achieves this by
+producing a mathematical graph using a filter function. This graph
+presents a picture analogous to taking an x-ray of the data, revealing
+the skeleton of the dataset; it allows one to find structural
+relationships that are not obvious at first glance. Persistent
+Homology's goal is to uncover topological features of a dataset
+(components, holes, voids, etc.) through various scales. As an example,
+think about viewing a small picture made of dots as you move it from
+touching your nose to arm's length away. Too close, you only see
+individual dots; too far away, the dots merge together into a singular
+shape. Persistent Homology takes observational notes about how the
+picture changes across all the various distances.
+
+Moving forward, we will use the terms ``traditional Mapper'' and
+``Mapper'' interchangeably. When we use the term ``traditional Mapper,''
+we are referring to the methodology for Mapper presented by Singh et
+al.\textsuperscript{\citeproc{ref-singh2007topological}{\textbf{3}}} in
+2007. This is an important distinction because the concept of the Mapper
+methodology has been implemented in various ways by changing the filter
+function and other parameters.
+
+Although Persistent Homology provides insight into the topological
+features our data contains, the focus of this paper is on the structural
+exploration that Mapper and Mapper variations offer. Specifically, we
+are examining various macroeconomic indicators of the United States
+(U.S.) using a Mapper-adjacent algorithm called Ball Mapper (BM). One
+advantage of BM is that it requires fewer parameters than traditional
+Mapper, allowing for easier implementation.
+
+In traditional Mapper, one must pass the data through three stages, all
+with their own parameters, in order to generate a graph. Ball Mapper,
+however, only needs one parameter before producing a
+graph.\textsuperscript{\citeproc{ref-dlotko2019ball}{\textbf{4}}} An
+important trade-off between Ball Mapper and traditional Mapper is that
+while BM reduces the number of steps, one loses the ability to fine-tune
+outputs. Additionally, traditional Mapper literature presents itself as
+requiring a mathematical background, such as an introductory course in
+Topology, or conceptual knowledge of data science methods and
+algorithms. Although it is not impossible to learn TDA without the above
+backgrounds, TDA might seem unnecessarily complicated for data analysis,
+or impossible to decipher.
+
+One major motivation for this paper came from a paper by D\l{}otko et
+al.\textsuperscript{\citeproc{ref-dlotko2019mapping}{\textbf{5}}} The
+paper was a two-pronged macroeconomic analysis using Ball Mapper. The
+first prong used a dataset of five macroeconomic variables from 16
+countries from the 1870s to 2017. The authors were interested in
+comparing how countries have evolved over time, their transformation
+from the Great Depression Era, and various views on wealth and
+inequality. The second prong was to look at the relationship between
+private credit growth and the GDP of various countries. This paper was
+the only one in the literature that we could find that combines both
+macroeconomics and Ball Mapper.
+
+This analysis will expand the small body of literature whose main focus
+is applications with Ball
+Mapper.\textsuperscript{\citeproc{ref-madukpe2025mapper}{\textbf{1}}} We
+also hope that it will serve as an on-ramp for anyone interested in TDA
+who feels inundated with jargon during early-stage research.
+
+Using U.S. macroeconomic data from the Bureau of Economic Analysis
+(BEA), the Federal Reserve Bank (FRB), and the Bureau of Labor
+Statistics (BLS), we plan to achieve these objectives in two stages. The
+first stage is to show Ball Mapper's use in exploratory data analysis
+(EDA) by looking at structural observations, coloration, and the size
+variation of nodes in our graph. Then, using what we demonstrated in our
+first stage, we extend that framework to other derived macroeconomic
+measures: the Real Interest
+Rate,\footnote{Approximation using the Fisher Equation.}\textsuperscript{\citeproc{ref-mcclung2024fisher}{\textbf{6}},
+\citeproc{ref-michaelides2024fisher}{\textbf{7}}} PPI-CPI
+Gap,\footnote{Producer Price Index: Finished Goods less Consumer Price Index.}\textsuperscript{\citeproc{ref-bls_ppi_cpi_comparison}{\textbf{8}}}
+and Real Wage
+Growth.\textsuperscript{\citeproc{ref-sullivan1997trends}{\textbf{9}}}\footnote{Compensation less Inflation (CPI).}
+
+\section{METHODS AND PROCEDURES}\label{methods-and-procedures}
+
+\emph{Data Selection \& Preparation}
+
+We pulled data from three publicly available U.S. government sources:
+The Bureau of Economic Analysis (BEA), The Federal Reserve Bank (FRB),
+and The Bureau of Labor Statistics
+(BLS).\textsuperscript{\citeproc{ref-bea_data}{\textbf{10}},
+\citeproc{ref-fred_data}{\textbf{11}}} We gathered the data using R via
+two application programming interfaces (APIs): one for data from the
+BEA, and the other from the Federal Reserve Economic Data (FRED)
+API.\textsuperscript{\citeproc{ref-bea_r_package}{\textbf{12}},
+\citeproc{ref-fredr_package}{\textbf{13}}}\footnote{FRED aggregates data from national and international sources, as well as public and private sources.}
+We additionally used recession dates based on business cycle
+contractions and expansions provided by the National Bureau of Economic
+Research (NBER). These agencies were selected because they are
+authoritative sources for U.S. economic data. Their widespread use in
+both the private and public sectors gives us high confidence in the
+accuracy and integrity of the
+data.\textsuperscript{\citeproc{ref-hughes2019value}{\textbf{14}}}
+
+\begin{table}[H]
+
+\centering{
+
+\fontsize{8.0pt}{10.0pt}\selectfont
+\begin{tabular*}{1\linewidth}{@{\extracolsep{\fill}}lcccc>{\centering\arraybackslash}p{\dimexpr 90.00pt -2\tabcolsep-1.5\arrayrulewidth}c}
+\toprule
+Data Series & Series Abbreviation & Year Start & Year End & Frequency & Series & API \\ 
+\midrule\addlinespace[2.5pt]
+Gross Domestic Product & GDP & 1930 & 2024 & Annual & Table 1.1.1 & BEA \\ 
+{\cellcolor[HTML]{F2F2F2}{Personal Income \& Its Disposition}} & {\cellcolor[HTML]{F2F2F2}{PID}} & {\cellcolor[HTML]{F2F2F2}{1948}} & {\cellcolor[HTML]{F2F2F2}{2024}} & {\cellcolor[HTML]{F2F2F2}{Annual}} & {\cellcolor[HTML]{F2F2F2}{Table 2.1}} & {\cellcolor[HTML]{F2F2F2}{BEA}} \\ 
+Foreign Direct Investment & FDI & 2014 & 2024 & Annual & Direct Investment and MNE & BEA \\ 
+{\cellcolor[HTML]{F2F2F2}{Federal Funds Rate}} & {\cellcolor[HTML]{F2F2F2}{FFR}} & {\cellcolor[HTML]{F2F2F2}{1955}} & {\cellcolor[HTML]{F2F2F2}{2025}} & {\cellcolor[HTML]{F2F2F2}{Annual}} & {\cellcolor[HTML]{F2F2F2}{RIFSPFFNA}} & {\cellcolor[HTML]{F2F2F2}{FRED}} \\ 
+Employment Cost Index & ECI & 2001 & 2025 & Quarterly & ECIALLCIV & FRED \\ 
+{\cellcolor[HTML]{F2F2F2}{Consumer Price Index}} & {\cellcolor[HTML]{F2F2F2}{CPI}} & {\cellcolor[HTML]{F2F2F2}{1947}} & {\cellcolor[HTML]{F2F2F2}{2025}} & {\cellcolor[HTML]{F2F2F2}{Monthly}} & {\cellcolor[HTML]{F2F2F2}{CPIAUCSL}} & {\cellcolor[HTML]{F2F2F2}{FRED}} \\ 
+New Privately-Owned Housing Units Started & Housing Starts & 1959 & 2025 & Monthly & HOUST & FRED \\ 
+{\cellcolor[HTML]{F2F2F2}{Producer Price Index - Finished Goods}} & {\cellcolor[HTML]{F2F2F2}{PPI}} & {\cellcolor[HTML]{F2F2F2}{1947}} & {\cellcolor[HTML]{F2F2F2}{2025}} & {\cellcolor[HTML]{F2F2F2}{Monthly}} & {\cellcolor[HTML]{F2F2F2}{WPSFD49207}} & {\cellcolor[HTML]{F2F2F2}{FRED}} \\ 
+Unemployment Rate & Unrate & 1948 & 2025 & Monthly & UNRATE & FRED \\ 
+\bottomrule
+\end{tabular*}
+
+}
+
+\caption{\label{tbl-Data_Sources}Summary of data series, time period,
+and sources for this analysis.}
+
+\end{table}%
+
+Table~\ref{tbl-Data_Sources} shows all the data series we considered for
+this analysis. We excluded Employment Cost Index (ECI) and Foreign
+Direct Investment (FDI) due to their limited availability of years. Of
+the remaining data series, New Privately-Owned Housing Units Started
+(Housing Starts) had the smallest range and so set our lower bound for
+the range years used (1960-2024). Our upper bound was the latest full
+calendar year that was available. We wanted to represent the economy
+from various vantage points, i.e., the broad economy, policy makers,
+consumers, business owners, etc. Table~\ref{tbl-Analysis_Data} shows the
+data series that we felt were representative of the economy as a whole
+and had data for our time period of interest. Within each of these
+series we used a subset of columns to construct our final dataset for
+analysis. To see what parts of the economy we determined each series
+plays, the column Functional Description summarizes them and can be
+found in Table~\ref{tbl-Analysis_Data}.
+
+For this analysis we are focusing on an annual time frame and data
+transformation was needed. Looking at Table~\ref{tbl-Data_Sources}, not
+all our data was provided on an annual basis.
+Table~\ref{tbl-Analysis_Data} shows a summary of the transformation
+taken and the details for each follow.
+
+The first transformation we did was on Personal Income and Its
+Disposition (subsequently, Personal Income). This data is reported in
+nominal dollars and does not account for inflation. So, to account for
+inflation we used the Consumer Price Index (CPI) to transform our values
+from nominal dollars to real dollars
+(Equation~\ref{eq-CPI_Real}).\textsuperscript{\citeproc{ref-dallasfed_nominal}{\textbf{15}}}
+We then took the log difference (Equation~\ref{eq-deltaLog}) from the
+output from Equation~\ref{eq-CPI_Real} to get an approximate percentage
+change from the preceding year.
+
+\begin{equation}\phantomsection\label{eq-CPI_Real}{
+\text{Real Dollars} = \frac{\text{Nominal Dollars}}{\text{CPI}} \times 100
+}\end{equation}
+
+Calculating the year-over-year percent change using log differences
+provides us with a few advantages. First, taking the log stabilizes the
+variance and makes exponential trends across the series more linear.
+Second, the difference between log values approximates the true
+percentage change well for small to moderate values. Further, the log
+difference allows for symmetric percent changes: increases or decreases
+from year to year are of equal
+magnitude.\textsuperscript{\citeproc{ref-hamilton2014logarithms}{\textbf{16}}}
+An interesting question that has not been explored to our knowledge is
+the impact on linearized data and Ball Mapper's distance metric, the
+Euclidean distance. Further exploration of this question will be touched
+on in the \emph{Discussion} section.
+
+\begin{equation}\phantomsection\label{eq-deltaLog}{
+\Delta\ln{(\text{Level})} = 
+[\ln{(\text{Level}_{t})} - \ln{(\text{Level}_{t-1})}] \times 100
+}\end{equation}
+
+Our next transformations were applied to housing starts, Producer Price
+Index - Finished Goods (PPI), and CPI. All three of these sources were
+only provided on a monthly time frame, so to get an annual value for
+them we used the simple arithmetic mean. Once these data were in annual
+form, we then found the percent change from the previous year using the
+log difference (Equation~\ref{eq-deltaLog}).
+
+Housing starts data is given in a seasonally adjusted annual rate
+(SAAR). To get this number the U.S. Census first takes the raw monthly
+number of housing starts reported to their survey. Then they adjust that
+number to account for seasonal patterns (e.g.~summertime booms or winter
+lulls), and finally they multiply it by 12. How we interpret this final
+number is: for the reporting month, it is the number of houses that
+would be built at the end of a 12-month
+period.\textsuperscript{\citeproc{ref-census_soc_methodology}{\textbf{17}}}
+
+\begin{table}[H]
+
+\centering{
+
+\fontsize{8.0pt}{10.0pt}\selectfont
+\begin{tabular*}{1\linewidth}{@{\extracolsep{\fill}}llll}
+\toprule
+Series Abbreviation & Economic Role & Functional Description & Transformation Applied \\ 
+\midrule\addlinespace[2.5pt]
+GDP & Growth Composition & Consumption, Investment, Gov., and Trade & None (Source in \% Change) \\ 
+{\cellcolor[HTML]{F2F2F2}{PID}} & {\cellcolor[HTML]{F2F2F2}{Income Structure}} & {\cellcolor[HTML]{F2F2F2}{Wages, Entrepreneurship, Gov. Transfers}} & {\cellcolor[HTML]{F2F2F2}{Real Adjustment \& Log Difference}} \\ 
+UnRate & Labor Market Dynamics & Labor Distress Level and Trend & None (Annual Rate) \& Simple Difference \\ 
+{\cellcolor[HTML]{F2F2F2}{FFR}} & {\cellcolor[HTML]{F2F2F2}{Monetary Policy}} & {\cellcolor[HTML]{F2F2F2}{Cost of Capital and Borrowing Conditions}} & {\cellcolor[HTML]{F2F2F2}{None (Annual Rate) \& Simple Difference}} \\ 
+PPI & Supply-Side Signal & Producer Costs \& Measures Cost-Push Inflation & 12-month Avg. \& Log Difference \\ 
+{\cellcolor[HTML]{F2F2F2}{CPI}} & {\cellcolor[HTML]{F2F2F2}{Demand-Side Signal}} & {\cellcolor[HTML]{F2F2F2}{Cost of Living \& Measures Demand-Pull Inflation}} & {\cellcolor[HTML]{F2F2F2}{12-month Avg. \& Log Difference}} \\ 
+Housing Starts & Leading Indicator & Physical Residential Production & 12-month Avg. \& Log Difference \\ 
+\bottomrule
+\end{tabular*}
+
+}
+
+\caption{\label{tbl-Analysis_Data}All years for analysis are 1960-2024.}
+
+\end{table}%
+
+Both PPI and CPI are economic indexes that represent a weighted average
+of goods they respectively track. Although PPI has many different
+series, the one used for this analysis tracks the price the producer
+receives from the physical goods that it sells to businesses or
+consumers. An important distinction to note about the PPI used here is
+that the index captures goods which are finished or final in the
+economic sense. Colloquially, it is similar to the wholesale price a
+retailer might pay to a producer before marking up for retail sales.
+However, it also includes goods which are sold to businesses, think
+fully assembled computers or fleet
+vehicles.\textsuperscript{\citeproc{ref-bls_ppi_handbook}{\textbf{18}}}
+CPI on the other hand captures the consumer side and the retail price.
+That is, the cost of the good after profit margin, transportation costs,
+and other intermediary costs are calculated into a goods price sold at
+the
+register.\textsuperscript{\citeproc{ref-bls_cpi_concepts}{\textbf{19}}}
+Broadly, both have been associated with measuring inflation for
+producers and consumers. The more nuanced understanding is that index
+changes can reflect many things: cost-push inflation, demand-pull
+inflation, supply shocks, monetary policy inflation, and wage-price
+spirals are just a few examples. It is our hope that Ball Mapper might
+show the distinctive separation in the various aforementioned reasons
+for the PPI and CPI indexes changing from year to year.
+
+Finally, after all the transformations are complete, we used a total of
+16 variables from our selected data series
+(Table~\ref{tbl-Analysis_Data}) for our analysis. Again, we aimed to use
+a comprehensive set of variables to represent the U.S. economy. A list
+of variables used can be found in Table~\ref{tbl-Analysis_Dimensions} in
+no particular order.
+
+\begin{table}[H]
+
+\centering{
+
+\fontsize{8.0pt}{10.0pt}\selectfont
+\begin{tabular*}{1\linewidth}{@{\extracolsep{\fill}}llll}
+\toprule
+ &  &  &  \\ 
+\midrule\addlinespace[2.5pt]
+PPI Finished Change & Personal Income & Compensation & Entrepreneurship \\ 
+{\cellcolor[HTML]{F2F2F2}{Transfers}} & {\cellcolor[HTML]{F2F2F2}{Consumption}} & {\cellcolor[HTML]{F2F2F2}{Domestic Investment}} & {\cellcolor[HTML]{F2F2F2}{Government Spending}} \\ 
+Exports & Imports & Inflation & Unemployment \\ 
+{\cellcolor[HTML]{F2F2F2}{Unemployment Change}} & {\cellcolor[HTML]{F2F2F2}{Fed Rate}} & {\cellcolor[HTML]{F2F2F2}{Fed Rate Change}} & {\cellcolor[HTML]{F2F2F2}{Housing Change}} \\ 
+\bottomrule
+\end{tabular*}
+
+}
+
+\caption{\label{tbl-Analysis_Dimensions}Variables inculde in Ball Mapper
+Point Cloud}
+
+\end{table}%
+
+\emph{Ball Mapper}
+
+In-depth descriptions of Ball Mapper's theory have been covered in
+various
+papers.\textsuperscript{\citeproc{ref-dlotko2019ball}{\textbf{4}},
+\citeproc{ref-rudkin2025ballmapper}{\textbf{20}},
+\citeproc{ref-qiu2020refining}{\textbf{21}}} As the aim of our paper is
+to provide an introductory foray into Ball Mapper and TDA in general, we
+will omit some of the more technical details below.
+
+Theoretically, Ball Mapper supposes we are given a dataset \(X\) with
+\(K\) dimensions, \(N\) observations and some metric \(d\). Then to
+create a Ball Mapper graph, our goal is to construct a collection of
+balls, let's call it \(B\), with a constant radius, \(\epsilon\), such
+that every observation of our dataset is covered by at least one ball in
+\(B\). Mathematically, this is written as follows: Let \((X, d)\) be a
+metric space where \(X \subset \mathbb{R}^K\) is our dataset and \(d\)
+is a distance metric on \(X\). For a fixed radius \(\epsilon >0\), let
+\(C \subseteq X\) be a set of center points. Then for each \(c \in C\),
+we define a ball
+\(b(c, \epsilon) = \{x \in X : d(c, x) \leq \epsilon\}\). Our collection
+then is \(B = \{b(c, \epsilon) : c \in C\}\) and
+\(\bigcup_{b \in B} b = X\).
+
+In practice, our dataset \(X\) is called a Point Cloud. Our \(N\)
+observations or rows are normally referenced as points, and our \(K\)
+dimensions, the columns of \(X\), are denoted variables. Since Ball
+Mapper is known to handle large multidimensional datasets well, it is
+common to have point clouds with dimensions \(K > 2\). Ball Mapper was
+originally written in R, but later on was adapted for use in Python. For
+this analysis we used R and the Ball Mapper package aptly named
+``BallMapper''.\textsuperscript{\citeproc{ref-ballmapper_package}{\textbf{22}}}
+
+To construct the Ball Mapper (BM) graph, the balls of our graph are
+created in an iterative manner and not a predetermined manner like the
+theory defines. If we pre-defined a subset of ball centers, it would
+take away from the driving idea behind TDA--that data has shape--as well
+as start moving into the territory of other clustering methods such as
+K-Means Clustering, where you select a number of clusters based on
+statistical properties of the data. This iterative process allows our
+point cloud to cluster in a ``natural'' way based on our choice of
+epsilon and distance metric.
+
+\begin{equation}\phantomsection\label{eq-euclideanDistance}{
+d(x_i, x_j) = 
+\sqrt{(x_{i_1} - x_{j_1})^2 + (x_{i_2} - x_{j_2})^2 + \ldots + (x_{i_k} - x_{j_k})^2} \leq \epsilon
+}\end{equation}
+
+The iterative ball creation is carried out in a linear fashion from the
+first row to the last of the point cloud. The result of this linear
+selection process is a greedy, sequential creation of ball centers. How
+this works is that it takes the first point, let's call it \(c_1\), of
+the point cloud and assigns it as the center of the first node in our
+graph. Then using the default distance metric, the Euclidean Distance
+(Equation~\ref{eq-euclideanDistance}), it compares every point in the
+point cloud to \(c_1\) to create
+\(b_1 = b(c_1, \epsilon) = \{x \in X : d(c_1, x) \leq \epsilon \}\).
+After this first ball is created, Ball Mapper looks for the next row in
+the point cloud that is not a member of the first ball, and assigns it
+as the next center. This process continues until all the points are in a
+ball and the union of balls covers our whole point cloud.
+
+Hopefully, it is clear now why this process can be described as greedy
+and sequential. It relies a great deal on the point cloud order as well
+as the epsilon. In fact, the Ball Mapper graph changes for epsilons
+sufficiently large enough to change at least one point's inclusion or
+exclusion to a ball; the graph can also change for unique orders of the
+point cloud rows. We touch on this in greater detail during our
+\emph{Discussion}.
+
+The last step to the Ball Mapper graph is to draw the edges if they
+exist. The way the BM algorithm is structured, it allows for the
+possibility of points to be in multiple balls. When two balls (also
+called nodes) contain the same point, they are said to intersect. If two
+nodes share at least one point, then an edge is created. If there is
+more than one shared point, the number of shared points dictates the
+edge strength. So, once we have all the nodes, edges, and edge
+strengths, we then can construct a Ball Mapper graph. The Ball Mapper
+algorithm described above can be broken down as follows:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Select a point \(x_i \in X\) and assign it as \(c_i\).
+\item
+  Given \(\epsilon > 0\), construct a ball \(b_i(c_i, \epsilon)\) with a
+  center \(c_i\) and radius \(\epsilon\) by checking if \(x_j\)
+  satisfies \(d(c_i, x_j) \leq \epsilon : x_j \in X\) and \(d\) is the
+  distance metric (Equation~\ref{eq-euclideanDistance}).
+\item
+  Place \(b_i\) in a set \(B\).
+\item
+  Select another \(x_n\) and repeat steps 1--3 such that
+  \(x_n \neq x_j : x_j \in b_i\).
+\item
+  Draw an edge between \(b_i, b_j \in B : b_i \neq b_j\) if
+  \(b_i \cap b_j \neq \emptyset\), weighting the edge based on the size
+  of the intersection.
+\end{enumerate}
+
+\emph{Implementation}
+
+To use Ball Mapper one only needs three parts: a point cloud, a variable
+to color by, and an epsilon. For this analysis, our point cloud was made
+up of 16 variables and 65 points, each representing a year from
+1960--2024. Two of the variables, \emph{Unemployment Change} and
+\emph{Fed Rate Change}, were created before any transformation took
+place. We elected to create these because the Unemployment Rate
+(Unemployment) and the Federal Funds Rate (Fed Rate) were the only two
+dimensions which did not have a transformation and thus did not have a
+year-over-year change like our other variables. Having the rate of
+change for both Unemployment and the Fed Rate is also important because
+it gives us additional information beyond the intrinsic value of each of
+the measures. Both measures on their own give us a current look at the
+economy: the Unemployment Rate telling us how many who are not working
+but want
+to,\textsuperscript{\citeproc{ref-bls_cps_concepts}{\textbf{23}}} and
+the Fed Rate signaling the structural cost of
+capital.\textsuperscript{\citeproc{ref-fed_monetary_goals}{\textbf{24}}}
+
+There seems to be no generally accepted way of choosing epsilon in the
+literature. Since Ball Mapper constructs maps by selecting a point and
+creating a ball with a radius of epsilon, it is possible to select an
+epsilon small enough to produce a graph where every point is a node of
+only itself. Conversely, this should lead to an epsilon big enough such
+that all of our points are included in one node. For our analysis here,
+this was indeed the case. So to find an appropriate epsilon we first
+started by finding lower and upper bounds.
+
+What we look for in our lower bound is a graph with an epsilon small
+enough to make every point in our point cloud a node of one point, a
+singleton node, not connected to any point. For our upper bound we
+similarly look for an epsilon so large that it creates a singular node
+that houses all of our points. Additionally, to reduce some of the
+computational time one can look for a lower bound where a connected
+component starts to form, and an upper bound where we have a connected
+component of only two nodes. This cuts off tail end graphs that
+generally don't provide much substantial insight into the data.
+
+For our analysis we found an initial lower and upper bound represented
+by the interval \([0.38, 0.90]\). We then wrote a function to generate
+around 100 graphs, reviewed them, and narrowed the upper and lower
+bounds to \([0.40, 0.70]\). During this narrowing process we were
+looking for interesting features: connected components forming or
+dissolving, flares coming off of any components, and notable sizing or
+coloration patterns. The resulting value of this process was \(0.474\).
+We thought it contained all the aforementioned features. This final
+epsilon is used for all the graphs generated in the analysis.
+
+\begin{figure}[H]
+
+\begin{minipage}{0.50\linewidth}
+
+\centering{
+
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{figures/fig-newGraph-1.pdf}
+
+}
+
+\subcaption{\label{fig-newGraph-1}Ball Mapper graph using standard
+function, ColorIgraphPlot.}
+
+\end{minipage}%
+%
+\begin{minipage}{0.50\linewidth}
+
+\centering{
+
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{figures/fig-newGraph-2.pdf}
+
+}
+
+\subcaption{\label{fig-newGraph-2}Ball Mapper graph using new graph
+output created with ggraph.}
+
+\end{minipage}%
+
+\caption{\label{fig-newGraph}Ball Mapper graph colored by Year; epsilon
+set to 0.511.}
+
+\end{figure}%
+
+Before describing some visual changes we made to the Ball Mapper output
+graph, it is important to note that Ball Mapper will output the same
+graph unless at least one of two things changes: the size of the point
+cloud changes or the order of the point cloud. The former intuitively
+makes sense. The algorithm is creating epsilon radius balls so adding or
+subtracting any data will yield a different amount of points in at least
+one ball. Depending on the data being changed or number of points, the
+structure of the output might not change much. As an example, when we
+were deciding on which PPI series to use, we had a multitude of choices.
+Initially we used PPI - All Commodities but when reading the BLS
+handbook on PPI, it specifically mentions that PPI - All Commodities is
+susceptible to double counting. To avoid this issue we used PPI -
+Finished Goods
+instead.\textsuperscript{\citeproc{ref-bls_ppi_handbook}{\textbf{18}}}
+
+The standard Ball Mapper package in R produces a sufficient graph for
+analysis. The output object of the Ball Mapper algorithm is a series of
+nodes, edges, edge weights, and other graph properties created by the
+package
+\emph{igraph}.\textsuperscript{\citeproc{ref-csardi2006igraph}{\textbf{25}}}
+Separate from the igraph object, a graphing function that uses R's base
+plot function and default coloring scheme produces the visual graph.
+This is an advantage because when packages are written in Base R they
+are usable to anyone who can install R. We, however, felt that this
+graph output could be improved upon and recognized that we could use
+alternative, and more comprehensive packages to create a graph,
+\emph{ggraph}.\textsuperscript{\citeproc{ref-pedersen2024ggraph}{\textbf{26}}}
+
+Using the same underlying output igraph object from Ball Mapper, we
+created the same graph in ggraph but changed the visual representation
+and added another helpful piece of information, edge weight, that was
+given but not used in the default BM graph. Looking at
+Figure~\ref{fig-newGraph}, we have the standard Ball Mapper graph output
+on the left (Figure~\ref{fig-newGraph-1}), and our new ggraph output on
+the right (Figure~\ref{fig-newGraph-2}). The most prominent changes are
+the spread of the network and coloration.
+
+Looking at Figure~\ref{fig-newGraph-2}, having the nodes spread out
+helps us see the structure of our graph more clearly as well as the edge
+weight between nodes. We see that highlighting the edge strength
+presents a potential insight between certain nodes. Although our data is
+relatively small, consisting of 65 rows, one could imagine the advantage
+Figure~\ref{fig-newGraph-2} might have with a data set much larger than
+this one (e.g.~looking at our time frame on a quarterly or monthly
+basis). Additionally, we changed the color palette for accessibility and
+readability.
+
+For Figure~\ref{fig-newGraph-2} and Figure~\ref{fig-EDA}, we use Year as
+our initial coloring variable. We started with this variable because
+D\l{}otko et
+al.\textsuperscript{\citeproc{ref-dlotko2019mapping}{\textbf{5}}}
+provided a framework for this type of analysis. In this paper the
+authors started by coloring their graphs by Year to initially understand
+the shape of their data. Later, in the second half of their analysis,
+they produced more graphs each colored by the point cloud's variables.
+Since we have 16 dimensions to our point cloud, an analysis of that size
+is outside the scope of this paper. An additional note about D\l{}otko
+et al., when they colored by the variable `Year', it was not a variable
+in their point cloud. Mentioned in the \emph{Introduction}, we
+recognized the usefulness of this technique and extended this idea to
+our point cloud. Specifically, we calculated variables from our data
+that we thought represented different economic lenses: the Real Interest
+Rate (Figure~\ref{fig-Fisher}), PPI-CPI Gap
+(Figure~\ref{fig-PPI-CPI_Gap}), and Real Wage Growth
+(Figure~\ref{fig-Wage_Growth}).
+
+The Fisher Equation (Equation~\ref{eq-fisherEquation}) is a mathematical
+relationship to approximate the Real Interest Rate. It captures the
+lived experience of purchasing power for producers and consumers by
+showing what is left of a nominal interest rate after accounting for
+inflation--in our case we are using the nominal Federal Funds Rate (Fed
+Rate). When the real interest rate is negative, inflation is higher than
+the Fed Rate and is sometimes described as the Federal Reserve (the Fed)
+being, ``behind the
+curve.''\textsuperscript{\citeproc{ref-jacoby2022behind}{\textbf{27}}}
+Being behind the curve can stem from various factors but some common
+interpretations are, the Federal Reserve does not want to try and tame
+inflation because of the possible negative impact on the labor market,
+or the Federal Reserve is hopeful that the economy will grow into the
+inflation, thereby raising wages up to or beyond inflation. On the other
+hand, when the real interest rate is positive, the Fed Rate is higher
+than inflation and could signal that the Federal Reserve is cautious
+about inflation's impact on the economy. This is described as being
+``ahead of the curve.'' If the Fed Rate is ahead of the curve, it
+indicates the cost of capital is higher causing businesses to ``feel''
+the rate. In reaction to business being more expensive to conduct,
+employers might cut costs or freeze hiring, directly affecting the labor
+market as a result of keeping prices stable. An important note about the
+Fisher equation: the approximation does not hold well when nominal
+interest rates (Fed Rate) are relatively high and when time spans are
+short.\textsuperscript{\citeproc{ref-michaelides2024fisher}{\textbf{7}}}
+
+\begin{equation}\phantomsection\label{eq-fisherEquation}{
+\text{Real Interest Rate} \approx \text{Fed Rate} - \text{Inflation}
+}\end{equation}
+
+We calculated the PPI-CPI Gap by taking the difference between PPI -
+Finished Goods and CPI (inflation). As a quick reminder, PPI represents
+an ``at-cost'' revenue (before adding margin, transportation,
+\emph{etc.}) that producers receive, and CPI is a common measure of
+consumer inflation. It is important to note that although CPI is used
+for general consumer inflation, the Federal Reserve prefers Personal
+Consumption Expenditures (PCE) because it tracks more normal consumer
+behavior such as substitution of products. The predominant question for
+this measure was: if producers or consumers are experiencing inflation,
+can our graph show the primary driving force behind the complex nature
+that is inflation?
+
+Similar in nature to the PPI-CPI gap, we took the difference between
+Compensation and Inflation as an approximate measure for Real Wage
+Growth. With this measure, we were interested in the relationship
+between people's annual compensation and inflation, i.e., are wages
+keeping up with inflation. Generally, for this relationship, positive
+numbers indicate that wages are growing faster than inflation, and vice
+versa if it is negative--effectively people are taking a pay cut.
+
+\section{RESULTS}\label{results}
+
+\emph{Exploratory Data Analysis}
+
+Figure~\ref{fig-EDA} shows three different connected components and many
+nodes not connected to any others. A connected component is when at
+minimum, two nodes share one edge. If a node is not connected to any
+other node, they are called singletons. When a node is a singleton, it
+suggests that node is unlike all the other data points and indicates
+that it is a possible outlier in the
+dataset.\textsuperscript{\citeproc{ref-dlotko2019mapping}{\textbf{5}}}
+Since our graph consists of 40 nodes and three components, we will
+provide all the singletons in a table
+(Table~\ref{tbl-Singleton_Summary}). For the three connected components,
+we see there is one large and two small components. Moving clockwise,
+starting with the large component on the left-hand side, we will label
+them C1,\footnote{Nodes: 4, 24, 25, 27, 29, 34, 35, 36, 40}
+C2,\footnote{Nodes: 7 and 8} and C3\footnote{Nodes: 2 and 28} for ease
+of reference. To prime the reader, the following section briefly
+discusses interpretation of Ball Mapper graphs via visual inspection. We
+then apply our knowledge to our three derived metrics to finish the
+section. Afterwards, we move to the \emph{Discussion} section where we
+investigate the contents of our nodes and R is a necessary tool.
+
+\begin{figure}[H]
+
+\centering{
+
+\includegraphics[width=0.8\linewidth,height=\textheight,keepaspectratio]{figures/fig-EDA-1.pdf}
+
+}
+
+\caption{\label{fig-EDA}Ball Mapper graph colored by Year; epsilon set
+to 0.474.}
+
+\end{figure}%
+
+When doing a visual inspection of Ball Mapper graphs, there are
+essentially two categories to view it through: coloration and shape.
+Most often, the coloration of the Ball Mapper graph is used to highlight
+a variable of interest, or certain known structures in the data. This
+could take the form of highlighting known outliers, showing a coloration
+pattern (e.g.~a smooth gradient from one end of the graph to the other),
+or a combination of the two; i.e., nodes which do not conform to
+patterning. Figure~\ref{fig-EDA} shows us no global coloration pattern,
+but does reveal four sub-groups of colors in C1 as well as the
+mismatching coloration for C3. From visual inspection, C1's four
+sub-groups of colors show distinct time periods: 1990s (magenta),
+mid-2000s (yellow), 2020s (orange), and 2000 (light terracotta). We also
+notice that for C3, 2000 and 1980 are what time periods its nodes show,
+while C2 shows a consistent mid-1980s coloration. Looking at shape and
+structure of the graph, as mentioned above, nodes contain an edge
+between them when there is an intersection of at least one point.
+Additionally, the edge weight is commensurate with how many points are
+in the intersection, and the overall size of the node indicates the
+number of points it contains. Particular to C1, nodes which are not
+directly connected by an edge (e.g.~Nodes 24 and 36), can be taken as
+similar in some fashion, but also signal a significant difference within
+the
+component.\textsuperscript{\citeproc{ref-dlotko2019mapping}{\textbf{5}}}
+
+Examining C2 and C3 closer, C2's nodes are colored very similarly, and
+are of the same size. As a relative measure, using
+Table~\ref{tbl-Singleton_Summary}, we look at our singletons and notice
+that many only hold one point. Thus, comparing C2 and C3 nodes, we
+should expect around one to two points in each of the nodes. C2's nodes
+contain the years 1968 and 1969 in nodes 7 and 8, respectively, and 2000
+is in both, creating the edge. Mentioned previously, C3's coloration is
+not consistent. Node 2 contains 1961 and node 28 contains 2001 with 2002
+being our bridge year. What is an interesting observation that will come
+up again when looking at C1 is how different, but grouped together the
+years are. This brings up questions as to why 1961 and 2001 would be
+seen as similar and is explored in the \emph{Discussion} section.
+
+Structure-wise, C1 is the largest component and contains nine total
+nodes. We mentioned already that it contains three subgroups of colors
+and observed the indicated years they visually represent. Of the nine
+nodes that make up C1, we are provided two distinct parts: a large
+triangle made of the largest nodes with strongly connected nodes (4, 29,
+and 36); and a sweeping arm to the left of the triangle that contains
+leaves on each end (nodes 25 and
+34).\footnote{The term leaf (leaves) could also be called a flare. How we define flare is two or more nodes in a row that are hanging off the main body of a component.}
+The combination of structure along with the subsets of the colors
+immediately present a notable result. On the upper half of our arm we
+see nodes 25, 24, and 27 all colored similarly. We have a similar
+outcome for the bottom half of the arm and one node from our triangle.
+Conversely, and equally interesting, the triangle's nodes are three
+distinct colors, while also being the largest nodes in the graph and
+containing the strongest edge strengths between them.
+
+\begin{table}[H]
+
+\centering{
+
+\fontsize{8.0pt}{10.0pt}\selectfont
+\begin{tabular*}{1\linewidth}{@{\extracolsep{\fill}}clclclclclcl}
+\toprule
+Node & Year(s) & Node & Year(s) & Node & Year(s) & Node & Year(s) & Node & Year(s) & Node & Year(s) \\ 
+\midrule\addlinespace[2.5pt]
+{\bfseries 1} & 1960 & {\bfseries 10} & 1971 & {\bfseries 15} & 1976, 1977 & {\bfseries 20} & 1982 & {\bfseries 30} & 2007 & {\bfseries 38} & 2021 \\ 
+{\bfseries \cellcolor[HTML]{F2F2F2}{3}} & {\cellcolor[HTML]{F2F2F2}{1962, 1965}} & {\bfseries \cellcolor[HTML]{F2F2F2}{11}} & {\cellcolor[HTML]{F2F2F2}{1972, 1998}} & {\bfseries \cellcolor[HTML]{F2F2F2}{16}} & {\cellcolor[HTML]{F2F2F2}{1978}} & {\bfseries \cellcolor[HTML]{F2F2F2}{21}} & {\cellcolor[HTML]{F2F2F2}{1983}} & {\bfseries \cellcolor[HTML]{F2F2F2}{31}} & {\cellcolor[HTML]{F2F2F2}{2008}} & {\bfseries \cellcolor[HTML]{F2F2F2}{39}} & {\cellcolor[HTML]{F2F2F2}{2022}} \\ 
+{\bfseries 5} & 1966 & {\bfseries 12} & 1973 & {\bfseries 17} & 1979 & {\bfseries 22} & 1984 & {\bfseries 32} & 2009 & {\bfseries } &  \\ 
+{\bfseries \cellcolor[HTML]{F2F2F2}{6}} & {\cellcolor[HTML]{F2F2F2}{1967}} & {\bfseries \cellcolor[HTML]{F2F2F2}{13}} & {\cellcolor[HTML]{F2F2F2}{1974}} & {\bfseries \cellcolor[HTML]{F2F2F2}{18}} & {\cellcolor[HTML]{F2F2F2}{1980}} & {\bfseries \cellcolor[HTML]{F2F2F2}{23}} & {\cellcolor[HTML]{F2F2F2}{1985, 1986}} & {\bfseries \cellcolor[HTML]{F2F2F2}{33}} & {\cellcolor[HTML]{F2F2F2}{2010}} & {\bfseries \cellcolor[HTML]{F2F2F2}{}} & {\cellcolor[HTML]{F2F2F2}{}} \\ 
+{\bfseries 9} & 1970 & {\bfseries 14} & 1975 & {\bfseries 19} & 1981 & {\bfseries 26} & 1991 & {\bfseries 37} & 2020 & {\bfseries } &  \\ 
+\bottomrule
+\end{tabular*}
+
+}
+
+\caption{\label{tbl-Singleton_Summary}Singleton nodes and the years they
+contain.}
+
+\end{table}%
+
+Although we would need to investigate what points make up the nodes to
+gain more insight into our data, on the surface what we can conclude
+about C1 is: the sweeping arm seems to have two groups representing two
+time periods in our range of years. We also notice that nodes 27, 35,
+and 34 make their own small cycle of nodes but are a mix of the two
+aforementioned time periods. Lastly, our triangle has a combination of
+factors which warrant further investigation: the nodes are the largest
+in size indicating they contain the most points; each pair of the nodes
+(4, 29, 36) contain the strongest edge strengths of the whole graph; all
+three nodes are distinct colors indicating separate time periods; and
+finally, the distinct colors seem to contain a path through time going
+from 2000 (node 4) around in a counter-clockwise direction to present
+day (2020--2024).
+
+\emph{Real Interest Rate}
+
+Figure~\ref{fig-Fisher} shows us that colors representing blue/mint
+green are negative values which represent inflation far outpacing the
+Fed Rate. In contrast, values colored yellow/orange show us that Fed
+Rates are very high compared to inflation. In general we notice that
+there are not many nodes which are blue or mint colored, and most nodes
+range from purple to yellow (approximately -2 to 4). Looking at the
+extreme ends (less than -4 or greater than 6), we see there are about
+four nodes for each end. On the low end are nodes 39, 14, 38, and 34;
+and on the high end are nodes 19--21. The reader may have noticed both
+groups of nodes seem to be consecutive (or close to), this is not a
+random event but a feature in Ball Mapper. We touched on this in the
+Methods and Procedures: Ball Mapper section, and will revisit this idea
+in our \emph{Discussion}. Lastly, and the only case of a coloration
+gradient, C1 shows a smooth transition from negative values at the
+bottom (34) to positive in a sweeping fashion like our arm.
+
+\emph{PPI-CPI Gap}
+
+Figure~\ref{fig-PPI-CPI_Gap} shows a very different distribution of
+colors compared to Figure~\ref{fig-Fisher}. Overall, a majority of our
+nodes are below the midpoint of the legend. This shows that regardless
+of the driver behind inflation on both consumers and producers, consumer
+inflation tends to outpace producers. Additionally, our legend is not
+balanced like it is in Figure~\ref{fig-Fisher}; this supports our
+clustering of values below the middle of our legend. In fact, we see
+that many nodes seem to be from -2 to -1. With a discerning eye, we
+estimate to have three nodes which are at the very end of our negative
+values (nodes 23, 37, and 9). However, on the opposite end there is only
+one node that appears to be an extreme positive, node 39.
+
+\begin{figure}[H]
+
+\centering{
+
+\includegraphics[width=0.8\linewidth,height=\textheight,keepaspectratio]{figures/fig-Fisher-1.pdf}
+
+}
+
+\caption{\label{fig-Fisher}Ball Mapper graph colored by the Real
+Interest Rate; epsilon set to 0.474.}
+
+\end{figure}%
+
+\emph{Real Wage Growth}
+
+Similar to Figure~\ref{fig-PPI-CPI_Gap}, there is a clear concentration
+of values on one end of our legend Real Wage Growth shown in
+Figure~\ref{fig-Wage_Growth}. Using the center of the legend as a
+reference point, we can see that Figure~\ref{fig-Wage_Growth} is even
+more skewed than Figure~\ref{fig-PPI-CPI_Gap}; its zero starts two tick
+marks from the center instead of one. To give a range for the
+overwhelming yellow coloring, most values seem to fall between -2.5 and
+2.5, with most of these values lying right around zero. With many values
+indicating zero, our selected time period tells us that wages have
+seemed to keep pace with inflation. Although
+Figure~\ref{fig-Wage_Growth} and Figure~\ref{fig-PPI-CPI_Gap} are
+showing different measures, Real Wage Growth shows a much longer tail.
+Intuitively this makes sense because with the PPI-CPI Gap, both
+producers and consumers play a similar role, i.e., they are a consumer
+to someone. On the other hand, if inflation spikes and a business cannot
+keep up with wages, there can be much more of a divergence. That said,
+nodes 18, 19, and 17 might be cases for this and further investigation
+is found in the \emph{Discussion} section.
+
+\section{DISCUSSION}\label{discussion}
+
+Often with Ball Mapper analyses EDA and visual inspection are the first
+steps, and then inspection of what points are housed in each node done
+after. This process of looking into each node helps us understand why we
+are seeing certain structures and the coloration. To do this
+investigative work, we combined all of our dimensions in our point cloud
+(Table~\ref{tbl-Analysis_Data}) with our three derived economic measures
+(Real Interest Rate, PPI-CPI Gap, Real Wage Growth), as well as the
+Year, GDP, NBER recession/expansion indication, and a Row ID to join all
+the data together (Table~\ref{tbl-Discussion_Data}). For the remainder
+of the discussion we will look closely at each component, starting with
+C2 and C3. We will spend a significant portion on C1 due to its size and
+complexity. Then we will turn to the singletons and finish with some
+questions and future research.
+
+\emph{C2}
+
+C2 is similarly colored across nodes, but this is misleading because of
+the average value used for coloration. Nodes 7 and 8 contain the years
+1968 and 1969, respectively, and the year 2000 forms the connecting
+edge. Ball Mapper has paired these years together because of their
+shared macroeconomic structures. What our analysis suggests is that C2
+represents an economic peak that shows a demand-pull inflation
+structure, reflecting the adage ``too much money chasing too few
+goods.''\textsuperscript{\citeproc{ref-investopedia_demandpull}{\textbf{28}}}
+Further, C2 describes a clean or structurally coherent peak, and shows
+that this kind of peak contains distinct stages.
+
+In Figure~\ref{fig-Fisher} through Figure~\ref{fig-Wage_Growth}, nodes 7
+and 8 both show real interest rates approaching 3\%, PPI-CPI gaps close
+to zero, as well as near-zero values for real wage growth. These three
+metrics indicate the economy was running hot but stable. Prices were not
+rising disproportionately for either producers or consumers. Both nodes
+also show strong GDP growth and very tight labor markets where
+unemployment has been falling through the points in C2. Where C2 splits
+into stages is that node 7 seems to represent early-stage demand-pull
+inflation, and node 8 represents late-stage. In node 7 this shows up in
+the positive housing starts (5.6\%), real wage growth (1.3\%), moderate
+inflation (3.7\%), and a Fed Rate (6.0\%) that has been rising
+throughout the years. Node 8, however, tells a different story: housing
+starts roll over (-2.9\%), real wage growth shrinking to almost zero
+(0.17\%), inflation continuing to rise (4.3\%) and the Federal Reserve
+aggressively responding with a nominal rate of 7.2\%.
+
+The parallel between early and late-stage demand-pull inflation is
+reflected in distinct historical policy and business choices. The
+late-1960s demand was primarily supported by mid-1960s fiscally driven
+policies, spending by the government on the Vietnam war, expansion of
+the workforce from college-aged graduates, and family
+formation.\textsuperscript{\citeproc{ref-marsh2021inflation}{\textbf{29}}}
+In 2000, corporate spending accelerated in anticipation of the digital
+age, playing a similar demand-driving role to the 1960s policies. This
+inevitably fueled the ``wealth effect'', encouraging consumers to drive
+up
+demand.\textsuperscript{\citeproc{ref-evercore2024booms}{\textbf{30}},
+\citeproc{ref-sussman2019wealth}{\textbf{31}}}
+
+\begin{figure}[H]
+
+\centering{
+
+\includegraphics[width=0.8\linewidth,height=\textheight,keepaspectratio]{figures/fig-PPI-CPI_Gap-1.pdf}
+
+}
+
+\caption{\label{fig-PPI-CPI_Gap}Ball Mapper graph colored by PPI less
+CPI (PPI-CPI Gap); epsilon set to 0.474.}
+
+\end{figure}%
+
+\emph{C3}
+
+Similar to C2, node 2 is misleading on the surface in
+Figure~\ref{fig-EDA}, it contains years 1961 and 2002 but the average
+value places it around the 1980s. Node 28 however is much closer in
+years, 2001 and 2002. Between the two nodes, though, we notice there is
+a common theme: they show an economy which is at a trough and has
+stabilized. What we mean is that this component seems to represent when
+a contraction has ended, but recovery has not started. Further, unlike
+C2 we find that C3 shows two different types of troughs: labor market
+trough and an investment trough. Both nodes show average muted GDP
+growth (2.2\% for node 2; 1.4\% for node 28), low Fed Rates (both nodes
+less than 2.8\%) falling throughout the year, housing starts are
+positive, and inflation is under control (1.3\% and 2.2\%). However,
+where they differ is that the labor market seems to break in node 2.
+Here we see personal income and compensation relatively intact (1.7\%
+and 1.0\% respectively), and high unemployment (6.2\%) that has been
+rising being cushioned by elevated transfer utilization. Conversely,
+node 28 also has elevated unemployment levels, but personal income and
+compensation are low, causing real wage growth to turn negative
+(-2.0\%). Additionally, domestic investment pulls back aggressively
+(-3.3\%), suggesting business pulling back is the primary driver behind
+this node.
+
+\emph{C1}
+
+As mentioned above, what is striking about C1 is that there are two
+shapes: a triangle and a sweeping arm that runs along the triangle's
+left side. Although we have not found any literature that explores the
+relationship between nodes and edge strength (how many points they
+share), the triangle (denoted body from now on) was something
+immediately of interest. Beginning with Real Wage Growth, it falls
+between -2.5\% and 2.5\% (Figure~\ref{fig-Wage_Growth}), with an average
+value of -0.065. A value close to zero tells us that for the points in
+C1, wages have generally kept up with inflation. The PPI-CPI Gap
+(Figure~\ref{fig-PPI-CPI_Gap}) shows there is a main group of nodes
+centered around negative one with three nodes higher (25, 34, and 29),
+and one lower (40). These mostly negative values suggest that consumer
+inflation is generally outpacing producers in C1. It's worth noting,
+however, that our PPI measure does not consider profit margin added,
+transportation costs included, or other on-the-shelf costs. So this
+small differential that we see in C1 possibly could be reflecting that
+gap in pricing, but a more in depth analysis or additional data in our
+point cloud is needed to provide a more definitive answer. The real
+interest rate graph, Figure~\ref{fig-Fisher}, displays a color gradient
+for C1 that immediately stood out to us. Seeing that it moves from
+negative to positive values in a semi-orderly manner supports the idea
+that the nodes with negative values show inflation was outpacing the
+nominal Fed Rate; and as we move toward the positive values, we see that
+relationship flip, with the Fed Rate exceeding inflation. Supposing that
+the Federal Reserve was behind the curve for the negative values and
+ahead for positive, along with our knowledge that overall real wages
+have kept up and the PPI-CPI Gap is relatively small, we start to get a
+picture of what C1 could represent.
+
+\begin{figure}[H]
+
+\centering{
+
+\includegraphics[width=0.8\linewidth,height=\textheight,keepaspectratio]{figures/fig-Wage_Growth-1.pdf}
+
+}
+
+\caption{\label{fig-Wage_Growth}Ball Mapper graph colored by
+Compensation less Inflation (Real Wage Growth); epsilon set to 0.474.}
+
+\end{figure}%
+
+Indeed, what we have found for C1 is that it represents the U.S. economy
+at different states of growth. This does not mean that every node in C1
+is an instance of good economic conditions, but rather nodes represent
+certain ``phases'' that the economy goes through until it turns into a
+state of overheating expansion (peak) or coming out of a state of
+contraction (trough). What we have also found is that these peaks and
+troughs are not included in C1, but are represented by C2 and C3
+respectively.
+
+\emph{C1: Recovery and Resistance}
+
+Broadly, the stages can be categorized in different phases: recovery (34
+and 35), stability (29, 4, and 36), resistance (24, 25), and
+non-canonical (27 and 40). Starting with our recovery phase, we find
+signs of an economy that has been beaten down but is starting to come
+back to life. We find that 34 shows a very fragile economy and 35, being
+connected to more nodes, indicates more stability. The first thing we
+notice is that housing starts is positive, so builders are feeling
+confident that they can start projects. The ``big four'' economic
+indicators--GDP, Inflation, Unemployment, Fed Rate--on average, show
+signs of improvement. GDP is increasing, inflation cooling, Unemployment
+starting to fall, and the Fed Rate relatively low because they are
+trying to stimulate the economy. Additionally, real interest rates are
+negative and real wage growth is improving, suggesting that producers
+and consumers feel more confident about the economy.
+
+Next, we have what we call the resistance phase. Unlike our recovery
+phase, nodes 24 and 25 show two different sides of resistance. Node 24
+shows an economy which feels like it is still growing and running well.
+Unemployment, on average, is 5.4\% and trending downwards, inflation
+seems to be under control, around 3.1\%. However, at this stage there
+seems to be some cracks forming in the economy, the first being housing
+starts turning negative. What is also worrisome is the high Fed Rate
+(5.9\%) and the negative PPI-CPI gap (-1.1\%). The combination of these
+suggests that the Federal Reserve sees that CPI is running ahead of PPI
+and are concerned about producer inflation catching up to consumer
+inflation. With CPI outpacing PPI, consumer prices are currently rising,
+however if producer costs start to rise, the PPI-CPI Gap will start to
+close and inflation then is a problem for both producers and consumers.
+To counteract this, the Federal Reserve is preemptively trying to kill
+inflation for consumers with higher rates. Unfortunately, this has
+knock-on effects to the labor market restricting wage growth and
+possibly reversing the direction of unemployment. Node 25 shows the
+other side of what 24 was warning us about. Housing slows down even more
+(from close to -5\% to -10\%, on average), and the PPI-CPI Gap shrinks
+to almost zero; unlike node 24, producer price inflation is now catching
+up to consumer price inflation. Since both producers and consumer prices
+are rising, the Federal Reserve continues to raise rates to an average
+7\%, sending average real interest rates above 3\% and risking the labor
+market to decline and the economy to possibly enter a recession. We also
+see real wage growth plummeting from -0.16\% (node 24) to -2.23\% (node
+25). To illustrate this differential, suppose we were given \$1,000 at
+the end of the year and to either had to give some back (negative wage
+growth), or we received extra (positive wage growth). In node 24 we get
+that \$1,000 and give back \$1.60, however in 25 we would have to give
+back \$22.30. So, node 25 shows a ``last resort'' node before turning
+into a singleton node. This is similar to 34 in the sense that it is
+only connected to the other nodes in C1 by one other node, supporting
+this idea that they are the exit and entrance into economic growth.
+
+\begin{table}[H]
+
+\centering{
+
+\fontsize{8.0pt}{10.0pt}\selectfont
+\begin{tabular*}{1\linewidth}{@{\extracolsep{\fill}}llll}
+\toprule
+ &  &  &  \\ 
+\midrule\addlinespace[2.5pt]
+Year & PPI Finished Change & Personal Income & Compensation \\ 
+{\cellcolor[HTML]{F2F2F2}{Entrepreneurship}} & {\cellcolor[HTML]{F2F2F2}{Transfers}} & {\cellcolor[HTML]{F2F2F2}{GDP}} & {\cellcolor[HTML]{F2F2F2}{Consumption}} \\ 
+Domestic Investment & Government Spending & Exports & Imports \\ 
+{\cellcolor[HTML]{F2F2F2}{Inflation}} & {\cellcolor[HTML]{F2F2F2}{Unemployment}} & {\cellcolor[HTML]{F2F2F2}{Unemployment Change}} & {\cellcolor[HTML]{F2F2F2}{Fed Rate}} \\ 
+Fed Rate Change & Housing Change & Recession Span (0-1 by 0.25) & Expansion Span (0-1 by 0.25) \\ 
+{\cellcolor[HTML]{F2F2F2}{Row Number}} & {\cellcolor[HTML]{F2F2F2}{Real Interest Rate}} & {\cellcolor[HTML]{F2F2F2}{PPI CPI Gap}} & {\cellcolor[HTML]{F2F2F2}{Real Wage Growth}} \\ 
+\bottomrule
+\end{tabular*}
+
+}
+
+\caption{\label{tbl-Discussion_Data}Data used to review nodes, included
+additional data that was excluded from our point cloud.}
+
+\end{table}%
+
+\emph{C1: Stability}
+
+The final phase tells a story of stability and contains three stages or
+variations. Starting with node 29, we label it emerging-stability; it
+shows an economy that has found its legs and is now starting to gain
+some momentum. Across the three stages, 29 has the highest average
+unemployment at 5.4\% and the lowest average Fed Rate (1.5\%). The
+Federal Reserve (the Fed) is intentionally keeping rates low, making the
+real interest rate -0.81\%, to stimulate the economy. The goal is to
+make borrowing cheaper to create an incentive to producers and consumers
+to spend. The PPI-CPI gap at 0.16\% informs us that producer prices are
+slightly growing faster than consumer prices. There are no clear reasons
+as to why prices are higher on the producer side but some possibilities
+in the context of emerging-stability are: producers are seeing a pick up
+in demand or retailers that sell to consumers have not passed on costs
+to consumers yet in anticipation that conditions get better. Lastly,
+real wage growth is negative (-0.27\%) and consumption is at a moderate
+3.08\%--the middle average of the three nodes. These two averages
+support the signs that consumer confidence is gaining and the economy is
+coming back to life.
+
+The story of node 36 is one of extended-stability. Between the three
+stages, the producers and consumers seem to be more cautious; on
+average, the labor market is tightening (unemployment at 4.2\%), and GDP
+(2.5\%) along with housing starts (2.4\%) are at their lowest. We also
+see consumer spending slowing down between our three nodes at 2.56\%,
+which is consistent with real wage growth being close to zero (0.24\%).
+The Federal Reserve at this stage has achieved its goal shown by real
+interest rates at 0.01\% and inflation at 2.10\%. With its goals met
+(stable prices and maximum employment), it shifts to actively monitoring
+for any signs expansion is starting to overheat.
+
+Unlike node 36, node 4 shows the Federal Reserve comfortable with how
+the economy is running and is letting the economy run its course; we
+have identified it as full-stability. What gives the Federal Reserve
+confidence for a ``hands off'' approach is the low inflation rate
+(1.94\%), unemployment at 5.03\%, moderate housing starts (3.96\%), and
+strong GDP growth of 3.72\%. Looking at our three derived metrics, our
+real interest rate is 0.86\%, indicating a slight drag on borrowing,
+allowing the economy to moderate itself as it continues to run
+efficiently. Our PPI-CPI gap (-0.82\%) is telling us consumer prices are
+rising faster than producer prices. This gap in combination with the
+fact that this stage has the highest consumption (3.76\%) informs
+producers that demand is strong at the retail level. Consumers also
+benefit from real wage growth at 1.56\%; their wages are outpacing
+inflation, giving them an increase in purchasing power. To illustrate
+using our example for node 25, if we got \$1,000 at the end of the year,
+this positive real wage growth says that we get an extra \$15.60.
+
+\emph{C1: Non-canonical}
+
+Up to this point in our discussion we have seen various stages of the
+U.S. economy's expansion behavior. Two of our nodes in C1, 40 and 27, do
+not align with any ``phase'' we have talked about thus far. Starting
+with node 40, it is connected to both node 4 and 36; to recall, node 4
+is our full-stability and 36 is extended-stability. What we find with
+node 40 is that consumption is the driving factor. Despite headwinds to
+the consumer--inflation at 3.48\% and real wage growth at -1.38\%--they
+continue to buy. However, housing starts have turned negative (-6.20\%),
+signaling that builders are stepping back and consumers are stepping up.
+The Federal Reserve, observing consumer resilience and builders'
+caution, is trying to cool the economy (real interest rates at 1.61\%)
+without crashing the tight labor market (unemployment at 3.83\%).
+
+Why we chose to categorize node 27 as non-canonical is because it is the
+only node which is connected to all three of our phases. Looking at
+average values, node 27 shows a balancing act of trying to stimulate an
+economy that is slow to recover without further entrenching sticky,
+elevated unemployment. On the surface there are signs of confidence. GDP
+is at 3.33\%, there is high domestic investment (8.00\%), and housing
+starts have picked up (10.78\%). When looking at the real interest rate,
+the Fed Rate, and unemployment, though, we see a Federal Reserve trying
+not to spur inflation while trying to bring unemployment down. On one
+hand we have a real interest rate of 1.01\% that puts a small drag on
+growth, but on the other the Fed Rate has changed by -1.07\% and
+unemployment is elevated (6.60\%) but unchanging (-0.04\%).
+
+\emph{Singletons}
+
+So far we have discussed how our three components represent the various
+growth stages, structural peaks, and structural troughs for the U.S.
+economy. As one might expect, singleton nodes do represent states of
+contraction. However, in addition to the contractions, we found that
+singletons also represent non-structural, or unstable growth that could
+feel contractionary. To show that our singletons contain economic
+contractions we will use a combination of known economic crises as well
+as observations we found from our derived economic measures. We will
+also weave in time periods where the economy was growing but in an
+unusual or unstable way.
+
+Perhaps the most obvious years to show are The Great Recession
+(2007--2009). Although The Great Recession is known to be '07--'09,
+nodes 30--32 are the years 2007--2009; however, node 33, another
+singleton, is the year 2010 seen in Table~\ref{tbl-Singleton_Summary}.
+These years are marked by deep, negative housing starts, very large Fed
+Rate cuts, and high unemployment. Another more recent time period was
+the COVID-19 Pandemic. Starting in 2020, the pandemic lasted for a few
+years, and we see that nodes 37--39 harbor these years: 2020, 2021, and
+2022. In 2020, we had a contraction with unemployment rising very
+quickly and substantial transfers from government stimulus. Following
+2020, we had economic expansion in 2021 and 2022 despite people feeling
+the economy was in a state of contraction. In these two years, we see a
+pattern of growth that feels bad: positive GDP, falling unemployment,
+and positive domestic investment mixed with rising inflation, shrinking
+real wage growth, slowing housing starts, and rapidly rising PPI.
+
+Looking at Table~\ref{tbl-Singleton_Summary}, something the reader might
+notice is that from 1970--1986, nearly every year is a singleton with
+the exception of 1976--77 and 1985--86. This tells us that Ball Mapper
+has found meaningful differences between these years such that no year
+is similar in economic structure to another. Throughout this 16-year
+period, a few factors that contributed to the distinctiveness are
+external supply shocks and monetary policy decisions. The oil embargo of
+1973--74 was a textbook case of cost-push inflation. This supply shock
+is visible in Figure~\ref{fig-Wage_Growth}, where real wage growth
+reaches one of its lowest values. During 1974 workers' real wages fell
+to -12.06\%. Returning to our previous example, this is receiving that
+\$1,000 but having to give back \$120.60 of
+it.\textsuperscript{\citeproc{ref-corbett2013oilshock}{\textbf{32}}}
+
+In 1979 Paul Volcker became the Federal Reserve chairman. Prior to
+Volcker, the U.S. economy was dealing with the stagflation from the
+1970s, characterized by high inflation, rising unemployment, and
+stagnant growth. So, to eliminate the climbing inflation, Volcker
+decided to aggressively hike rates with rates peaking in 1981.
+Specifically, at their peak, Volcker raised the nominal interest rate
+(Fed Rate) to 16.39\% at the expense of the labor market. We see this
+decision distinctly in Figure~\ref{fig-Fisher}. Nodes 19--22 represent
+the years 1981--1984, which show us another example of a contractionary
+and expansionary period, this time through monetary policy. In 1981,
+real interest rates were 6.54\%, showing that the Federal Reserve was
+ahead of the curve. By doing this, Volcker achieved his goal of lowering
+inflation from 9.87\% in 1981 to 5.98\% in 1982. Raising the Fed Rate,
+though, made the cost of capital very expensive which caused
+unemployment to rise and stay around 9.65\% from 1982--83. So, during
+1981--82 we had a contraction period, and in 1983--84, we saw economic
+growth with instability in employment and elevated Fed
+Rates.\textsuperscript{\citeproc{ref-bryan2013greatinflation}{\textbf{33}}}
+
+\newpage
+
+\emph{Final Notes and Future Research}
+
+As the last part of our discussion, there are two primary areas. The
+first half touches on the limitations we found both with Ball Mapper and
+the design of our analysis. The second examines some of the unanswered
+questions that arose during the analysis which are possible avenues for
+future research.
+
+The primary limitations we had were the choice of time period and number
+of variables. Initially we used a set of variables we thought would
+represent the U.S. economy as a whole, but found that they did not all
+have consistent time ranges. Some data series, such as the Federal Funds
+Rate, ranged as far back as the early 1900s, and others were only
+created recently, such as Foreign Direct Investment (2014). While we had
+65 years of data, we were not able to capture early structural economic
+changes or events such as the Great Depression, the New Deal, and WWII.
+Alternatively, we could have chosen a different frequency of data, such
+as monthly or quarterly. This would have given us more points in our
+point cloud and perhaps a more nuanced picture of the U.S. economy. Our
+analysis also could have included more dimensions, testing Ball Mapper's
+ability to handle a multitude of dimensions. It also could have asked a
+more focused economic question to see if there is a nuanced structure in
+a particular area of the economy.
+
+Focusing on the technical limitations, the first is that the standard
+Euclidean Distance between points is the only distance metric used.
+Currently, in Ball Mapper (R version) there is no way to easily change
+the distance metric. To do so one would need to copy the source code of
+the \emph{BallMapper} function and either: adapt the code to add an
+argument for a distance metric, or hard code it into a copy of the
+original function. Additionally, the \emph{BallMapper} function in R
+uses a greedy, sequential algorithm to select ball centers. When a
+landmark is chosen, the Ball Mapper algorithm does so in a sequential
+top-down order. This rigid structure is good when others would like to
+verify the output of the graph; having the same dataset, in the same
+order, using the same epsilon, will produce the exact same graph.
+However, Ball Mapper could be susceptible to seasonal data where you
+have large naturally occurring spaces between the data. While
+seasonality is a valid characteristic of a dataset, it might not be the
+true underlying structure. Because of Ball Mapper's greedy, sequential
+algorithm, it may pick up on the seasonality of the data right away
+rather than comprehensively looking at the dataset. To fix some of these
+issues, one could randomize the dataset every time Ball Mapper is run,
+or make sure to seasonally adjust or normalize any data. Currently, some
+of these fixes have been implemented in the package \emph{pyBallMapper},
+written in Python. In this package they have added an order argument to
+allow randomization of rows. They also have included a distance metric
+argument so a user can choose what distance metric they would like to
+use. Finally, \emph{pyBallMapper} uses Python's NumPy package which
+utilizes vectorization, speeding up the sequential nature of the Ball
+Mapper algorithm.
+
+To start the second half, we noticed during the analysis there is not a
+clear way to know whether Ball Mapper is giving us a stable graph of our
+data. We discussed that if given the same data, in the same order, it
+indeed will give us the same graph. However, we did not find any
+literature answering this exact question. The closest paper we could
+find was one which studied the Brexit Vote using Ball Mapper. At the end
+of this paper they wrote about a robustness test they implemented by
+showing why the vote to leave the European Union
+passed.\textsuperscript{\citeproc{ref-rudkin2024brexit}{\textbf{34}}}
+What is unclear is how they ran a stated 10,000 repetitions. From what
+we know about the Ball Mapper algorithm, we could infer that they
+randomize the order of their data every time, or took infinitesimal
+slices of an interval such that theoretically Ball Mapper would produce
+a different graph. The former would be a good standard to show general
+robustness for any Ball Mapper output and could look like running many
+repetitions while randomizing the order of the data every time, and
+simultaneously collecting summary statistics of each graph. Some example
+statistics might include the number of components, nodes, and edges at a
+singular epsilon or a range of epsilons. One could also look at edges
+and edge weights for consistency, as well as some sort of base value,
+noting if there is a large or small variance.
+
+Moving to more abstract questions that came up during our analysis, our
+questions revolved around nodes' relationships to each other based on
+various factors: edge strength, connectedness (degree), and node size.
+Acknowledging that node relationships could have a combination of these
+factors, our primary questions are: does edge strength between nodes
+indicate a stronger relationship? For our graph, does the edge strength
+between nodes 4 and 29 represent a stronger structural signal than the
+edge between node 25 and 24? There is also the question of connectedness
+or degree--how many edges a node has. Similar to edge strength, does the
+fact that node 27 has three edges indicate its importance over node 34
+with just one edge? Lastly, and in combination with the previous two,
+does node size carry any relational value? Using our node 4 and node 29
+example again, since they are the largest nodes with the strongest edge
+weight, does this combination indicate that their relationship is
+stronger? That is, if we were to look at this graph over many epsilons,
+would the connection between nodes 4 and 29 persist while the connection
+between nodes 4 and 40 does not? All of these questions came up during
+our analysis, and to our knowledge have not been studied; they are all
+areas for future research on Ball Mapper.
+
+\section{CONCLUSIONS}\label{conclusions}
+
+Although there is much further work to do on developing Ball Mapper,
+through our analysis we have shown how TDA, and Ball Mapper in
+particular, is able to give insight into data that we might not see or
+describe easily. Throughout this paper we have hopefully guided our
+reader to better understand how Ball Mapper works, as well as shown a
+path to start implementing it. From our structural map of the U.S.
+economy from 1960 to 2024, Ball Mapper revealed structural expansion,
+structural ``clean'' peaks and troughs, as well as showing contractions
+and non-organic growth. By displaying the Ball Mapper output with a new
+graph, we were able to clearly explain how to systematically take
+high-level, global interpretations of our Ball Mapper output and use
+them in combination with lower-level, local, node-specific
+investigation. We also explained some of the limitations we discovered
+and touched on future work based on questions that came up for us during
+the analysis.
+
+Ball Mapper has been applied to many fields ranging across the social
+sciences, finance, and the life sciences. Ball Mapper, and TDA in
+general, may have an advantage in some of the social sciences because it
+can combine both qualitative and quantitative data in the same analysis.
+For instance, in our Brexit example from our \emph{Discussion}, the
+authors sought to understand qualitative and quantitative motivations
+behind the Brexit vote outcome. Some of the variables they used were
+Household composition (single, married, etc.), Car ownership (number of
+cars), Housing Tenure (Owned, Private rental, etc.), and Age. Whether
+Ball Mapper brings new insights, or shows what is known in a unique way,
+we hope that this paper serves as an accessible entry point for
+researchers of all disciplines who are interested in what TDA can offer.
+
+\section{REFERENCES}\label{references}
+
+\begin{CSLReferences}{1}{0}
+\bibitem[\citeproctext]{ref-madukpe2025mapper}
+\CSLLeftMargin{\textbf{1}. }%
+\CSLRightInline{Madukpe, V. N., Ugoala, B. C. and Zulkepli, N. F. S.
+(2025) A comprehensive review of the {M}apper algorithm, a topological
+data analysis technique, and its applications across various fields
+(2007--2025), \emph{arXiv preprint arXiv:2504.09042}
+\emph{\url{https://arxiv.org/abs/2504.09042}}}
+
+\bibitem[\citeproctext]{ref-chazal2021introduction}
+\CSLLeftMargin{\textbf{2}. }%
+\CSLRightInline{Chazal, F. and Michel, B. (2021) An introduction to
+topological data analysis: Fundamental and practical aspects for data
+scientists, \emph{Front. Artif. Intell.} 4, 667963.
+https://doi.org/\href{https://doi.org/10.3389/frai.2021.667963}{10.3389/frai.2021.667963}}
+
+\bibitem[\citeproctext]{ref-singh2007topological}
+\CSLLeftMargin{\textbf{3}. }%
+\CSLRightInline{Singh, G., Mémoli, F. and Carlsson, G. (2007)
+\href{https://www.researchgate.net/profile/Facundo-Memoli/publication/221571174_Topological_Methods_for_the_Analysis_of_High_Dimensional_Data_Sets_and_3D_Object_Recognition/links/02bfe50fe76b396b8f000000/Topological-Methods-for-the-Analysis-of-High-Dimensional-Data-Sets-and-3D-Object-Recognition.pdf}{Topological
+methods for the analysis of high dimensional data sets and {3D} object
+recognition}, \emph{in Eurographics symposium on point-based graphics},
+}
+
+\bibitem[\citeproctext]{ref-dlotko2019ball}
+\CSLLeftMargin{\textbf{4}. }%
+\CSLRightInline{Dłotko, P. (2019) Ball mapper: A shape summary for
+topological data analysis, \emph{arXiv preprint arXiv:1901.07410}
+\emph{\url{https://arxiv.org/abs/1901.07410}}}
+
+\bibitem[\citeproctext]{ref-dlotko2019mapping}
+\CSLLeftMargin{\textbf{5}. }%
+\CSLRightInline{Dłotko, P., Rudkin, S. and Qiu, W. (2019) Topologically
+mapping the macroeconomy, \emph{arXiv preprint arXiv:1911.10476}
+\emph{\url{https://arxiv.org/abs/1911.10476}}}
+
+\bibitem[\citeproctext]{ref-mcclung2024fisher}
+\CSLLeftMargin{\textbf{6}. }%
+\CSLRightInline{McClung, S. (2024)
+\href{https://inomics.com/terms/fisher-effect-1545486}{Fisher effect}, }
+
+\bibitem[\citeproctext]{ref-michaelides2024fisher}
+\CSLLeftMargin{\textbf{7}. }%
+\CSLRightInline{Michaelides, P. G. (2024)
+\href{https://doi.org/10.1007/978-3-031-76140-9_9}{The fisher equation},
+\emph{in 21 equations that shaped the world economy: Understanding the
+theory behind the equations} 113--120, Springer, }
+
+\bibitem[\citeproctext]{ref-bls_ppi_cpi_comparison}
+\CSLLeftMargin{\textbf{8}. }%
+\CSLRightInline{Bureau of Labor Statistics (2023)
+\href{https://www.bls.gov/ppi/methodology-reports/comparing-the-producer-price-index-for-personal-consumption-with-the-us-all-items-cpi-for-all-urban-consumers.htm}{How
+does the producer price index differ from the consumer price index?
+Comparing the personal consumption {PPI} with the {CPI}}, }
+
+\bibitem[\citeproctext]{ref-sullivan1997trends}
+\CSLLeftMargin{\textbf{9}. }%
+\CSLRightInline{Sullivan, D. G. (1997) Trends in real wage growth,
+\emph{Chicago Fed Letter}
+\emph{\url{https://www.chicagofed.org/publications/chicago-fed-letter/1997/march-115}}}
+
+\bibitem[\citeproctext]{ref-bea_data}
+\CSLLeftMargin{\textbf{10}. }%
+\CSLRightInline{Bureau of Economic Analysis (n.d.)
+\href{https://www.bea.gov/itable}{Interactive data application}, }
+
+\bibitem[\citeproctext]{ref-fred_data}
+\CSLLeftMargin{\textbf{11}. }%
+\CSLRightInline{Federal Reserve Bank of St. Louis (n.d.)
+\href{https://fred.stlouisfed.org/}{Federal reserve economic data
+(FRED)}, }
+
+\bibitem[\citeproctext]{ref-bea_r_package}
+\CSLLeftMargin{\textbf{12}. }%
+\CSLRightInline{Batch, A., Chen, J. and Kampas, W. (2018)
+\emph{\href{https://CRAN.R-project.org/package=bea.R}{Bea.r: Bureau of
+economic analysis API}}, }
+
+\bibitem[\citeproctext]{ref-fredr_package}
+\CSLLeftMargin{\textbf{13}. }%
+\CSLRightInline{Boysel, S. and Vaughan, D. (2021)
+\emph{\href{https://CRAN.R-project.org/package=fredr}{Fredr: An r client
+for the 'FRED' API}}, }
+
+\bibitem[\citeproctext]{ref-hughes2019value}
+\CSLLeftMargin{\textbf{14}. }%
+\CSLRightInline{Hughes-Cromwick, E. and Coronado, J. (2019) The value of
+{US} government data to {US} business decisions, \emph{J. Econ.
+Perspect.} 33, 131--146.
+https://doi.org/\href{https://doi.org/10.1257/jep.33.1.131}{10.1257/jep.33.1.131}}
+
+\bibitem[\citeproctext]{ref-dallasfed_nominal}
+\CSLLeftMargin{\textbf{15}. }%
+\CSLRightInline{Federal Reserve Bank of Dallas (n.d.)
+\href{https://www.dallasfed.org/research/basics/nominal}{Deflating
+nominal values to real values}, }
+
+\bibitem[\citeproctext]{ref-hamilton2014logarithms}
+\CSLLeftMargin{\textbf{16}. }%
+\CSLRightInline{Hamilton, J. D. and Chinn, M. (2014)
+\href{https://econbrowser.com/archives/2014/02/use-of-logarithms-in-economics}{Use
+of logarithms in economics}, }
+
+\bibitem[\citeproctext]{ref-census_soc_methodology}
+\CSLLeftMargin{\textbf{17}. }%
+\CSLRightInline{U.S. Census Bureau (n.d.)
+\href{https://www.census.gov/construction/soc/methodology.html}{Survey
+of construction (SOC): methodology}, }
+
+\bibitem[\citeproctext]{ref-bls_ppi_handbook}
+\CSLLeftMargin{\textbf{18}. }%
+\CSLRightInline{Bureau of Labor Statistics (n.d.)
+\href{https://www.bls.gov/opub/hom/ppi/home.htm}{Producer price indexes:
+Handbook of methods}, }
+
+\bibitem[\citeproctext]{ref-bls_cpi_concepts}
+\CSLLeftMargin{\textbf{19}. }%
+\CSLRightInline{Bureau of Labor Statistics (2025)
+\href{https://www.bls.gov/opub/hom/cpi/concepts.htm}{Consumer price
+index: concepts}, }
+
+\bibitem[\citeproctext]{ref-rudkin2025ballmapper}
+\CSLLeftMargin{\textbf{20}. }%
+\CSLRightInline{Rudkin, S. (2025) An introduction to topological data
+analysis ball mapper in r, \emph{arXiv preprint arXiv:2504.14081}
+\emph{\url{https://arxiv.org/abs/2504.14081}}}
+
+\bibitem[\citeproctext]{ref-qiu2020refining}
+\CSLLeftMargin{\textbf{21}. }%
+\CSLRightInline{Qiu, W., Rudkin, S. and Dłotko, P. (2020) Refining
+understanding of corporate failure through a topological data analysis
+mapping of {A}ltman's {Z}-score model, \emph{Expert Syst. Appl.} 156,
+113475.
+https://doi.org/\href{https://doi.org/10.1016/j.eswa.2020.113475}{10.1016/j.eswa.2020.113475}}
+
+\bibitem[\citeproctext]{ref-ballmapper_package}
+\CSLLeftMargin{\textbf{22}. }%
+\CSLRightInline{Dłotko, P. (2019)
+\emph{\href{https://CRAN.R-project.org/package=BallMapper}{BallMapper:
+The ball mapper algorithm}}, }
+
+\bibitem[\citeproctext]{ref-bls_cps_concepts}
+\CSLLeftMargin{\textbf{23}. }%
+\CSLRightInline{Bureau of Labor Statistics (2018)
+\href{https://www.bls.gov/opub/hom/cps/concepts.htm}{Current population
+survey: concepts}, }
+
+\bibitem[\citeproctext]{ref-fed_monetary_goals}
+\CSLLeftMargin{\textbf{24}. }%
+\CSLRightInline{Board of Governors of the Federal Reserve System (2021)
+\href{https://www.federalreserve.gov/monetarypolicy/monetary-policy-what-are-its-goals-how-does-it-work.htm}{Monetary
+policy: What are its goals? How does it work?}, }
+
+\bibitem[\citeproctext]{ref-csardi2006igraph}
+\CSLLeftMargin{\textbf{25}. }%
+\CSLRightInline{Csardi, G. and Nepusz, T. (2006) The igraph software
+package for complex network research, \emph{InterJournal, Complex
+Systems} 1695, 1--9. \emph{\url{https://igraph.org}}}
+
+\bibitem[\citeproctext]{ref-pedersen2024ggraph}
+\CSLLeftMargin{\textbf{26}. }%
+\CSLRightInline{Pedersen, T. L. (2024)
+\emph{\href{https://CRAN.R-project.org/package=ggraph}{Ggraph: An
+implementation of grammar of graphics for graphs and networks}}, }
+
+\bibitem[\citeproctext]{ref-jacoby2022behind}
+\CSLLeftMargin{\textbf{27}. }%
+\CSLRightInline{Jacoby, T. (2022)
+\href{https://www.nasdaq.com/articles/what-does-it-mean-when-the-fed-is-behind-the-curve}{What
+does it mean when the fed is 'behind the curve?'}, }
+
+\bibitem[\citeproctext]{ref-investopedia_demandpull}
+\CSLLeftMargin{\textbf{28}. }%
+\CSLRightInline{Investopedia (n.d.)
+\href{https://www.investopedia.com/terms/d/demandpullinflation.asp}{Demand-pull
+inflation: Definition, how it works, causes, vs. Cost-push inflation}, }
+
+\bibitem[\citeproctext]{ref-marsh2021inflation}
+\CSLLeftMargin{\textbf{29}. }%
+\CSLRightInline{Marsh, D. (2021) Look at 1960s, not 1970s, to learn how
+{US} inflation took hold, \emph{OMFIF}
+\emph{\url{https://www.omfif.org/2021/11/look-at-1960s-not-1970s-to-learn-how-us-inflation-took-hold/}}}
+
+\bibitem[\citeproctext]{ref-evercore2024booms}
+\CSLLeftMargin{\textbf{30}. }%
+\CSLRightInline{Evercore Wealth and Trust (2024)
+\href{https://evercorewealthandtrust.com/booms-and-busts-a-brief-history-of-capital-spending-cycles/}{Booms
+and busts: A brief history of capital spending cycles}, }
+
+\bibitem[\citeproctext]{ref-sussman2019wealth}
+\CSLLeftMargin{\textbf{31}. }%
+\CSLRightInline{Sussman, A. L. (2019) New estimates of the stock market
+wealth effect, \emph{NBER Digest}
+\emph{\url{https://www.nber.org/digest/aug19/new-estimates-stock-market-wealth-effect}}}
+
+\bibitem[\citeproctext]{ref-corbett2013oilshock}
+\CSLLeftMargin{\textbf{32}. }%
+\CSLRightInline{Corbett, M. (2013)
+\href{https://www.federalreservehistory.org/essays/oil-shock-of-1973-74}{Oil
+shock of 1973--74}, }
+
+\bibitem[\citeproctext]{ref-bryan2013greatinflation}
+\CSLLeftMargin{\textbf{33}. }%
+\CSLRightInline{Bryan, M. (2013)
+\href{https://www.federalreservehistory.org/essays/great-inflation}{The
+great inflation}, }
+
+\bibitem[\citeproctext]{ref-rudkin2024brexit}
+\CSLLeftMargin{\textbf{34}. }%
+\CSLRightInline{Rudkin, S., Barros, L., Dłotko, P. and Qiu, W. (2024) An
+economic topology of the {B}rexit vote, \emph{Reg. Stud.} 58, 601--618.
+https://doi.org/\href{https://doi.org/10.1080/00343404.2023.2204123}{10.1080/00343404.2023.2204123}}
+
+\end{CSLReferences}
+
+\section{ABOUT THE STUDENT AUTHOR}\label{about-the-student-author}
+
+Ryan Z. Johnson is an alumnus of the University of Alaska - Anchorage.
+They graduated spring of 2018 with a Bachelor's of Science in
+Mathematics. During their senior year, Ryan was urged by their advisor
+Dr.~Mark Fitch to pursue TDA after doing presentation for a course and
+connected with Dr.~Samuel Cook. Since then, they have continually worked
+with Dr.~Cook outside their profession in social services. They will be
+continuing their education at the University at Albany as a graduate
+student in the Master's in Data Science program. This paper provided
+valuable preparation and experience for the upcoming program's
+concentration areas: TDA, machine learning, and statistics.
+
+
+
+
+\end{document}

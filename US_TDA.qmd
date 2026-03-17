@@ -3,6 +3,7 @@ format:
   pdf:
     pdf-engine: xelatex
     mainfont: "EB Garamond"
+    keep-tex: true
     fontsize: 10pt
     geometry:
       - "top = 1in"
@@ -23,7 +24,7 @@ format:
       
 
 bibliography: references.bib
-csl: aip.csl
+csl: AJUR.csl
 
 editor: source
 ---
@@ -592,5 +593,6 @@ Ball Mapper has been applied to many fields ranging across the social sciences, 
 
 Ryan Z. Johnson is an alumnus of the University of Alaska - Anchorage. They graduated spring of 2018 with a Bachelor's of Science in Mathematics. During their senior year, Ryan was urged by their advisor Dr. Mark Fitch to pursue TDA after doing presentation for a course and connected with Dr. Samuel Cook. Since then, they have continually worked with Dr. Cook outside their profession in social services. They will be continuing their education at the University at Albany as a graduate student in the Master's in Data Science program. This paper provided valuable preparation and experience for the upcoming program's concentration areas: TDA, machine learning, and statistics.
 
+# PRESS SUMMARY
 
-
+Topological Data Analysis (TDA) is a data analysis method which is based in the idea that any given data set has an inherent shape or structure to it. Currently there is a large body of research that explores TDA's most popular algorithm called Mapper; this paper uses a Mapper-adjacent algorithm called Ball Mapper. The goals of this paper are to provide a clear guide on how to use Ball Mapper, and to add to the small body of literature on Ball Mapper's applications. We achieve these goals using data from the Bureau of Economic Analysis (BEA), the Federal Reserve Bank (FRB), and the Bureau of Labor Statistics (BLS). Our analysis found that Ball Mapper revealed distinct types of economic activity: economic expansion, structural economic peaks and troughs, and when the U.S. economy is in a contractionary state or growing in an unstable, non-organic way. Further, within our economic expansion finding, Ball Mapper showed that expansions consists of various phases, and that our results did no rely on economic time periods dependent which indicates that Ball Mapper graphs showed the underlying structure of our dataset.
