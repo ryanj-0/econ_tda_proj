@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0"
+  demote-non-dropping-particle="sort-only" default-locale="en-US">
+
+  <info>
+    <title>American Journal of Undergraduate Research (AJUR)</title>
+    <title-short>AJUR</title-short>
+    <id>http://ajuronline.org/ajur-style</id>
+    <link href="http://ajuronline.org" rel="self"/>
+    <category citation-format="numeric"/>
+    <category field="science"/>
+    <summary>
+      AJUR style: numeric superscript citations placed after punctuation;
+      bibliography entries hang-left with bold number + period, year in
+      parentheses after authors, abbreviated italic journal titles, en-dash
+      page ranges, DOI when available.
+    </summary>
+    <updated>2026-03-15T00:00:00+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">
+      Creative Commons Attribution-ShareAlike 3.0
+    </rights>
+  </info>
+
+  <!-- ============================================================
+       MACROS
+  ============================================================ -->
+
+  <!-- Authors: Last, F. M., Last, F. M., and Last, F. M. -->
+  <macro name="author">
+    <names variable="author">
+      <name name-as-sort-order="all"
+            sort-separator=", "
+            initialize-with=". "
+            delimiter=", "
+            delimiter-precedes-last="never"
+            and="text"/>
+      <!-- Fall back to editor if no author -->
+      <substitute>
+        <names variable="editor"/>
+        <text variable="title"/>
+      </substitute>
+    </names>
+  </macro>
+
+  <!-- Editor macro used inside book-chapter entries -->
+  <macro name="editor-parens">
+    <names variable="editor" prefix="(" suffix=")">
+      <name name-as-sort-order="all"
+            sort-separator=", "
+            initialize-with=". "
+            delimiter=", "
+            delimiter-precedes-last="never"
+            and="text"/>
+      <label form="short" prefix=", " strip-periods="false"/>
+    </names>
+  </macro>
+
+  <!-- Year in parentheses, e.g. (2011) -->
+  <macro name="year-parens">
+    <date variable="issued" prefix="(" suffix=")">
+      <date-part name="year"/>
+    </date>
+  </macro>
+
+  <!-- Access date: "accessed Mon YYYY" -->
+  <macro name="accessed">
+    <date variable="accessed" prefix="(accessed " suffix=")">
+      <date-part name="month" form="short" strip-periods="false" suffix=" "/>
+      <date-part name="year"/>
+    </date>
+  </macro>
+
+  <!-- ============================================================
+       IN-TEXT CITATION
+       Superscript bold numbers; placed after punctuation (no prefix
+       space); consecutive refs collapsed with en-dash, e.g. 1–3;
+       non-consecutive separated by comma+space, e.g. 1, 2
+  ============================================================ -->
+  <citation collapse="citation-number"
+            after-collapse-delimiter="&#x2013;">
+    <sort>
+      <key variable="citation-number"/>
+    </sort>
+    <layout vertical-align="sup"
+            delimiter=", ">
+      <text variable="citation-number" font-weight="bold"/>
+    </layout>
+  </citation>
+
+  <!-- ============================================================
+       BIBLIOGRAPHY
+       Hanging indent; bold number + period flush left; no space
+       between items.
+  ============================================================ -->
+  <bibliography hanging-indent="true"
+                second-field-align="flush"
+                entry-spacing="0">
+    <sort>
+      <key variable="citation-number"/>
+    </sort>
+    <layout>
+
+      <!-- Bold reference number with period, e.g. "1. " -->
+      <text variable="citation-number" font-weight="bold" suffix=". "/>
+
+      <choose>
+
+        <!-- ── JOURNAL ARTICLE ───────────────────────────────────
+             Last, F. M., and Last, F. M. (Year) Title, J Abbrev
+             Volume, FirstPage–LastPage. https://doi.org/xxx
+        -->
+        <if type="article-journal">
+          <group>
+            <text macro="author" suffix=" "/>
+            <text macro="year-parens" suffix=" "/>
+            <text variable="title" suffix=", "/>
+            <text variable="container-title" form="short"
+                  font-style="italic" suffix=" "/>
+            <text variable="volume" suffix=", "/>
+            <text variable="page" suffix="."/>
+          </group>
+          <choose>
+            <if variable="DOI">
+              <text variable="DOI" prefix=" https://doi.org/"/>
+            </if>
+            <else-if variable="URL">
+              <text variable="URL" font-style="italic" prefix=" "/>
+            </else-if>
+          </choose>
+        </if>
+
+        <!-- ── BOOK CHAPTER ──────────────────────────────────────
+             Last, F. M., and Last, F. M. (Year) Chapter Title, in
+             Book Title (Editor, Ed.) Nth ed., FirstPage–LastPage,
+             Publisher, Place.
+        -->
+        <else-if type="chapter">
+          <group>
+            <text macro="author" suffix=" "/>
+            <text macro="year-parens" suffix=" "/>
+            <text variable="title" suffix=", "/>
+            <text value="in " font-style="italic"/>
+            <text variable="container-title" font-style="italic" suffix=" "/>
+            <text macro="editor-parens" suffix=" "/>
+            <text variable="edition" suffix=" ed., "/>
+            <text variable="page" suffix=", "/>
+            <text variable="publisher" suffix=", "/>
+            <text variable="publisher-place" suffix="."/>
+          </group>
+        </else-if>
+
+        <!-- ── BOOK ──────────────────────────────────────────────
+             Last, F. M. (Year) Book Title, Nth ed., Publisher, Place.
+        -->
+        <else-if type="book">
+          <group>
+            <text macro="author" suffix=" "/>
+            <text macro="year-parens" suffix=" "/>
+            <text variable="title" font-style="italic" suffix=", "/>
+            <text variable="edition" suffix=" ed., "/>
+            <text variable="publisher" suffix=", "/>
+            <text variable="publisher-place" suffix="."/>
+          </group>
+        </else-if>
+
+        <!-- ── WEBPAGE / WEB SOURCE ──────────────────────────────
+             Organization/Author. Title, URL (accessed Mon YYYY)
+             (No year-in-parens per AJUR example 3)
+        -->
+        <else-if type="webpage post post-weblog">
+          <group>
+            <text macro="author" suffix=" "/>
+            <text variable="title" suffix=", "/>
+            <text variable="URL" font-style="italic" suffix=" "/>
+            <text macro="accessed" suffix="."/>
+          </group>
+        </else-if>
+
+        <!-- ── CONFERENCE PAPER ──────────────────────────────────
+             Treated similarly to journal article; proceedings title
+             italicised.
+        -->
+        <else-if type="paper-conference">
+          <group>
+            <text macro="author" suffix=" "/>
+            <text macro="year-parens" suffix=" "/>
+            <text variable="title" suffix=", "/>
+            <text value="in " font-style="italic"/>
+            <text variable="container-title" font-style="italic" suffix=", "/>
+            <text variable="page" suffix=", "/>
+            <text variable="publisher" suffix=", "/>
+            <text variable="publisher-place" suffix="."/>
+          </group>
+        </else-if>
+
+        <!-- ── THESIS / DISSERTATION ─────────────────────────────-->
+        <else-if type="thesis">
+          <group>
+            <text macro="author" suffix=" "/>
+            <text macro="year-parens" suffix=" "/>
+            <text variable="title" font-style="italic" suffix=", "/>
+            <text variable="genre" suffix=", "/>
+            <text variable="publisher" suffix="."/>
+          </group>
+        </else-if>
+
+        <!-- ── FALLBACK ──────────────────────────────────────────-->
+        <else>
+          <group>
+            <text macro="author" suffix=" "/>
+            <text macro="year-parens" suffix=" "/>
+            <text variable="title" suffix=", "/>
+            <text variable="container-title" font-style="italic" suffix=" "/>
+            <text variable="volume" suffix=", "/>
+            <text variable="page" suffix="."/>
+          </group>
+        </else>
+
+      </choose>
+    </layout>
+  </bibliography>
+
+</style>
