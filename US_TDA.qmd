@@ -15,7 +15,7 @@ format:
     number-sections: false
     link-citations: true
     header-includes:
-      #- \pagenumbering{gobble}
+      - \pagenumbering{gobble}
       - \usepackage[table]{xcolor}
       - \usepackage{setspace}
       - \usepackage[draft]{hyperref}
@@ -141,7 +141,7 @@ Finally, after all the transformations are complete, we used a total of 16 varia
 
 ```{r}
 #| label: tbl-Analysis_Dimensions
-#| tbl-cap: "Variables inculde in Ball Mapper Point Cloud"
+#| tbl-cap: "Variables inculded in Ball Mapper Point Cloud"
 #| tbl-cap-location: bottom
 #| tbl-pos: "H"
 #| echo: false

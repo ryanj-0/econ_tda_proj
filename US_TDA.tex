@@ -151,6 +151,7 @@
 \usepackage{anyfontsize}
 \usepackage{multirow}
 \KOMAoption{captions}{tableheading}
+\pagenumbering{gobble}
 \usepackage[table]{xcolor}
 \usepackage{setspace}
 \usepackage[draft]{hyperref}
@@ -397,7 +398,7 @@ this analysis. We excluded Employment Cost Index (ECI) and Foreign
 Direct Investment (FDI) due to their limited availability of years. Of
 the remaining data series, New Privately-Owned Housing Units Started
 (Housing Starts) had the smallest range and so set our lower bound for
-the range years used (1960-2024). Our upper bound was the latest full
+the range years used (1960--2024). Our upper bound was the latest full
 calendar year that was available. We wanted to represent the economy
 from various vantage points, i.e., the broad economy, policy makers,
 consumers, business owners, etc. Table~\ref{tbl-Analysis_Data} shows the
@@ -536,8 +537,8 @@ Exports & Imports & Inflation & Unemployment \\
 
 }
 
-\caption{\label{tbl-Analysis_Dimensions}Variables inculde in Ball Mapper
-Point Cloud}
+\caption{\label{tbl-Analysis_Dimensions}Variables inculded in Ball
+Mapper Point Cloud}
 
 \end{table}%
 
@@ -1225,7 +1226,7 @@ are rising, the Federal Reserve continues to raise rates to an average
 market to decline and the economy to possibly enter a recession. We also
 see real wage growth plummeting from -0.16\% (node 24) to -2.23\% (node
 25). To illustrate this differential, suppose we were given \$1,000 at
-the end of the year and to either had to give some back (negative wage
+the end of the year and either had to give some back (negative wage
 growth), or we received extra (positive wage growth). In node 24 we get
 that \$1,000 and give back \$1.60, however in 25 we would have to give
 back \$22.30. So, node 25 shows a ``last resort'' node before turning
@@ -1402,8 +1403,8 @@ Rates.\textsuperscript{\citeproc{ref-bryan2013greatinflation}{\textbf{33}}}
 \emph{Final Notes and Future Research}
 
 As the last part of our discussion, there are two primary areas. The
-first half touches on the limitations we found both with Ball Mapper and
-the design of our analysis. The second examines some of the unanswered
+first touches on the limitations we found both with Ball Mapper and the
+design of our analysis. The second examines some of the unanswered
 questions that arose during the analysis which are possible avenues for
 future research.
 
@@ -1428,7 +1429,7 @@ Euclidean Distance between points is the only distance metric used.
 Currently, in Ball Mapper (R version) there is no way to easily change
 the distance metric. To do so one would need to copy the source code of
 the \emph{BallMapper} function and either: adapt the code to add an
-argument for a distance metric, or hard code it into a copy of the
+argument for a distance function, or hard code it into a copy of the
 original function. Additionally, the \emph{BallMapper} function in R
 uses a greedy, sequential algorithm to select ball centers. When a
 landmark is chosen, the Ball Mapper algorithm does so in a sequential
@@ -1445,20 +1446,21 @@ issues, one could randomize the dataset every time Ball Mapper is run,
 or make sure to seasonally adjust or normalize any data. Currently, some
 of these fixes have been implemented in the package \emph{pyBallMapper},
 written in Python. In this package they have added an order argument to
-allow randomization of rows. They also have included a distance metric
-argument so a user can choose what distance metric they would like to
-use. Finally, \emph{pyBallMapper} uses Python's NumPy package which
-utilizes vectorization, speeding up the sequential nature of the Ball
-Mapper algorithm.
+allow randomization of rows. They also have included a distance function
+argument so a user can choose what metric they would like to use. For
+instance, there are a variety of different metrics to choose from in the
+\emph{scikit-learn} package for Python. Finally, \emph{pyBallMapper}
+uses Python's NumPy package which utilizes vectorization, speeding up
+the sequential nature of the Ball Mapper algorithm.
 
-To start the second half, we noticed during the analysis there is not a
-clear way to know whether Ball Mapper is giving us a stable graph of our
-data. We discussed that if given the same data, in the same order, it
-indeed will give us the same graph. However, we did not find any
-literature answering this exact question. The closest paper we could
-find was one which studied the Brexit Vote using Ball Mapper. At the end
-of this paper they wrote about a robustness test they implemented by
-showing why the vote to leave the European Union
+Second, we noticed during the analysis there is not a clear way to know
+whether Ball Mapper is giving us a stable graph of our data. We
+discussed that if given the same data, in the same order, it indeed will
+give us the same graph. However, we did not find any literature
+answering this exact question. The closest paper we could find was one
+which studied the Brexit Vote using Ball Mapper. At the end of this
+paper they wrote about a robustness test they implemented by showing why
+the vote to leave the European Union
 passed.\textsuperscript{\citeproc{ref-rudkin2024brexit}{\textbf{34}}}
 What is unclear is how they ran a stated 10,000 repetitions. From what
 we know about the Ball Mapper algorithm, we could infer that they
@@ -1515,7 +1517,7 @@ Ball Mapper has been applied to many fields ranging across the social
 sciences, finance, and the life sciences. Ball Mapper, and TDA in
 general, may have an advantage in some of the social sciences because it
 can combine both qualitative and quantitative data in the same analysis.
-For instance, in our Brexit example from our \emph{Discussion}, the
+For instance, in the Brexit example from the \emph{Discussion}, the
 authors sought to understand qualitative and quantitative motivations
 behind the Brexit vote outcome. Some of the variables they used were
 Household composition (single, married, etc.), Car ownership (number of
@@ -1584,9 +1586,9 @@ Comparing the personal consumption {PPI} with the {CPI}}, }
 
 \bibitem[\citeproctext]{ref-sullivan1997trends}
 \CSLLeftMargin{\textbf{9}. }%
-\CSLRightInline{Sullivan, D. G. (1997) Trends in real wage growth,
-\emph{Chicago Fed Letter}
-\emph{\url{https://www.chicagofed.org/publications/chicago-fed-letter/1997/march-115}}}
+\CSLRightInline{Sullivan, D. G. (1997)
+\href{https://www.chicagofed.org/publications/chicago-fed-letter/1997/march-115}{Trends
+in real wage growth}, }
 
 \bibitem[\citeproctext]{ref-bea_data}
 \CSLLeftMargin{\textbf{10}. }%
@@ -1745,15 +1747,15 @@ https://doi.org/\href{https://doi.org/10.1080/00343404.2023.2204123}{10.1080/003
 \section{ABOUT THE STUDENT AUTHOR}\label{about-the-student-author}
 
 Ryan Z. Johnson is an alumnus of the University of Alaska - Anchorage.
-They graduated spring of 2018 with a Bachelor's of Science in
-Mathematics. During their senior year, Ryan was urged by their advisor
-Dr.~Mark Fitch to pursue TDA after doing presentation for a course and
-connected with Dr.~Samuel Cook. Since then, they have continually worked
-with Dr.~Cook outside their profession in social services. They will be
-continuing their education at the University at Albany as a graduate
-student in the Master's in Data Science program. This paper provided
-valuable preparation and experience for the upcoming program's
-concentration areas: TDA, machine learning, and statistics.
+They graduated spring of 2018 with a Bachelor of Science in Mathematics.
+During their senior year, Ryan was urged by their advisor Dr.~Mark Fitch
+to pursue TDA after doing a presentation for a course and connected with
+Dr.~Samuel Cook. Since then, they have continually worked with Dr.~Cook
+outside their profession in social services. They will be continuing
+their education at the University at Albany as a graduate student in the
+Master's in Data Science program. This paper provided valuable
+preparation and experience for the upcoming program's concentration
+areas: TDA, machine learning, and statistics.
 
 \section{PRESS SUMMARY}\label{press-summary}
 
